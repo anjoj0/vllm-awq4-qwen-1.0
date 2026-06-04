@@ -1,0 +1,64 @@
+{
+  "baseline_file": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+  "experiment_file": "test/results/decode_backend/20260601-152310_hip_decode_no_dual_storage.json",
+  "triton_startup": {
+    "model_memory_gib": 40.5,
+    "model_load_seconds": 93.939685,
+    "kv_available_gib": 20.61,
+    "kv_cache_tokens": 71552,
+    "max_concurrency": 2.68,
+    "engine_init_seconds": 64.09,
+    "registered_count": 0,
+    "failed_register_count": 0
+  },
+  "hip_startup": {
+    "patch16_last": "RocmMmqQ4LinearKernel registered at _POSSIBLE_KERNELS[ROCM][0]",
+    "model_memory_gib": 27.27,
+    "model_load_seconds": 8.551317,
+    "kv_available_gib": 33.84,
+    "kv_cache_tokens": 118144,
+    "max_concurrency": 4.4,
+    "engine_init_seconds": 64.81,
+    "registered_count": 2,
+    "failed_register_count": 0
+  },
+  "model_memory_delta_gib": -13.23,
+  "rows": [
+    {
+      "case": "short_decode_128",
+      "triton_wall_s": 8.614,
+      "hip_wall_s": 16.575,
+      "hip_wall_delta_pct": 92.4,
+      "triton_total_tps_e2e": 42.721,
+      "hip_total_tps_e2e": 22.022,
+      "hip_total_tps_delta_pct": -48.5,
+      "triton_output_tps_e2e": 9.171,
+      "hip_output_tps_e2e": 4.585,
+      "hip_output_tps_delta_pct": -50.0
+    },
+    {
+      "case": "mid_prefill_512_decode_64",
+      "triton_wall_s": 23.074,
+      "hip_wall_s": 29.207,
+      "hip_wall_delta_pct": 26.6,
+      "triton_total_tps_e2e": 97.815,
+      "hip_total_tps_e2e": 77.275,
+      "hip_total_tps_delta_pct": -21.0,
+      "triton_output_tps_e2e": 2.774,
+      "hip_output_tps_e2e": 2.191,
+      "hip_output_tps_delta_pct": -21.0
+    },
+    {
+      "case": "long_prefill_2k_decode_32",
+      "triton_wall_s": 78.405,
+      "hip_wall_s": 80.874,
+      "hip_wall_delta_pct": 3.1,
+      "triton_total_tps_e2e": 111.639,
+      "hip_total_tps_e2e": 108.23,
+      "hip_total_tps_delta_pct": -3.1,
+      "triton_output_tps_e2e": 0.408,
+      "hip_output_tps_e2e": 0.396,
+      "hip_output_tps_delta_pct": -2.9
+    }
+  ]
+}

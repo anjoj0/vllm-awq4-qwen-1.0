@@ -1,0 +1,4 @@
+gpu_memory_utilization,file,kv_available_gib,kv_cache_tokens,max_concurrency,engine_init_seconds,attention_block_size,acceptance_pct_last,paper8k_wall,paper8k_ttft,paper32k_wall,paper32k_ttft,paper32k_prefill_tps
+0.58,test/results/competition/20260603-163717_stageD_gpu058_n8_mbt8192_longscreen_stream.json,24.09,84032,3.13,66.23,832,18.6,18.792320620967075,12.91919060901273,67.91466529504396,55.97295417601708,119.84359408484104
+0.6,test/results/competition/20260603-115115_stageC_n8_mbt8192_longscreen_stream.json,26.41,91520,3.43,65.5,832,45.7,17.54814881400671,11.513002217980102,67.5200450939592,55.567204441991635,120.71868771089058
+0.62,test/results/competition/20260603-164520_stageD_gpu062_n8_mbt8192_longscreen_stream.json,28.73,99840,3.73,65.73,832,37.5,18.733178593975026,12.906663243949879,68.45051515399246,56.51345938403392,118.69738772167841

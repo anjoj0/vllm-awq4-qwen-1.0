@@ -1,0 +1,90 @@
+{
+  "label": "hip_decode_v0_scalar_no_dual_storage",
+  "host": "http://127.0.0.1:8001",
+  "model": "Qwen3.6-27B-AWQ4",
+  "timestamp": "20260601-161013",
+  "env": {
+    "AWQ_MMQ_DECODE_BACKEND": "hip",
+    "AWQ_MMQ_SMALL_M_THRESHOLD": "32"
+  },
+  "startup": {
+    "patch16_last": "RocmMmqQ4LinearKernel registered at _POSSIBLE_KERNELS[ROCM][0]",
+    "model_memory_gib": 27.27,
+    "model_load_seconds": 5.529148,
+    "kv_available_gib": 33.84,
+    "kv_cache_tokens": 118144,
+    "max_concurrency": 4.4,
+    "engine_init_seconds": 65.15,
+    "registered_count": 2,
+    "failed_register_count": 0
+  },
+  "memory_before": {},
+  "cases": [
+    {
+      "case": "short_decode_128",
+      "run": 1,
+      "ok": true,
+      "wall_seconds": 110.563,
+      "prompt_tokens": 289,
+      "completion_tokens": 128,
+      "total_tokens": 417,
+      "output_tokens_per_second_e2e": 1.158,
+      "total_tokens_per_second_e2e": 3.772,
+      "finish_reason": "length",
+      "text_preview": "请用然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是"
+    },
+    {
+      "case": "mid_prefill_512_decode_64",
+      "run": 1,
+      "ok": true,
+      "wall_seconds": 71.352,
+      "prompt_tokens": 2193,
+      "completion_tokens": 64,
+      "total_tokens": 2257,
+      "output_tokens_per_second_e2e": 0.897,
+      "total_tokens_per_second_e2e": 31.632,
+      "finish_reason": "length",
+      "text_preview": "<think>然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是"
+    },
+    {
+      "case": "long_prefill_2k_decode_32",
+      "run": 1,
+      "ok": true,
+      "wall_seconds": 101.026,
+      "prompt_tokens": 8721,
+      "completion_tokens": 32,
+      "total_tokens": 8753,
+      "output_tokens_per_second_e2e": 0.317,
+      "total_tokens_per_second_e2e": 86.641,
+      "finish_reason": "length",
+      "text_preview": "<think>然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是然是"
+    }
+  ],
+  "memory_after": {},
+  "summary": {
+    "short_decode_128": {
+      "ok_runs": 1,
+      "avg_wall_seconds": 110.563,
+      "avg_prompt_tokens": 289.0,
+      "avg_completion_tokens": 128.0,
+      "avg_output_tps_e2e": 1.158,
+      "avg_total_tps_e2e": 3.772
+    },
+    "mid_prefill_512_decode_64": {
+      "ok_runs": 1,
+      "avg_wall_seconds": 71.352,
+      "avg_prompt_tokens": 2193.0,
+      "avg_completion_tokens": 64.0,
+      "avg_output_tps_e2e": 0.897,
+      "avg_total_tps_e2e": 31.632
+    },
+    "long_prefill_2k_decode_32": {
+      "ok_runs": 1,
+      "avg_wall_seconds": 101.026,
+      "avg_prompt_tokens": 8721.0,
+      "avg_completion_tokens": 32.0,
+      "avg_output_tps_e2e": 0.317,
+      "avg_total_tps_e2e": 86.641
+    }
+  }
+}

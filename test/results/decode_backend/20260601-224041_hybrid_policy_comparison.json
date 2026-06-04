@@ -1,0 +1,58 @@
+{
+  "metric": "avg_total_tps_e2e",
+  "candidate": "hybrid_triton_short_v7_long",
+  "source_files": {
+    "triton_old": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+    "triton_current": "test/results/decode_backend/20260601-225106_triton_fallback_current.json",
+    "v7_all_hip": "test/results/decode_backend/20260601-203311_hip_decode_v7_m16n64_meta_wmma.json",
+    "hybrid_stats": "test/results/decode_backend/20260601-222843_hybrid_triton_short_v7_long_shape_stats.json",
+    "hybrid": "test/results/decode_backend/20260601-224041_hybrid_triton_short_v7_long.json"
+  },
+  "shape_stats_file": "test/results/decode_backend/20260601-222843_shape_stats_hybrid.json",
+  "scenarios": {
+    "short_decode_128": {
+      "triton_old": 42.721,
+      "triton_current": 38.394,
+      "v7_all_hip": 30.494,
+      "hybrid_stats": 38.107,
+      "hybrid": 38.17,
+      "hybrid_vs_triton_current_pct": -0.5834244934104227,
+      "hybrid_vs_v7_all_hip_pct": 25.17216501606874
+    },
+    "mid_prefill_512_decode_64": {
+      "triton_old": 97.815,
+      "triton_current": 97.293,
+      "v7_all_hip": 89.52,
+      "hybrid_stats": 97.43,
+      "hybrid": 97.676,
+      "hybrid_vs_triton_current_pct": 0.39365627537437664,
+      "hybrid_vs_v7_all_hip_pct": 9.110813226094727
+    },
+    "long_prefill_2k_decode_32": {
+      "triton_old": 111.639,
+      "triton_current": 112.824,
+      "v7_all_hip": 112.615,
+      "hybrid_stats": 110.54,
+      "hybrid": 111.232,
+      "hybrid_vs_triton_current_pct": -1.4110472949017905,
+      "hybrid_vs_v7_all_hip_pct": -1.228077964747143
+    }
+  },
+  "route_summary": {
+    "by_route_backend_version": {
+      "('decode', 'triton', -1)": 14592,
+      "('decode', 'hip', 7)": 4096,
+      "('prefill', 'hip', 1)": 1280
+    },
+    "by_m": {
+      "('decode', 'triton', -1, 9)": 14336,
+      "('decode', 'hip', 7, 9)": 4096,
+      "('decode', 'triton', -1, 1)": 256,
+      "('prefill', 'hip', 1, 289)": 256,
+      "('prefill', 'hip', 1, 536)": 256,
+      "('prefill', 'hip', 1, 2193)": 256,
+      "('prefill', 'hip', 1, 8185)": 256,
+      "('prefill', 'hip', 1, 8192)": 256
+    }
+  }
+}

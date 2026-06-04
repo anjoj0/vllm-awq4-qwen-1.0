@@ -1,0 +1,39 @@
+{
+  "timestamp": "20260602-112155",
+  "baseline": {
+    "label": "default_0.55_full_triton",
+    "gpu_memory_utilization": 0.55,
+    "model_memory_gib": 40.5,
+    "kv_available_gib": 20.61,
+    "kv_cache_tokens": 71552,
+    "max_concurrency": 2.68
+  },
+  "probe": {
+    "label": "gpu_util_0.60_full_triton",
+    "gpu_memory_utilization": 0.6,
+    "model_memory_gib": 40.5,
+    "kv_available_gib": 26.41,
+    "kv_cache_tokens": 91520,
+    "max_concurrency": 3.43,
+    "first_request": {
+      "ok": true,
+      "wall_seconds": 3.446,
+      "prompt_tokens": 12,
+      "completion_tokens": 16,
+      "total_tokens": 28,
+      "finish_reason": "length",
+      "note": "urllib proxy disabled via ProxyHandler({}); earlier proxied attempt returned HTTP 502 without reaching vLLM logs."
+    },
+    "padding_warnings": [
+      "Add 2 padding layers, may waste at most 4.17% KV cache memory",
+      "Add 4 padding layers, may waste at most 25.00% KV cache memory"
+    ]
+  },
+  "delta": {
+    "kv_available_gib": 5.8,
+    "kv_cache_tokens": 19968,
+    "kv_cache_tokens_pct": 27.91,
+    "max_concurrency": 0.75,
+    "max_concurrency_pct": 27.99
+  }
+}

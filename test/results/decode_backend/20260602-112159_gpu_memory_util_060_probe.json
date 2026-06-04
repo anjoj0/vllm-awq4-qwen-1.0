@@ -1,0 +1,46 @@
+{
+  "timestamp": "20260602-112159",
+  "experiment": "kv_cache_gpu_memory_util_sweep_probe",
+  "baseline": {
+    "label": "gpu_memory_util_0.55_default",
+    "gpu_memory_utilization": 0.55,
+    "model_memory_gib": 40.5,
+    "kv_available_gib": 20.61,
+    "kv_cache_tokens": 71552,
+    "max_concurrency": 2.68,
+    "source": "20260601-225106_triton_fallback_current.json / restored default logs"
+  },
+  "candidate": {
+    "label": "gpu_memory_util_0.60_startup_probe",
+    "gpu_memory_utilization": 0.6,
+    "backend": "triton",
+    "decode_policy": "all",
+    "model_memory_gib": 40.5,
+    "model_load_seconds": 93.982007,
+    "kv_available_gib": 26.41,
+    "kv_cache_tokens": 91520,
+    "max_concurrency": 3.43,
+    "engine_init_seconds": 65.01,
+    "first_request": {
+      "ok": true,
+      "wall_seconds": 3.446,
+      "prompt_tokens": 12,
+      "completion_tokens": 16,
+      "total_tokens": 28,
+      "finish_reason": "length",
+      "note": "urllib proxy disabled via ProxyHandler({}); earlier proxied attempt returned HTTP 502 without reaching vLLM logs."
+    },
+    "padding_warnings": [
+      "Add 2 padding layers, may waste at most 4.17% KV cache memory",
+      "Add 4 padding layers, may waste at most 25.00% KV cache memory"
+    ]
+  },
+  "delta_vs_0.55": {
+    "kv_available_gib": 5.8,
+    "kv_cache_tokens": 19968,
+    "kv_cache_tokens_pct": 27.91,
+    "max_concurrency": 0.75,
+    "max_concurrency_pct": 27.99
+  },
+  "conclusion": "0.60 starts and survives a first short request, expanding KV capacity by 27.91% over 0.55. Keep as candidate, but do not make default until long benchmark and repeated first-request stability pass."
+}

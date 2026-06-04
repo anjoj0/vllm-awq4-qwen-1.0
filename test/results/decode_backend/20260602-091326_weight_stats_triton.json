@@ -1,0 +1,2614 @@
+{
+  "layers": 256,
+  "native_bytes": 14064025600,
+  "kmajor_bytes": 14064025600,
+  "by_shape": [
+    {
+      "K": 5120,
+      "N": 34816,
+      "layers": 64,
+      "native_bytes": 6595543040,
+      "kmajor_bytes": 6595543040,
+      "use_triton_decode_layers": 64,
+      "kmajor_layers": 64
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "layers": 64,
+      "native_bytes": 3297771520,
+      "kmajor_bytes": 3297771520,
+      "use_triton_decode_layers": 64,
+      "kmajor_layers": 64
+    },
+    {
+      "K": 5120,
+      "N": 16384,
+      "layers": 48,
+      "native_bytes": 2327838720,
+      "kmajor_bytes": 2327838720,
+      "use_triton_decode_layers": 48,
+      "kmajor_layers": 48
+    },
+    {
+      "K": 6144,
+      "N": 5120,
+      "layers": 64,
+      "native_bytes": 1163919360,
+      "kmajor_bytes": 1163919360,
+      "use_triton_decode_layers": 64,
+      "kmajor_layers": 64
+    },
+    {
+      "K": 5120,
+      "N": 14336,
+      "layers": 16,
+      "native_bytes": 678952960,
+      "kmajor_bytes": 678952960,
+      "use_triton_decode_layers": 16,
+      "kmajor_layers": 16
+    }
+  ],
+  "layers_detail": [
+    {
+      "idx": 0,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 1,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 2,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 3,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 4,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 5,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 6,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 7,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 8,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 9,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 10,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 11,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 12,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 13,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 14,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 15,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 16,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 17,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 18,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 19,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 20,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 21,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 22,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 23,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 24,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 25,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 26,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 27,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 28,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 29,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 30,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 31,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 32,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 33,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 34,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 35,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 36,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 37,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 38,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 39,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 40,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 41,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 42,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 43,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 44,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 45,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 46,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 47,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 48,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 49,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 50,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 51,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 52,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 53,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 54,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 55,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 56,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 57,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 58,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 59,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 60,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 61,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 62,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 63,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 64,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 65,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 66,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 67,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 68,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 69,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 70,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 71,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 72,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 73,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 74,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 75,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 76,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 77,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 78,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 79,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 80,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 81,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 82,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 83,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 84,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 85,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 86,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 87,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 88,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 89,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 90,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 91,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 92,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 93,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 94,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 95,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 96,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 97,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 98,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 99,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 100,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 101,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 102,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 103,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 104,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 105,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 106,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 107,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 108,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 109,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 110,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 111,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 112,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 113,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 114,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 115,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 116,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 117,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 118,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 119,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 120,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 121,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 122,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 123,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 124,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 125,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 126,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 127,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 128,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 129,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 130,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 131,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 132,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 133,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 134,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 135,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 136,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 137,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 138,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 139,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 140,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 141,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 142,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 143,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 144,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 145,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 146,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 147,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 148,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 149,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 150,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 151,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 152,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 153,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 154,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 155,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 156,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 157,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 158,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 159,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 160,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 161,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 162,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 163,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 164,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 165,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 166,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 167,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 168,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 169,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 170,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 171,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 172,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 173,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 174,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 175,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 176,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 177,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 178,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 179,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 180,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 181,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 182,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 183,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 184,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 185,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 186,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 187,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 188,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 189,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 190,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 191,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 192,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 193,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 194,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 195,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 196,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 197,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 198,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 199,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 200,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 201,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 202,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 203,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 204,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 205,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 206,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 207,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 208,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 209,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 210,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 211,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 212,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 213,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 214,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 215,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 216,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 217,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 218,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 219,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 220,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 221,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 222,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 223,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 224,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 225,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 226,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 227,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 228,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 229,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 230,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 231,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 232,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 233,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 234,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 235,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 236,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 237,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 238,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 239,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 240,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 241,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 242,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 243,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 244,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 245,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 246,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 247,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 248,
+      "K": 5120,
+      "N": 16384,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 48496640,
+      "kmajor_bytes": 48496640
+    },
+    {
+      "idx": 249,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 250,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 251,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    },
+    {
+      "idx": 252,
+      "K": 5120,
+      "N": 14336,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 42434560,
+      "kmajor_bytes": 42434560
+    },
+    {
+      "idx": 253,
+      "K": 6144,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 18186240,
+      "kmajor_bytes": 18186240
+    },
+    {
+      "idx": 254,
+      "K": 5120,
+      "N": 34816,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 103055360,
+      "kmajor_bytes": 103055360
+    },
+    {
+      "idx": 255,
+      "K": 17408,
+      "N": 5120,
+      "use_triton_decode": true,
+      "need_kmajor_decode": false,
+      "has_zeros": true,
+      "native_bytes": 51527680,
+      "kmajor_bytes": 51527680
+    }
+  ]
+}

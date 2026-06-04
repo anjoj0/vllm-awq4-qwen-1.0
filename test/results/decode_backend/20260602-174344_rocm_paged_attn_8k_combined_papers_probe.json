@@ -1,0 +1,20 @@
+{
+  "timestamp": "20260602-174344",
+  "model": "Qwen3.6-27B-AWQ4",
+  "source_file": "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt",
+  "prompt_path": "/tmp/combined_papers_8k_prompt.txt",
+  "target_prompt_tokens": 8192,
+  "constructed_prompt_token_count": 8192,
+  "max_tokens": 8,
+  "ok": true,
+  "http_status": 200,
+  "wall_seconds": 69.77955484390259,
+  "usage": {
+    "prompt_tokens": 8223,
+    "total_tokens": 8231,
+    "completion_tokens": 8,
+    "prompt_tokens_details": null
+  },
+  "finish_reason": "length",
+  "response_preview": ""
+}

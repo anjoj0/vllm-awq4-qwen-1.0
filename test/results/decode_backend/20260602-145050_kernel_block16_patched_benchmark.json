@@ -1,0 +1,16 @@
+{
+  "variant": "patched_dflash_draft_kernel_block16_manager_block832",
+  "timestamp": "2026-06-02 22:55:14",
+  "results": [
+    {
+      "name": "short_decode_96",
+      "error": "TypeError(\"'NoneType' object is not subscriptable\")",
+      "elapsed_s": 25.919472389970906
+    },
+    {
+      "name": "paper_prefix_32kchars_decode_96",
+      "error": "TypeError(\"'NoneType' object is not subscriptable\")",
+      "elapsed_s": 59.25198691897094
+    }
+  ]
+}

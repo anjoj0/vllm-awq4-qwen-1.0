@@ -1,0 +1,58 @@
+{
+  "files": {
+    "triton_fallback": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+    "hip_v2_smallm": "test/results/decode_backend/20260601-163238_hip_decode_v2_smallm_no_dual_storage.json",
+    "hip_v3_kmajor": "test/results/decode_backend/20260601-171900_hip_decode_v3_kmajor_no_dual_storage.json"
+  },
+  "cases": [
+    "short_decode_128",
+    "mid_prefill_512_decode_64",
+    "long_prefill_2k_decode_32"
+  ],
+  "rows": [
+    {
+      "label": "triton_fallback",
+      "file": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+      "short_decode_128_wall_s": 8.614,
+      "short_decode_128_total_tps": 42.721,
+      "short_decode_128_delta_pct_vs_triton": 0.0,
+      "mid_prefill_512_decode_64_wall_s": 23.074,
+      "mid_prefill_512_decode_64_total_tps": 97.815,
+      "mid_prefill_512_decode_64_delta_pct_vs_triton": 0.0,
+      "long_prefill_2k_decode_32_wall_s": 78.405,
+      "long_prefill_2k_decode_32_total_tps": 111.639,
+      "long_prefill_2k_decode_32_delta_pct_vs_triton": 0.0
+    },
+    {
+      "label": "hip_v2_smallm",
+      "file": "test/results/decode_backend/20260601-163238_hip_decode_v2_smallm_no_dual_storage.json",
+      "short_decode_128_wall_s": 64.845,
+      "short_decode_128_total_tps": 5.675,
+      "short_decode_128_delta_pct_vs_triton": -86.7,
+      "mid_prefill_512_decode_64_wall_s": 69.067,
+      "mid_prefill_512_decode_64_total_tps": 32.678,
+      "mid_prefill_512_decode_64_delta_pct_vs_triton": -66.6,
+      "long_prefill_2k_decode_32_wall_s": 107.786,
+      "long_prefill_2k_decode_32_total_tps": 81.208,
+      "long_prefill_2k_decode_32_delta_pct_vs_triton": -27.3
+    },
+    {
+      "label": "hip_v3_kmajor",
+      "file": "test/results/decode_backend/20260601-171900_hip_decode_v3_kmajor_no_dual_storage.json",
+      "short_decode_128_wall_s": 56.258,
+      "short_decode_128_total_tps": 6.541,
+      "short_decode_128_delta_pct_vs_triton": -84.7,
+      "mid_prefill_512_decode_64_wall_s": 62.382,
+      "mid_prefill_512_decode_64_total_tps": 36.18,
+      "mid_prefill_512_decode_64_delta_pct_vs_triton": -63.0,
+      "long_prefill_2k_decode_32_wall_s": 103.868,
+      "long_prefill_2k_decode_32_total_tps": 84.27,
+      "long_prefill_2k_decode_32_delta_pct_vs_triton": -24.5
+    }
+  ],
+  "conclusion": [
+    "v3 K-major decode is correct but much slower than Triton fallback and v2 end-to-end.",
+    "The bottleneck is not just native layout coalescing; the small-M HIP decode still lacks a tensor-core/WMMA-style structure comparable to TritonW4A16.",
+    "Do not ship v3 as the default. Keep Triton fallback for decode until a real fused/decode-specialized kernel is implemented."
+  ]
+}

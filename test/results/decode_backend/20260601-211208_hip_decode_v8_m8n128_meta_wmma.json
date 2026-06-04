@@ -1,0 +1,90 @@
+{
+  "label": "hip_decode_v8_m8n128_meta_wmma",
+  "host": "http://127.0.0.1:8001",
+  "model": "Qwen3.6-27B-AWQ4",
+  "timestamp": "20260601-211208",
+  "env": {
+    "AWQ_MMQ_DECODE_BACKEND": "hip",
+    "AWQ_MMQ_SMALL_M_THRESHOLD": "32"
+  },
+  "startup": {
+    "patch16_last": "RocmMmqQ4LinearKernel registered at _POSSIBLE_KERNELS[ROCM][0]",
+    "model_memory_gib": 40.5,
+    "model_load_seconds": 94.786386,
+    "kv_available_gib": 20.61,
+    "kv_cache_tokens": 71552,
+    "max_concurrency": 2.68,
+    "engine_init_seconds": 63.98,
+    "registered_count": 2,
+    "failed_register_count": 0
+  },
+  "memory_before": {},
+  "cases": [
+    {
+      "case": "short_decode_128",
+      "run": 1,
+      "ok": true,
+      "wall_seconds": 12.015,
+      "prompt_tokens": 289,
+      "completion_tokens": 79,
+      "total_tokens": 368,
+      "output_tokens_per_second_e2e": 6.575,
+      "total_tokens_per_second_e2e": 30.629,
+      "finish_reason": "stop",
+      "text_preview": "请用中文概括以下 ROCm 指令优化上下文，\n\n<think>\n\n</think>\n\n在 AMD Strix Halo (gfx1151) 显卡上，通过 ROCm 平台结合 vLLM 框架，利用 AWQ INT4 量化、自定义 HIP 内核及 DFlash 投机解码技术，优化本地推理的延迟、吞吐量及 KV 缓存内存效率"
+    },
+    {
+      "case": "mid_prefill_512_decode_64",
+      "run": 1,
+      "ok": true,
+      "wall_seconds": 25.259,
+      "prompt_tokens": 2193,
+      "completion_tokens": 64,
+      "total_tokens": 2257,
+      "output_tokens_per_second_e2e": 2.534,
+      "total_tokens_per_second_e2e": 89.356,
+      "finish_reason": "stop",
+      "text_preview": "<think>\n\n</think>\n\n在 AMD Strix Halo (gfx1151) 显卡上，通过 ROCm 平台结合 vLLM、AWQ INT4 量化、自定义 HIP 内核及 DFlash 投机解码技术，优化本地推理的延迟、吞吐量及 KV 缓存内存效率。"
+    },
+    {
+      "case": "long_prefill_2k_decode_32",
+      "run": 1,
+      "ok": true,
+      "wall_seconds": 78.22,
+      "prompt_tokens": 8721,
+      "completion_tokens": 32,
+      "total_tokens": 8753,
+      "output_tokens_per_second_e2e": 0.409,
+      "total_tokens_per_second_e2e": 111.902,
+      "finish_reason": "length",
+      "text_preview": "<think>\n\n</think>\n\n在 AMD Strix Halo (gfx1151) 显卡上，通过 ROCm 平台结合 vLLM、AWQ"
+    }
+  ],
+  "memory_after": {},
+  "summary": {
+    "short_decode_128": {
+      "ok_runs": 1,
+      "avg_wall_seconds": 12.015,
+      "avg_prompt_tokens": 289.0,
+      "avg_completion_tokens": 79.0,
+      "avg_output_tps_e2e": 6.575,
+      "avg_total_tps_e2e": 30.629
+    },
+    "mid_prefill_512_decode_64": {
+      "ok_runs": 1,
+      "avg_wall_seconds": 25.259,
+      "avg_prompt_tokens": 2193.0,
+      "avg_completion_tokens": 64.0,
+      "avg_output_tps_e2e": 2.534,
+      "avg_total_tps_e2e": 89.356
+    },
+    "long_prefill_2k_decode_32": {
+      "ok_runs": 1,
+      "avg_wall_seconds": 78.22,
+      "avg_prompt_tokens": 8721.0,
+      "avg_completion_tokens": 32.0,
+      "avg_output_tps_e2e": 0.409,
+      "avg_total_tps_e2e": 111.902
+    }
+  }
+}

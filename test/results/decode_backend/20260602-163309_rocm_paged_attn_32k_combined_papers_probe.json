@@ -1,0 +1,14 @@
+{
+  "timestamp": "20260602-163309",
+  "model": "Qwen3.6-27B-AWQ4",
+  "source_file": "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt",
+  "prompt_path": "/tmp/combined_papers_32k_prompt.txt",
+  "target_prompt_tokens": 32000,
+  "constructed_prompt_token_count": 32000,
+  "max_tokens": 16,
+  "ok": false,
+  "wall_seconds": 323.2914385795593,
+  "error_type": "TypeError",
+  "error": "'NoneType' object is not subscriptable",
+  "error_body": null
+}

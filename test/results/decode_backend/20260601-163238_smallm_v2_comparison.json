@@ -1,0 +1,75 @@
+{
+  "files": {
+    "triton_all": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+    "hip_v1_none": "test/results/decode_backend/20260601-152310_hip_decode_no_dual_storage.json",
+    "hip_v0_scalar_none": "test/results/decode_backend/20260601-161013_hip_decode_v0_scalar_no_dual_storage.json",
+    "hip_v2_smallm_none": "test/results/decode_backend/20260601-163238_hip_decode_v2_smallm_no_dual_storage.json"
+  },
+  "cases": [
+    "short_decode_128",
+    "mid_prefill_512_decode_64",
+    "long_prefill_2k_decode_32"
+  ],
+  "rows": [
+    {
+      "mode": "triton_all",
+      "file": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+      "model_memory_gib": 40.5,
+      "kv_cache_tokens": 71552,
+      "short_decode_128_wall_s": 8.614,
+      "short_decode_128_total_tps": 42.721,
+      "short_decode_128_delta_pct": 0.0,
+      "mid_prefill_512_decode_64_wall_s": 23.074,
+      "mid_prefill_512_decode_64_total_tps": 97.815,
+      "mid_prefill_512_decode_64_delta_pct": 0.0,
+      "long_prefill_2k_decode_32_wall_s": 78.405,
+      "long_prefill_2k_decode_32_total_tps": 111.639,
+      "long_prefill_2k_decode_32_delta_pct": 0.0
+    },
+    {
+      "mode": "hip_v1_none",
+      "file": "test/results/decode_backend/20260601-152310_hip_decode_no_dual_storage.json",
+      "model_memory_gib": 27.27,
+      "kv_cache_tokens": 118144,
+      "short_decode_128_wall_s": 16.575,
+      "short_decode_128_total_tps": 22.022,
+      "short_decode_128_delta_pct": -48.5,
+      "mid_prefill_512_decode_64_wall_s": 29.207,
+      "mid_prefill_512_decode_64_total_tps": 77.275,
+      "mid_prefill_512_decode_64_delta_pct": -21.0,
+      "long_prefill_2k_decode_32_wall_s": 80.874,
+      "long_prefill_2k_decode_32_total_tps": 108.23,
+      "long_prefill_2k_decode_32_delta_pct": -3.1
+    },
+    {
+      "mode": "hip_v0_scalar_none",
+      "file": "test/results/decode_backend/20260601-161013_hip_decode_v0_scalar_no_dual_storage.json",
+      "model_memory_gib": 27.27,
+      "kv_cache_tokens": 118144,
+      "short_decode_128_wall_s": 110.563,
+      "short_decode_128_total_tps": 3.772,
+      "short_decode_128_delta_pct": -91.2,
+      "mid_prefill_512_decode_64_wall_s": 71.352,
+      "mid_prefill_512_decode_64_total_tps": 31.632,
+      "mid_prefill_512_decode_64_delta_pct": -67.7,
+      "long_prefill_2k_decode_32_wall_s": 101.026,
+      "long_prefill_2k_decode_32_total_tps": 86.641,
+      "long_prefill_2k_decode_32_delta_pct": -22.4
+    },
+    {
+      "mode": "hip_v2_smallm_none",
+      "file": "test/results/decode_backend/20260601-163238_hip_decode_v2_smallm_no_dual_storage.json",
+      "model_memory_gib": 27.27,
+      "kv_cache_tokens": 118144,
+      "short_decode_128_wall_s": 64.845,
+      "short_decode_128_total_tps": 5.675,
+      "short_decode_128_delta_pct": -86.7,
+      "mid_prefill_512_decode_64_wall_s": 69.067,
+      "mid_prefill_512_decode_64_total_tps": 32.678,
+      "mid_prefill_512_decode_64_delta_pct": -66.6,
+      "long_prefill_2k_decode_32_wall_s": 107.786,
+      "long_prefill_2k_decode_32_total_tps": 81.208,
+      "long_prefill_2k_decode_32_delta_pct": -27.3
+    }
+  ]
+}

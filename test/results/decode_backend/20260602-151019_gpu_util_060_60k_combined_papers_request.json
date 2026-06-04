@@ -1,0 +1,23 @@
+{
+  "timestamp": "20260602-151019",
+  "label": "gpu_util_060_60k_combined_papers_request",
+  "prompt_path": "/tmp/combined_papers_60k_prompt.txt",
+  "prompt_chars": 263886,
+  "prompt_tokens_expected": 60000,
+  "max_tokens": 128,
+  "env": {
+    "VLLM_GPU_MEMORY_UTIL": "0.60",
+    "AWQ_MMQ_DECODE_BACKEND": "triton",
+    "AWQ_MMQ_DECODE_POLICY": "all"
+  },
+  "ok": true,
+  "wall_seconds": 762.486,
+  "usage": {
+    "prompt_tokens": 60000,
+    "total_tokens": 60128,
+    "completion_tokens": 128,
+    "prompt_tokens_details": null
+  },
+  "finish_reason": "length",
+  "text_preview": "\n\n<think>\n\n</think>\n\n基于对论文《Nowcast3D: Reliable precipitation nowcasting via gray-box learning》的深度阅读与分析，以下是针对短临降雨和扩散模型研究的总结与建议：\n\n### 1. 主要模型路线\n\nNowcast3D 采用了一种**“灰盒”（Gray-box）**架构，将**物理约束的确定性预测**与**数据驱动的随机生成**相结合，直接处理三维体雷达反射率数据。其核心路线分为两个紧密耦合的阶段：\n\n*   **阶段一：物理驱动的确定性预测模块 (Physics-driven Prediction Module)**\n    *   **物理分解：**"
+}

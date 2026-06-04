@@ -1,0 +1,96 @@
+{
+  "timestamp": "20260601-184457",
+  "baselines": {
+    "triton_fallback": "20260601-151801_triton_fallback.json",
+    "hip_v2_smallm": "20260601-163238_hip_decode_v2_smallm_no_dual_storage.json",
+    "hip_v3_kmajor": "20260601-171900_hip_decode_v3_kmajor_no_dual_storage.json",
+    "hip_v4_kmajor_wmma": "20260601-184457_hip_decode_v4_kmajor_wmma_no_dual_storage.json"
+  },
+  "metrics": {
+    "triton_fallback": {
+      "short_decode_128": {
+        "wall_seconds": 8.614,
+        "output_tps": 9.171,
+        "total_tps": 42.721,
+        "total_tps_delta_vs_triton_pct": 0.0
+      },
+      "mid_prefill_512_decode_64": {
+        "wall_seconds": 23.074,
+        "output_tps": 2.774,
+        "total_tps": 97.815,
+        "total_tps_delta_vs_triton_pct": 0.0
+      },
+      "long_prefill_2k_decode_32": {
+        "wall_seconds": 78.405,
+        "output_tps": 0.408,
+        "total_tps": 111.639,
+        "total_tps_delta_vs_triton_pct": 0.0
+      }
+    },
+    "hip_v2_smallm": {
+      "short_decode_128": {
+        "wall_seconds": 64.845,
+        "output_tps": 1.218,
+        "total_tps": 5.675,
+        "total_tps_delta_vs_triton_pct": -86.7
+      },
+      "mid_prefill_512_decode_64": {
+        "wall_seconds": 69.067,
+        "output_tps": 0.927,
+        "total_tps": 32.678,
+        "total_tps_delta_vs_triton_pct": -66.6
+      },
+      "long_prefill_2k_decode_32": {
+        "wall_seconds": 107.786,
+        "output_tps": 0.297,
+        "total_tps": 81.208,
+        "total_tps_delta_vs_triton_pct": -27.3
+      }
+    },
+    "hip_v3_kmajor": {
+      "short_decode_128": {
+        "wall_seconds": 56.258,
+        "output_tps": 1.404,
+        "total_tps": 6.541,
+        "total_tps_delta_vs_triton_pct": -84.7
+      },
+      "mid_prefill_512_decode_64": {
+        "wall_seconds": 62.382,
+        "output_tps": 1.026,
+        "total_tps": 36.18,
+        "total_tps_delta_vs_triton_pct": -63.0
+      },
+      "long_prefill_2k_decode_32": {
+        "wall_seconds": 103.868,
+        "output_tps": 0.308,
+        "total_tps": 84.27,
+        "total_tps_delta_vs_triton_pct": -24.5
+      }
+    },
+    "hip_v4_kmajor_wmma": {
+      "short_decode_128": {
+        "wall_seconds": 13.748,
+        "output_tps": 5.746,
+        "total_tps": 26.768,
+        "total_tps_delta_vs_triton_pct": -37.3
+      },
+      "mid_prefill_512_decode_64": {
+        "wall_seconds": 27.228,
+        "output_tps": 2.351,
+        "total_tps": 82.893,
+        "total_tps_delta_vs_triton_pct": -15.3
+      },
+      "long_prefill_2k_decode_32": {
+        "wall_seconds": 79.063,
+        "output_tps": 0.405,
+        "total_tps": 110.71,
+        "total_tps_delta_vs_triton_pct": -0.8
+      }
+    }
+  },
+  "conclusion": [
+    "v4 K-major WMMA decode is a large improvement over v2/v3 scalar/reduction HIP decode.",
+    "v4 still trails TritonW4A16 on short and mid decode, and roughly matches long total throughput where prefill dominates.",
+    "Do not make v4 the default yet; use it as the next optimization baseline for reducing LDS traffic and improving decode scheduling."
+  ]
+}

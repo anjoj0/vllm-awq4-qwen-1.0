@@ -1,0 +1,31 @@
+{
+  "timestamp": "20260602-144612",
+  "run": 1,
+  "profile": "full_triton_gpu_util_0.60",
+  "restart": {
+    "returncode": 0
+  },
+  "ready": {
+    "ok": true
+  },
+  "first_request": {
+    "ok": true,
+    "wall_seconds": 3.382,
+    "prompt_tokens": 12,
+    "completion_tokens": 16,
+    "total_tokens": 28,
+    "finish_reason": "length",
+    "text_preview": "\n\n<think>\n\n</think>\n\nKV Cache 通过缓存已处理 token 的键"
+  },
+  "startup": {
+    "gpu_memory_utilization": 0.6,
+    "model_memory_gib": 40.5,
+    "model_load_seconds": 93.754867,
+    "kv_available_gib": 26.41,
+    "kv_cache_tokens": 91520,
+    "max_concurrency": 3.43,
+    "engine_init_seconds": 65.41,
+    "oom_like_count": 0,
+    "server_started": true
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "metric": "avg_total_tps_e2e",
+  "candidate": "v8_m8n128_meta_wmma",
+  "source_files": {
+    "triton": "test/results/decode_backend/20260601-151801_triton_fallback.json",
+    "v6": "test/results/decode_backend/20260601-200248_hip_decode_v6_meta_wmma_no_dual_storage.json",
+    "v7": "test/results/decode_backend/20260601-203311_hip_decode_v7_m16n64_meta_wmma.json",
+    "v8": "test/results/decode_backend/20260601-211208_hip_decode_v8_m8n128_meta_wmma.json"
+  },
+  "scenarios": {
+    "short_decode_128": {
+      "triton": 42.721,
+      "v6": 28.69,
+      "v7": 30.494,
+      "v8": 30.629,
+      "v8_vs_triton_pct": -28.304580885278895,
+      "v8_vs_v6_pct": 6.758452422446837,
+      "v8_vs_v7_pct": 0.4427100413196161
+    },
+    "mid_prefill_512_decode_64": {
+      "triton": 97.815,
+      "v6": 87.179,
+      "v7": 89.52,
+      "v8": 89.356,
+      "v8_vs_triton_pct": -8.647957879670809,
+      "v8_vs_v6_pct": 2.4971610135468225,
+      "v8_vs_v7_pct": -0.1831992850759634
+    },
+    "long_prefill_2k_decode_32": {
+      "triton": 111.639,
+      "v6": 111.506,
+      "v7": 112.615,
+      "v8": 111.902,
+      "v8_vs_triton_pct": 0.2355807558290568,
+      "v8_vs_v6_pct": 0.3551378401162264,
+      "v8_vs_v7_pct": -0.6331305776317464
+    }
+  }
+}

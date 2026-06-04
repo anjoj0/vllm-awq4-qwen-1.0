@@ -1,0 +1,56 @@
+{
+  "variant": "default_kernel_block832_baseline_safe",
+  "timestamp": "2026-06-02 23:04:03",
+  "results": [
+    {
+      "name": "short_decode_96",
+      "status": 200,
+      "elapsed_s": 5.547089632018469,
+      "prompt_tokens": 31,
+      "completion_tokens": 96,
+      "total_tokens": 127,
+      "completion_tok_per_s": 17.30637259687971,
+      "finish_reason": "length",
+      "message_is_none": false,
+      "raw_keys": [
+        "id",
+        "object",
+        "created",
+        "model",
+        "choices",
+        "service_tier",
+        "system_fingerprint",
+        "usage",
+        "prompt_logprobs",
+        "prompt_token_ids",
+        "kv_transfer_params"
+      ],
+      "text_prefix": ""
+    },
+    {
+      "name": "paper_prefix_32kchars_decode_96",
+      "status": 200,
+      "elapsed_s": 60.65599711902905,
+      "prompt_tokens": 6711,
+      "completion_tokens": 96,
+      "total_tokens": 6807,
+      "completion_tok_per_s": 1.5826959337856272,
+      "finish_reason": "length",
+      "message_is_none": false,
+      "raw_keys": [
+        "id",
+        "object",
+        "created",
+        "model",
+        "choices",
+        "service_tier",
+        "system_fingerprint",
+        "usage",
+        "prompt_logprobs",
+        "prompt_token_ids",
+        "kv_transfer_params"
+      ],
+      "text_prefix": ""
+    }
+  ]
+}

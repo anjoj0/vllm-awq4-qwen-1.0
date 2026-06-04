@@ -1,0 +1,30 @@
+{
+  "total_calls": 126,
+  "last": {
+    "native_use_custom": false,
+    "is_pow2": false,
+    "block_size": 832,
+    "head_size": 128,
+    "gqa_ratio": 4,
+    "max_seq_len": 8254,
+    "sliding_window": "0",
+    "kv_cache_dtype": "auto",
+    "has_alibi": false,
+    "has_sinks": false,
+    "num_seqs": 1,
+    "num_query_heads": 32,
+    "num_kv_heads": 8,
+    "q_dtype": "torch.float16",
+    "is_block_table_ptr": false
+  },
+  "top": [
+    {
+      "key": "native_use_custom=False|is_pow2=False|block_size=832|head_size=256|gqa_ratio=6|sliding_window=0|kv_cache_dtype=auto|has_alibi=False|has_sinks=False",
+      "count": 96
+    },
+    {
+      "key": "native_use_custom=False|is_pow2=False|block_size=832|head_size=128|gqa_ratio=4|sliding_window=0|kv_cache_dtype=auto|has_alibi=False|has_sinks=False",
+      "count": 30
+    }
+  ]
+}

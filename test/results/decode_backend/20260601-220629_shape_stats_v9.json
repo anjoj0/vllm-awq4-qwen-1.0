@@ -1,0 +1,610 @@
+{
+  "total_calls": 19968,
+  "top": [
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 5120,
+      "K": 6144,
+      "count": 4608
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 5120,
+      "K": 17408,
+      "count": 4608
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 34816,
+      "K": 5120,
+      "count": 4608
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 16384,
+      "K": 5120,
+      "count": 3456
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 14336,
+      "K": 5120,
+      "count": 1152
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    }
+  ],
+  "all": [
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 5120,
+      "K": 6144,
+      "count": 4608
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 5120,
+      "K": 17408,
+      "count": 4608
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 34816,
+      "K": 5120,
+      "count": 4608
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 16384,
+      "K": 5120,
+      "count": 3456
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 9,
+      "N": 14336,
+      "K": 5120,
+      "count": 1152
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 5120,
+      "K": 6144,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 5120,
+      "K": 17408,
+      "count": 64
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 34816,
+      "K": 5120,
+      "count": 64
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 16384,
+      "K": 5120,
+      "count": 48
+    },
+    {
+      "route": "decode",
+      "backend": "hip",
+      "version": 9,
+      "M": 1,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 289,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 536,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 2193,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8185,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    },
+    {
+      "route": "prefill",
+      "backend": "hip",
+      "version": 1,
+      "M": 8192,
+      "N": 14336,
+      "K": 5120,
+      "count": 16
+    }
+  ]
+}

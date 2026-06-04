@@ -1,0 +1,56 @@
+{
+  "variant": "patched_dflash_draft_kernel_block16_manager_block832_safe",
+  "timestamp": "2026-06-02 22:57:26",
+  "results": [
+    {
+      "name": "short_decode_96",
+      "status": 200,
+      "elapsed_s": 20.800971615011804,
+      "prompt_tokens": 31,
+      "completion_tokens": 96,
+      "total_tokens": 127,
+      "completion_tok_per_s": 4.615169030408079,
+      "finish_reason": "length",
+      "message_is_none": false,
+      "raw_keys": [
+        "id",
+        "object",
+        "created",
+        "model",
+        "choices",
+        "service_tier",
+        "system_fingerprint",
+        "usage",
+        "prompt_logprobs",
+        "prompt_token_ids",
+        "kv_transfer_params"
+      ],
+      "text_prefix": ""
+    },
+    {
+      "name": "paper_prefix_32kchars_decode_96",
+      "status": 200,
+      "elapsed_s": 82.62289929197868,
+      "prompt_tokens": 6711,
+      "completion_tokens": 96,
+      "total_tokens": 6807,
+      "completion_tok_per_s": 1.161905486525574,
+      "finish_reason": "length",
+      "message_is_none": false,
+      "raw_keys": [
+        "id",
+        "object",
+        "created",
+        "model",
+        "choices",
+        "service_tier",
+        "system_fingerprint",
+        "usage",
+        "prompt_logprobs",
+        "prompt_token_ids",
+        "kv_transfer_params"
+      ],
+      "text_prefix": ""
+    }
+  ]
+}
