@@ -1,6 +1,6 @@
 services:
   vllm:
-    image: vllm-awq4-qwen:builder
+    image: vllm-awq4-qwen:patches-20-21
     build:
       context: .
       network: host
@@ -105,19 +105,18 @@ services:
       # back to the legacy ops.awq_gemm slow path.
       #
       # Attention backends (load-bearing on gfx1151):
-      #   LM:  ROCM_ATTN selected for DFlash speculative decoding. Our
-      #        Patch 13 cherry-picks vLLM PR #40176 which adds
-      #        supports_non_causal()=True + causal:bool field to this
-      #        backend (NOT in v0.20.0 tag, only on main as of 04-22).
-      #        Historical note: TRITON_ATTN beat ROCM_ATTN by 2x at long
-      #        context BEFORE PR #40176, but TRITON_ATTN doesn't expose
-      #        non-causal so it cannot host DFlash. Re-bench after
-      #        spec-decode is stable to validate the tradeoff.
+      #   LM:  TRITON_ATTN under DFlash. Patches 20+21 (this project) add
+      #        non-causal support to kernel_unified_attention and relax
+      #        the max_seqlen_q>1 gate so verify's N+1 query tokens can
+      #        enter the 3D Flash-Decoding split-K path. This recovers
+      #        the historical 2x long-context advantage of TRITON_ATTN
+      #        while keeping DFlash hosted. Patch 13 (PR #40176) still
+      #        keeps ROCM_ATTN non-causal-capable as a fallback.
       #   ViT: TRITON_ATTN required  -  auto-pick falls to TORCH_SDPA
       #        which silently produces NaN/Inf and collapses output to
       #        endless "!" stream on image input (kyuz0 PR #47).
       - --attention-backend
-      - ROCM_ATTN
+      - TRITON_ATTN
       - --mm-encoder-attn-backend
       - TRITON_ATTN
       # Qwen3.x emits <think>...</think> tokens in native thinking mode.
@@ -153,6 +152,18 @@ services:
       # KV pressure when batching many concurrent decodes.
       - --max-num-batched-tokens
       - "${VLLM_MAX_NUM_BATCHED_TOKENS:-8192}"
+      # KV cache dtype. "auto" resolves to model dtype (BF16/FP16) — historical
+      # default. "fp8" halves KV memory traffic, dequantized in the Triton
+      # unified kernel via per-tensor scale (default 1.0; Qwen3.6 KV magnitudes
+      # stay within e4m3's ±448 range without calibration). Options:
+      #   auto       — model dtype (BF16/FP16)
+      #   fp8        — alias for fp8_e4m3 on ROCm (gfx1151 fp8 is e4m3fnuz)
+      #   fp8_e4m3   — explicit e4m3, more precision less range
+      #   fp8_e5m2   — explicit e5m2, more range less precision (use if
+      #                outliers cause garbage output under e4m3)
+      # Set in .env via VLLM_KV_CACHE_DTYPE; see .research/fp8-kv-cache/FINDINGS.md.
+      - --kv-cache-dtype
+      - "${VLLM_KV_CACHE_DTYPE:-auto}"
       # Native max context for Qwen 3.6 27B is 262144 (256K). AWQ4
       # frees ~37 GiB of UMA vs BF16, full 256K is comfortable.
       - --max-model-len

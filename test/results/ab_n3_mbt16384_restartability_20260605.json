@@ -1,0 +1,62 @@
+{
+  "date": "2026-06-05",
+  "baseline_reference": {
+    "source": "test/results/bench_matrix_patch20_21_retest_20260605.json",
+    "config": "N=4, MBT=8192, KV=fp8, max_model_len=65536",
+    "note": "This was measured on the already-running container before force-recreate."
+  },
+  "attempts": [
+    {
+      "name": "N3_MBT8192_fp8",
+      "env": {
+        "VLLM_DFLASH_N": 3,
+        "VLLM_MAX_NUM_BATCHED_TOKENS": 8192,
+        "VLLM_KV_CACHE_DTYPE": "fp8",
+        "VLLM_MAX_MODEL_LEN": 65536
+      },
+      "result": "startup_failed",
+      "attention_block_size": 1600,
+      "available_kv_cache_memory_gib": 26.41,
+      "error": "AssertionError in vllm/v1/core/kv_cache_utils.py:1030 unify_kv_cache_spec_page_size: assert new_spec.page_size_bytes == max_page_size"
+    },
+    {
+      "name": "N4_MBT16384_fp8",
+      "env": {
+        "VLLM_DFLASH_N": 4,
+        "VLLM_MAX_NUM_BATCHED_TOKENS": 16384,
+        "VLLM_KV_CACHE_DTYPE": "fp8",
+        "VLLM_MAX_MODEL_LEN": 65536
+      },
+      "result": "startup_failed",
+      "attention_block_size": 1616,
+      "available_kv_cache_memory_gib": 24.07,
+      "error": "AssertionError in vllm/v1/core/kv_cache_utils.py:1030 unify_kv_cache_spec_page_size: assert new_spec.page_size_bytes == max_page_size"
+    },
+    {
+      "name": "N4_MBT8192_fp8_recreate",
+      "env": {
+        "VLLM_DFLASH_N": 4,
+        "VLLM_MAX_NUM_BATCHED_TOKENS": 8192,
+        "VLLM_KV_CACHE_DTYPE": "fp8",
+        "VLLM_MAX_MODEL_LEN": 65536
+      },
+      "result": "startup_failed_after_force_recreate",
+      "attention_block_size": 1616,
+      "available_kv_cache_memory_gib": 26.41,
+      "error": "Same AssertionError in unify_kv_cache_spec_page_size"
+    }
+  ],
+  "restored_service": {
+    "env": {
+      "VLLM_DFLASH_N": 4,
+      "VLLM_MAX_NUM_BATCHED_TOKENS": 8192,
+      "VLLM_KV_CACHE_DTYPE": "auto",
+      "VLLM_MAX_MODEL_LEN": 65536
+    },
+    "status": "ready",
+    "attention_block_size": 816,
+    "gpu_kv_cache_tokens": 92208,
+    "max_concurrency_65536": 3.73
+  },
+  "conclusion": "Under the current recreated container/code path, fp8 KV with these DFlash hybrid page geometries is not restartable. Do not select N=3 or MBT=16384 as best config. Current safe restartable config is N=4, MBT=8192, KV auto. The earlier fp8 32K speed result remains valid for that already-running container but needs a page-size fix before it can be considered deployable."
+}

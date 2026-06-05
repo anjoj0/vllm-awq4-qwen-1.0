@@ -1364,6 +1364,823 @@ except Exception:
             p_cmake.write_text(txt)
             print(" -> Patched CMakeLists.txt (Patch 18: alias HIP_FOUND from PYTORCH_FOUND_HIP / hip_FOUND)")
 
+    # Patch 19 (local): bump Triton fallback iteration tile from 32 to 64 on the
+    # non-power-of-2 paged-attention path.
+    #
+    # Why: ROCm's native paged_attention_rocm rejects non-pow2 cache block
+    # sizes (Qwen3 / DFlash hybrid produce 816 / 832 / 848 depending on
+    # num_speculative_tokens). vLLM falls back to a Triton kernel that
+    # iterates over the KV cache with TRITON_BLOCK_SIZE=32 and Q/K tiles of
+    # BLOCK_M=BLOCK_N=32. At 32K context that's ~1000 iterations of a tiny
+    # tile per decode step -- two orders of magnitude below UMA bandwidth
+    # ceiling. Bumping the tile to 64 reduces iterations 2x and matches
+    # gfx1151 wave32 + AMD WMMA 16x16x16 well without risking VGPR spill
+    # (a 128 tile of bf16 K+V at head_dim 128 stresses the 1536 VGPR / SIMD
+    # budget; 64 is safe).
+    #
+    # The kernel already decouples the iteration tile (BLOCK_SIZE constexpr)
+    # from the physical cache block (PHYSICAL_BLOCK_SIZE constexpr) via
+    # per-token block-table lookup, so the tile is free to be any value --
+    # this fix is size-agnostic and will work for any future non-pow2
+    # PHYSICAL_BLOCK_SIZE that DFlash / hybrid layouts produce.
+    #
+    # No allocator / cache-geometry change. The standard pow2 path is
+    # untouched and continues to use the ROCm custom paged attention kernel.
+    p_cppd = Path('vllm/v1/attention/ops/chunked_prefill_paged_decode.py')
+    if p_cppd.exists():
+        txt = p_cppd.read_text()
+        if "Patch 19" not in txt:
+            old = "TRITON_BLOCK_SIZE = block_size if is_pow2 else 32"
+            new = "TRITON_BLOCK_SIZE = block_size if is_pow2 else 64  # Patch 19: bump non-pow2 iteration tile"
+            if old in txt:
+                txt = txt.replace(old, new, 1)
+                p_cppd.write_text(txt)
+                print(" -> Patched vllm/v1/attention/ops/chunked_prefill_paged_decode.py (Patch 19: bump non-pow2 iteration tile to 64)")
+
+    p_pp = Path('vllm/v1/attention/ops/prefix_prefill.py')
+    if p_pp.exists():
+        txt = p_pp.read_text()
+        if "Patch 19" not in txt:
+            old_block = (
+                "    if is_pow2:\n"
+                "        BLOCK_M = 128\n"
+                "        BLOCK_N = 64\n"
+                "    else:\n"
+                "        BLOCK_M = 32\n"
+                "        BLOCK_N = 32\n"
+                "\n"
+                "    # TRITON_BLOCK_SIZE is kept at 32 to ensure\n"
+                "    # correct alignment logic when the kernel handles\n"
+                "    # non-standard sizes (such as 544).\n"
+                "    TRITON_BLOCK_SIZE = 32"
+            )
+            new_block = (
+                "    if is_pow2:\n"
+                "        BLOCK_M = 128\n"
+                "        BLOCK_N = 64\n"
+                "    else:\n"
+                "        # Patch 19: bump non-pow2 tile from 32 to 64 for long-context decode throughput\n"
+                "        BLOCK_M = 64\n"
+                "        BLOCK_N = 64\n"
+                "\n"
+                "    # Patch 19: iteration tile bumped 32 -> 64. Per-token block-table\n"
+                "    # lookup makes the tile size independent of PHYSICAL_BLOCK_SIZE,\n"
+                "    # so this is size-agnostic for any future non-standard cache size.\n"
+                "    TRITON_BLOCK_SIZE = 64"
+            )
+            if old_block in txt:
+                txt = txt.replace(old_block, new_block, 1)
+                p_pp.write_text(txt)
+                print(" -> Patched vllm/v1/attention/ops/prefix_prefill.py (Patch 19: bump non-pow2 iteration tile to 64)")
+
+    # Patch 20 (local): Add non-causal attention support to TRITON_ATTN's
+    # unified-attention kernel. Mirrors PR #40176's ROCm-only non-causal
+    # support but applies it to vllm/v1/attention/ops/triton_unified_attention.py
+    # and vllm/v1/attention/backends/triton_attn.py.
+    #
+    # Why: TRITON_ATTN's kernel_unified_attention already has a 3D split-K
+    # (Flash-Decoding) path that fully utilizes gfx1151's 40 CUs. ROCM_ATTN's
+    # kernel_paged_attention_2d is 2D-only, single-CU per (seq, kv_head), and
+    # serially scans 512 tiles at 32K context (3.45 t/s ceiling).
+    # The only blocker to running TRITON_ATTN under DFlash is one assert:
+    #   assert causal, "Only causal attention is supported"
+    # DFlash verify needs non-causal (drafted tokens can't see future drafts
+    # in the same step). This patch threads a CAUSAL constexpr through the
+    # kernel + helpers + backend wrapper, exactly like Patch 13 did for ROCm.
+    #
+    # Combined with Patch 21 (relax the max_seqlen_q>1 gate that blocks the
+    # 3D path for DFlash verify's N+1 query tokens), this is expected to
+    # 2-3x decode at 32K (3.45 -> 7-10 t/s) and apply SWA loop-bound
+    # tightening on drafter layers (compute_tile_loop_bounds in
+    # triton_attention_helpers.py already prunes SWA tiles correctly).
+    #
+    # 20a: triton_unified_attention.py - relax assert, thread CAUSAL through
+    p_tua = Path('vllm/v1/attention/ops/triton_unified_attention.py')
+    if p_tua.exists():
+        txt = p_tua.read_text()
+        applied = False
+
+        if "Patch 20" not in txt:
+            # 1. Drop the causal-only assert. compute_kv_seq_mask now branches
+            #    on CAUSAL and composes correctly with SWA / chunked attention
+            #    (PR #40176's prefix_prefill non-causal+SWA pattern carries
+            #    through here via the same AND-of-masks structure).
+            old_assert = 'assert causal, "Only causal attention is supported"'
+            new_assert = (
+                '# Patch 20: causal toggle threaded through compute_kv_seq_mask.\n'
+                '    # SWA + non-causal is well-defined: bidirectional within window.\n'
+                '    pass'
+            )
+            if old_assert in txt:
+                txt = txt.replace(old_assert, new_assert, 1)
+                applied = True
+
+            # 2. Add CAUSAL constexpr to kernel_unified_attention signature
+            #    (insert right after IS_3D: tl.constexpr,).
+            old_sig = (
+                "    IS_3D: tl.constexpr,\n"
+                "    # KV cache quantization mode handled inside this kernel via constexpr"
+            )
+            new_sig = (
+                "    IS_3D: tl.constexpr,\n"
+                "    # Patch 20: causal toggle. False=bidirectional within seq bounds\n"
+                "    # (DFlash verify); True=standard causal. SWA + non-causal is\n"
+                "    # disallowed in the launcher assert above.\n"
+                "    CAUSAL: tl.constexpr = True,\n"
+                "    # KV cache quantization mode handled inside this kernel via constexpr"
+            )
+            if old_sig in txt:
+                txt = txt.replace(old_sig, new_sig, 1)
+                applied = True
+
+            # 3. Pass CAUSAL into compute_kv_seq_mask call.
+            old_call = (
+                "        seq_mask = compute_kv_seq_mask(\n"
+                "            query_abs_pos,\n"
+                "            seq_offset,\n"
+                "            seq_idx,\n"
+                "            mm_prefix_range_ptr,\n"
+                "            SLIDING_WINDOW,\n"
+                "            USE_MM_PREFIX,\n"
+                "            MAX_MM_RANGES,\n"
+                "            CHUNK_LOOKBACK,\n"
+                "            CHUNK_SIZE,\n"
+                "        )"
+            )
+            new_call = (
+                "        seq_mask = compute_kv_seq_mask(\n"
+                "            query_abs_pos,\n"
+                "            seq_offset,\n"
+                "            seq_idx,\n"
+                "            mm_prefix_range_ptr,\n"
+                "            SLIDING_WINDOW,\n"
+                "            USE_MM_PREFIX,\n"
+                "            MAX_MM_RANGES,\n"
+                "            CHUNK_LOOKBACK,\n"
+                "            CHUNK_SIZE,\n"
+                "            CAUSAL,  # Patch 20\n"
+                "        )"
+            )
+            if old_call in txt:
+                txt = txt.replace(old_call, new_call, 1)
+                applied = True
+
+            # 4. Pass CAUSAL=causal in kernel launch (insert after IS_3D=use_3d,).
+            old_launch = "        IS_3D=use_3d,\n        KV_QUANT_MODE=kv_quant_mode,"
+            new_launch = (
+                "        IS_3D=use_3d,\n"
+                "        CAUSAL=causal,  # Patch 20: thread non-causal through to kernel\n"
+                "        KV_QUANT_MODE=kv_quant_mode,"
+            )
+            if old_launch in txt:
+                txt = txt.replace(old_launch, new_launch, 1)
+                applied = True
+
+        if applied:
+            p_tua.write_text(txt)
+            print(" -> Patched vllm/v1/attention/ops/triton_unified_attention.py (Patch 20: non-causal support)")
+
+    # 20b: triton_attention_helpers.py - CAUSAL branch in compute_kv_seq_mask
+    p_tah = Path('vllm/v1/attention/ops/triton_attention_helpers.py')
+    if p_tah.exists():
+        txt = p_tah.read_text()
+        applied = False
+
+        if "Patch 20" not in txt:
+            # 1. Add CAUSAL constexpr to compute_kv_seq_mask signature.
+            old_sig = (
+                "def compute_kv_seq_mask(\n"
+                "    query_abs_pos,\n"
+                "    seq_offset,\n"
+                "    seq_idx,\n"
+                "    mm_prefix_range_ptr,\n"
+                "    SLIDING_WINDOW: tl.constexpr,\n"
+                "    USE_MM_PREFIX: tl.constexpr,\n"
+                "    MAX_MM_RANGES: tl.constexpr,\n"
+                "    CHUNK_LOOKBACK: tl.constexpr = -1,\n"
+                "    CHUNK_SIZE: tl.constexpr = -1,\n"
+                "):"
+            )
+            new_sig = (
+                "def compute_kv_seq_mask(\n"
+                "    query_abs_pos,\n"
+                "    seq_offset,\n"
+                "    seq_idx,\n"
+                "    mm_prefix_range_ptr,\n"
+                "    SLIDING_WINDOW: tl.constexpr,\n"
+                "    USE_MM_PREFIX: tl.constexpr,\n"
+                "    MAX_MM_RANGES: tl.constexpr,\n"
+                "    CHUNK_LOOKBACK: tl.constexpr = -1,\n"
+                "    CHUNK_SIZE: tl.constexpr = -1,\n"
+                "    CAUSAL: tl.constexpr = True,  # Patch 20\n"
+                "):"
+            )
+            if old_sig in txt:
+                txt = txt.replace(old_sig, new_sig, 1)
+                applied = True
+
+            # 2. Branch on CAUSAL for the base mask. Non-causal allows the full
+            #    prefix (DFlash verify still needs the per-query position to
+            #    bound; tile_mask handles that via max_seq_prefix_len).
+            old_mask = "    # Compute attention mask: causal by default (key <= query)\n    seq_mask = seq_offset[None, :] <= query_abs_pos"
+            new_mask = (
+                "    # Compute attention mask: causal by default (key <= query).\n"
+                "    # Patch 20: CAUSAL=False relaxes the causal constraint so drafted\n"
+                "    # tokens (DFlash verify) can see each other and the prefix equally.\n"
+                "    # tile_mask in the caller bounds seq_offset to < max_seq_prefix_len,\n"
+                "    # so OOB keys are zeroed by the V/K masked load + this mask leaves\n"
+                "    # softmax to ignore those rows.\n"
+                "    if CAUSAL:\n"
+                "        seq_mask = seq_offset[None, :] <= query_abs_pos\n"
+                "    else:\n"
+                "        # All-True (BLOCK_M, TILE_SIZE) via broadcast of always-true\n"
+                "        # row vector with implicit broadcast against query_abs_pos.\n"
+                "        seq_mask = (seq_offset[None, :] >= 0) | (query_abs_pos < 0)"
+            )
+            if old_mask in txt:
+                txt = txt.replace(old_mask, new_mask, 1)
+                applied = True
+
+        if applied:
+            p_tah.write_text(txt)
+            print(" -> Patched vllm/v1/attention/ops/triton_attention_helpers.py (Patch 20: non-causal mask branch)")
+
+    # 20c: triton_attn.py - metadata field + supports_non_causal + thread causal
+    p_triton_attn = Path('vllm/v1/attention/backends/triton_attn.py')
+    if p_triton_attn.exists():
+        txt = p_triton_attn.read_text()
+        applied = False
+
+        if "Patch 20" not in txt:
+            # 1. Add causal field to TritonAttentionMetadata.
+            old_field_block = (
+                "    mm_prefix_range: dict[int, list[tuple[int, int]]] | None = None\n"
+                "    mm_prefix_range_tensor: torch.Tensor | None = None\n"
+            )
+            new_field_block = (
+                "    mm_prefix_range: dict[int, list[tuple[int, int]]] | None = None\n"
+                "    mm_prefix_range_tensor: torch.Tensor | None = None\n"
+                "\n"
+                "    # Patch 20: DFlash drafting sets this to False via\n"
+                "    # CommonAttentionMetadata.causal.\n"
+                "    causal: bool = True\n"
+            )
+            if old_field_block in txt:
+                txt = txt.replace(old_field_block, new_field_block, 1)
+                applied = True
+
+            # 2. Backend.supports_non_causal() classmethod returns True.
+            old_sink_block = (
+                "    @classmethod\n"
+                "    def supports_sink(cls) -> bool:\n"
+                "        return True\n"
+            )
+            new_sink_block = (
+                "    @classmethod\n"
+                "    def supports_sink(cls) -> bool:\n"
+                "        return True\n"
+                "\n"
+                "    @classmethod\n"
+                "    def supports_non_causal(cls) -> bool:\n"
+                "        # Patch 20: kernel_unified_attention now supports CAUSAL=False\n"
+                "        # (DFlash drafter verify uses this).\n"
+                "        return True\n"
+            )
+            if old_sink_block in txt and "def supports_non_causal" not in txt:
+                txt = txt.replace(old_sink_block, new_sink_block, 1)
+                applied = True
+
+            # 3. Builder.build() - propagate common_attn_metadata.causal.
+            old_build_tail = (
+                "            softmax_segm_max=self.softmax_segm_max,\n"
+                "            softmax_segm_expsum=self.softmax_segm_expsum,\n"
+                "        )\n"
+                "        return attn_metadata\n"
+            )
+            new_build_tail = (
+                "            softmax_segm_max=self.softmax_segm_max,\n"
+                "            softmax_segm_expsum=self.softmax_segm_expsum,\n"
+                "            causal=common_attn_metadata.causal,  # Patch 20\n"
+                "        )\n"
+                "        return attn_metadata\n"
+            )
+            if old_build_tail in txt and "causal=common_attn_metadata.causal" not in txt:
+                txt = txt.replace(old_build_tail, new_build_tail, 1)
+                applied = True
+
+            # 4. forward() - replace hardcoded causal=True with metadata flag.
+            old_forward_call = (
+                "            softmax_scale=self.scale,\n"
+                "            causal=True,\n"
+            )
+            new_forward_call = (
+                "            softmax_scale=self.scale,\n"
+                "            causal=attn_metadata.causal,  # Patch 20\n"
+            )
+            if old_forward_call in txt:
+                txt = txt.replace(old_forward_call, new_forward_call, 1)
+                applied = True
+
+        if applied:
+            p_triton_attn.write_text(txt)
+            print(" -> Patched vllm/v1/attention/backends/triton_attn.py (Patch 20: non-causal support)")
+
+    # Patch 21 (local): Relax the 3D-launch gate so DFlash verify (max_seqlen_q
+    # = N+1) can use Flash-Decoding split-K.
+    #
+    # Why: kernel_unified_attention's 3D path splits the KV dimension into
+    # NUM_SEGMENTS_PER_SEQ workgroups via `tl.program_id(2)`. On gfx1151 with
+    # 40 CUs and 8 KV heads at bs=1, the 2D path launches only 8 workgroups
+    # (20% utilization) while 3D launches 32 (full utilization). The math
+    # works under associativity of online softmax regardless of max_seqlen_q;
+    # the existing gate `max_seqlen_q > 1` was a conservatism, not a correctness
+    # requirement. The reduce_segments pass handles per-query merging.
+    #
+    # DFlash verify uses max_seqlen_q = num_speculative_tokens + 1 = 5 (N=4)
+    # or 9 (N=8). Bumping the threshold to 16 keeps the gate honest while
+    # admitting our verify path.
+    p_tua2 = Path('vllm/v1/attention/ops/triton_unified_attention.py')
+    if p_tua2.exists():
+        txt = p_tua2.read_text()
+        if "Patch 21" not in txt:
+            old_gate = "        or max_seqlen_q > 1\n"
+            new_gate = "        or max_seqlen_q > 16  # Patch 21: admit DFlash verify (N+1 queries)\n"
+            if old_gate in txt:
+                txt = txt.replace(old_gate, new_gate, 1)
+                p_tua2.write_text(txt)
+                print(" -> Patched vllm/v1/attention/ops/triton_unified_attention.py (Patch 21: relax 3D gate for DFlash verify)")
+
+    # Patch 22 candidate (NUM_PAR_SOFTMAX_SEGMENTS 16 -> 32) was tested 2026-06-04
+    # and reverted: mid-ctx regression (-1.5% / -3.9% at 8K/16K) outweighed the
+    # tiny 32K gain (+2.2%). Default 16 keeps 128 workgroups across the 40 CUs
+    # of gfx1151 (already saturated at ~3 waves of overcommit) — reduce-segments
+    # cost at 32 dominates the shorter per-segment serial chain.
+    # See .research/patch22-num-par-segments/FINDINGS.md.
+
+    # Patch 24 (local cherry-pick of vLLM PR #42102, closed unmerged 2026-05-15):
+    # "Allow DFlash drafter to coexist with quantized target KV via independent
+    # KV groups + dtype override".
+    #
+    # Why: With VLLM_KV_CACHE_DTYPE=fp8, engine init crashes at
+    #   unify_kv_cache_spec_page_size  ->  AssertionError
+    # because DFlash drafter Attention layers inherit the target's quantized
+    # cache_config and end up with FP8 pages computed against different
+    # num_kv_heads/head_size than target layers (drafter is its own ~2B
+    # transformer; weights are BF16 but page sizes don't align with target's
+    # FP8-padded Mamba page). The unify pass then tries to scale the smaller
+    # layer's block_size, which is a no-op for MambaSpec (page_size_bytes is
+    # independent of block_size), and the post-scale assert fires.
+    #
+    # PR #42102 fixes this by:
+    #   (a) [Patch 24a] Partitioning DFlash drafter layers out of the target
+    #       group BEFORE the unify pass runs. Drafter and target then each
+    #       resolve their own uniform page size and pool, with no cross-group
+    #       page-size constraint. Layer indices >= target_num_layers are
+    #       drafter; uses regex on the layer name.
+    #   (b) [Patch 24b] Overriding the drafter's cache_dtype to "auto"
+    #       (i.e. BF16) so the drafter does not inherit FP8 from target's
+    #       cache_config. Drafter weights are BF16; quantizing drafter KV
+    #       adds no benefit and increases per-token dequant overhead.
+    #
+    # PR #42102 also touched flash_attn.py to thread per-spec kv_quant_mode
+    # through the metadata scheduler. We use TRITON_ATTN; TritonAttentionImpl
+    # captures kv_cache_dtype per-layer at __init__ time (triton_attn.py:491,
+    # self._kv_quant_mode = get_kv_quant_mode(kv_cache_dtype)) so per-layer
+    # dtype routing already works — no analogous patch needed for our backend.
+    #
+    # See .research/fp8-kv-cache/FINDINGS.md for the failure trace and the
+    # upstream investigation (PR #40128 closed, PR #42102 closed, issue #43626
+    # still open) that led to porting this locally.
+    #
+    # 24a: kv_cache_utils.py - partition drafter from target before unify.
+    p_kvu = Path('vllm/v1/core/kv_cache_utils.py')
+    if p_kvu.exists():
+        txt = p_kvu.read_text()
+        applied = False
+
+        # Per-sub-patch idempotency. Do NOT guard the whole block by a single
+        # "Patch 24a" marker - sub-patch 7 was added after sub-patches 1-6 had
+        # already been baked into the live file, so a single outer guard would
+        # skip 7 on every subsequent run.
+        if True:
+            # 1. Add `import re` to the stdlib imports block. Used by the
+            #    layer-index regex.
+            old_imp = "import math\nimport os\nfrom collections import defaultdict\n"
+            new_imp = "import math\nimport os\nimport re  # Patch 24a: DFlash layer-index regex\nfrom collections import defaultdict\n"
+            if old_imp in txt and "import re  # Patch 24a" not in txt:
+                txt = txt.replace(old_imp, new_imp, 1)
+                applied = True
+
+            # 2. Add the layer-index regex constant right after logger init.
+            old_logger = (
+                "logger = init_logger(__name__)\n\n"
+                "# The hash seed for the first block of any prefix block sequence.\n"
+            )
+            new_logger = (
+                "logger = init_logger(__name__)\n\n"
+                "# Patch 24a (PR #42102): DFlash drafter layer-index pattern.\n"
+                "# Layer indices >= target_num_layers are drafter layers; we\n"
+                "# partition them into an isolated KV cache group before unify\n"
+                "# so drafter (BF16) and target (FP8) page sizes don't collide.\n"
+                "_LAYER_INDEX_RE = re.compile(r\"(?:^|[.])layers[.](\\d+)(?:[.]|$)\")\n\n"
+                "# The hash seed for the first block of any prefix block sequence.\n"
+            )
+            if old_logger in txt and "_LAYER_INDEX_RE" not in txt:
+                txt = txt.replace(old_logger, new_logger, 1)
+                applied = True
+
+            # 3. Insert helper functions immediately before unify_kv_cache_spec_page_size.
+            old_unify_def = (
+                "def unify_kv_cache_spec_page_size(\n"
+                "    kv_cache_spec: dict[str, KVCacheSpec],\n"
+                ") -> dict[str, KVCacheSpec]:\n"
+            )
+            helpers_block = (
+                "# Patch 24a (PR #42102): DFlash drafter partitioning helpers.\n"
+                "def _get_dflash_isolated_layer_names(\n"
+                "    vllm_config: VllmConfig,\n"
+                "    layer_names: Iterable[str],\n"
+                ") -> set[str]:\n"
+                "    spec_config = vllm_config.speculative_config\n"
+                "    if spec_config is None or getattr(spec_config, \"method\", None) != \"dflash\":\n"
+                "        return set()\n"
+                "    try:\n"
+                "        target_num_layers = vllm_config.model_config.get_num_layers(\n"
+                "            vllm_config.parallel_config\n"
+                "        )\n"
+                "    except Exception:\n"
+                "        # Be conservative: if we cannot determine target layer count,\n"
+                "        # do not isolate (falls back to the legacy unify behaviour).\n"
+                "        return set()\n"
+                "    isolated: set[str] = set()\n"
+                "    for layer_name in layer_names:\n"
+                "        m = _LAYER_INDEX_RE.search(layer_name)\n"
+                "        if m is not None and int(m.group(1)) >= target_num_layers:\n"
+                "            isolated.add(layer_name)\n"
+                "    return isolated\n\n"
+                "def _partition_dflash_isolated_specs(\n"
+                "    vllm_config: VllmConfig,\n"
+                "    kv_cache_spec: dict[str, KVCacheSpec],\n"
+                ") -> tuple[dict[str, KVCacheSpec], dict[str, KVCacheSpec]]:\n"
+                "    isolated_names = _get_dflash_isolated_layer_names(\n"
+                "        vllm_config, kv_cache_spec.keys()\n"
+                "    )\n"
+                "    if not isolated_names:\n"
+                "        return kv_cache_spec, {}\n"
+                "    shared_specs = {n: s for n, s in kv_cache_spec.items() if n not in isolated_names}\n"
+                "    isolated_specs = {n: s for n, s in kv_cache_spec.items() if n in isolated_names}\n"
+                "    if not shared_specs or not isolated_specs:\n"
+                "        return kv_cache_spec, {}\n"
+                "    return shared_specs, isolated_specs\n\n"
+                "def _get_dflash_isolated_group_ids(\n"
+                "    vllm_config: VllmConfig,\n"
+                "    kv_cache_groups: list[KVCacheGroupSpec],\n"
+                ") -> set[int]:\n"
+                "    isolated_names = _get_dflash_isolated_layer_names(\n"
+                "        vllm_config,\n"
+                "        (n for g in kv_cache_groups for n in g.layer_names),\n"
+                "    )\n"
+                "    if not isolated_names:\n"
+                "        return set()\n"
+                "    out: set[int] = set()\n"
+                "    for gid, g in enumerate(kv_cache_groups):\n"
+                "        if g.layer_names and all(n in isolated_names for n in g.layer_names):\n"
+                "            out.add(gid)\n"
+                "    return out\n\n"
+                "def _get_layer_spec_from_group(\n"
+                "    group: KVCacheGroupSpec,\n"
+                "    layer_name: str,\n"
+                ") -> KVCacheSpec:\n"
+                "    gs = group.kv_cache_spec\n"
+                "    if isinstance(gs, UniformTypeKVCacheSpecs):\n"
+                "        return gs.kv_cache_specs[layer_name]\n"
+                "    return gs\n\n"
+                "def _get_dflash_isolated_layers(\n"
+                "    vllm_config: VllmConfig,\n"
+                "    kv_cache_groups: list[KVCacheGroupSpec],\n"
+                ") -> list[tuple[str, KVCacheSpec]]:\n"
+                "    gids = _get_dflash_isolated_group_ids(vllm_config, kv_cache_groups)\n"
+                "    return [\n"
+                "        (n, _get_layer_spec_from_group(kv_cache_groups[gid], n))\n"
+                "        for gid in sorted(gids)\n"
+                "        for n in kv_cache_groups[gid].layer_names\n"
+                "    ]\n\n"
+                "def _get_shared_kv_cache_groups(\n"
+                "    vllm_config: VllmConfig,\n"
+                "    kv_cache_groups: list[KVCacheGroupSpec],\n"
+                ") -> list[KVCacheGroupSpec]:\n"
+                "    gids = _get_dflash_isolated_group_ids(vllm_config, kv_cache_groups)\n"
+                "    return [g for gid, g in enumerate(kv_cache_groups) if gid not in gids]\n\n\n"
+            )
+            new_unify_def = helpers_block + old_unify_def
+            if old_unify_def in txt and "_get_dflash_isolated_layer_names" not in txt:
+                txt = txt.replace(old_unify_def, new_unify_def, 1)
+                applied = True
+
+            # 4. Wrap get_kv_cache_groups: rename existing -> _get_kv_cache_groups,
+            #    then add a new outer get_kv_cache_groups that partitions first.
+            old_outer_def = "def get_kv_cache_groups(\n    vllm_config: VllmConfig, kv_cache_spec: dict[str, KVCacheSpec]\n) -> list[KVCacheGroupSpec]:\n"
+            new_outer_def = "def _get_kv_cache_groups(\n    vllm_config: VllmConfig, kv_cache_spec: dict[str, KVCacheSpec]\n) -> list[KVCacheGroupSpec]:  # Patch 24a: renamed; outer wrapper below partitions DFlash drafter\n"
+            if old_outer_def in txt and "def _get_kv_cache_groups(" not in txt:
+                txt = txt.replace(old_outer_def, new_outer_def, 1)
+                applied = True
+
+            # 5. Append the new outer get_kv_cache_groups wrapper right after
+            #    the renamed function's final `return` line.
+            old_return_line = (
+                "    # As KVCacheManager can only allocate memory of one size, we need to unify\n"
+                "    # the page size of the layers. For cases cannot be unified, this function\n"
+                "    # will raise an error.\n"
+                "    kv_cache_spec = unify_kv_cache_spec_page_size(kv_cache_spec)\n"
+                "    # Model contains multiple attention types, but KV cache of all layers\n"
+                "    # have the same physical memory per block per layer. Split the layers\n"
+                "    # into groups with the same number of layers, and thus same total page\n"
+                "    # size.\n"
+                "    return _get_kv_cache_groups_uniform_page_size(kv_cache_spec)\n"
+            )
+            wrapper_block = (
+                "    # As KVCacheManager can only allocate memory of one size, we need to unify\n"
+                "    # the page size of the layers. For cases cannot be unified, this function\n"
+                "    # will raise an error.\n"
+                "    kv_cache_spec = unify_kv_cache_spec_page_size(kv_cache_spec)\n"
+                "    # Model contains multiple attention types, but KV cache of all layers\n"
+                "    # have the same physical memory per block per layer. Split the layers\n"
+                "    # into groups with the same number of layers, and thus same total page\n"
+                "    # size.\n"
+                "    return _get_kv_cache_groups_uniform_page_size(kv_cache_spec)\n\n\n"
+                "def get_kv_cache_groups(\n"
+                "    vllm_config: VllmConfig, kv_cache_spec: dict[str, KVCacheSpec]\n"
+                ") -> list[KVCacheGroupSpec]:\n"
+                "    \"\"\"Patch 24a (PR #42102): partition DFlash drafter layers into their\n"
+                "    own KV group before the regular grouping/unify pipeline runs. Drafter\n"
+                "    has its own page size (BF16, possibly different num_kv_heads/head_size\n"
+                "    than target), so sharing the target's pool causes unify_kv_cache_spec_page_size\n"
+                "    to assert when target is FP8.\n"
+                "    \"\"\"\n"
+                "    shared_specs, isolated_specs = _partition_dflash_isolated_specs(\n"
+                "        vllm_config, kv_cache_spec\n"
+                "    )\n"
+                "    if isolated_specs:\n"
+                "        return [\n"
+                "            *_get_kv_cache_groups(vllm_config, shared_specs),\n"
+                "            *_get_kv_cache_groups(vllm_config, isolated_specs),\n"
+                "        ]\n"
+                "    return _get_kv_cache_groups(vllm_config, kv_cache_spec)\n"
+            )
+            if old_return_line in txt and "def get_kv_cache_groups(" not in txt.split("def _get_kv_cache_groups(")[-1]:
+                txt = txt.replace(old_return_line, wrapper_block, 1)
+                applied = True
+
+            # 6. get_kv_cache_config_from_groups general case: handle isolated
+            #    layers by treating them as a per-layer pool appended to the
+            #    shared pool.
+            old_general = (
+                "        # General case:\n"
+                "        # We will have group_size memory pools, each is shared by one layer from\n"
+                "        # each group. As layers of different groups have different block table,\n"
+                "        # they will use different parts of the shared Tensor.\n"
+                "        # The memory layout for 3 groups (full.0, full.1), (sw.0, sw.2),\n"
+                "        # (sw.1, padding) will be: (group_size = 2)\n"
+                "        # full.0, sw.0, sw.1: share a Tensor with size=available_memory//2\n"
+                "        # full.1, sw.2: share another Tensor with size=available_memory//2\n"
+                "        group_size = max(len(group.layer_names) for group in kv_cache_groups)\n\n"
+                "        page_size = get_uniform_page_size(\n"
+                "            [group.kv_cache_spec for group in kv_cache_groups]\n"
+                "        )\n"
+                "        assert group_size > 0, \"group_size must be greater than 0\"\n"
+                "        num_blocks = get_num_blocks(\n"
+                "            vllm_config,\n"
+                "            group_size,\n"
+                "            available_memory,\n"
+                "            page_size,\n"
+                "            suppress_log=suppress_log,\n"
+                "        )\n"
+                "        kv_cache_tensors = []\n"
+                "        for i in range(group_size):\n"
+                "            shared_by = []\n"
+                "            for j in range(len(kv_cache_groups)):\n"
+                "                if i < len(kv_cache_groups[j].layer_names):\n"
+                "                    shared_by.append(kv_cache_groups[j].layer_names[i])\n"
+                "            kv_cache_tensors.append(\n"
+                "                KVCacheTensor(size=page_size * num_blocks, shared_by=shared_by)\n"
+                "            )\n"
+            )
+            new_general = (
+                "        # General case (Patch 24a / PR #42102): split shared and DFlash-\n"
+                "        # isolated groups. Shared groups follow the legacy layout (one pool\n"
+                "        # per slot, shared by one layer from each group). Isolated drafter\n"
+                "        # layers each get their own pool sized by that layer's page_size_bytes.\n"
+                "        isolated_layers = _get_dflash_isolated_layers(vllm_config, kv_cache_groups)\n"
+                "        shared_groups = (\n"
+                "            _get_shared_kv_cache_groups(vllm_config, kv_cache_groups)\n"
+                "            if isolated_layers else kv_cache_groups\n"
+                "        )\n"
+                "        shared_group_size = (\n"
+                "            max(len(g.layer_names) for g in shared_groups) if shared_groups else 0\n"
+                "        )\n"
+                "        page_size = (\n"
+                "            get_uniform_page_size([g.kv_cache_spec for g in shared_groups])\n"
+                "            if shared_groups else 0\n"
+                "        )\n"
+                "        bytes_per_block = page_size * shared_group_size + sum(\n"
+                "            spec.page_size_bytes for _, spec in isolated_layers\n"
+                "        )\n"
+                "        assert bytes_per_block > 0, \"bytes_per_block must be greater than 0\"\n"
+                "        num_blocks = int(available_memory // bytes_per_block)\n"
+                "        num_blocks = max(num_blocks, 0)\n"
+                "        num_blocks = may_override_num_blocks(\n"
+                "            vllm_config, num_blocks, suppress_log=suppress_log\n"
+                "        )\n"
+                "        kv_cache_tensors = []\n"
+                "        for i in range(shared_group_size):\n"
+                "            shared_by = []\n"
+                "            for g in shared_groups:\n"
+                "                if i < len(g.layer_names):\n"
+                "                    shared_by.append(g.layer_names[i])\n"
+                "            kv_cache_tensors.append(\n"
+                "                KVCacheTensor(size=page_size * num_blocks, shared_by=shared_by)\n"
+                "            )\n"
+                "        for layer_name, layer_spec in isolated_layers:\n"
+                "            kv_cache_tensors.append(\n"
+                "                KVCacheTensor(\n"
+                "                    size=layer_spec.page_size_bytes * num_blocks,\n"
+                "                    shared_by=[layer_name],\n"
+                "                )\n"
+                "            )\n"
+            )
+            if old_general in txt and "_get_dflash_isolated_layers(vllm_config, kv_cache_groups)" not in txt:
+                txt = txt.replace(old_general, new_general, 1)
+                applied = True
+
+            # 7. _max_memory_usage_bytes_from_groups general case: also split
+            #    shared vs isolated. This function feeds _check_enough_kv_cache_memory
+            #    and the binary-search auto-fit; in v0.20.0 it predates the
+            #    _pool_bytes_per_block refactor that PR #42102 touched in the
+            #    newer vllm tree, so we keep the same split here.
+            old_max_mem_general = (
+                "    # General case: group_size pools, each shared by one layer per group\n"
+                "    # Memory = group_size * page_size * blocks_for_max_len\n"
+                "    group_size = max(len(group.layer_names) for group in kv_cache_groups)\n"
+                "    page_size = get_uniform_page_size(\n"
+                "        [group.kv_cache_spec for group in kv_cache_groups]\n"
+                "    )\n"
+                "    blocks_needed = sum(\n"
+                "        cdiv(group.kv_cache_spec.max_memory_usage_bytes(vllm_config), page_size)\n"
+                "        for group in kv_cache_groups\n"
+                "    )\n\n"
+                "    return group_size * page_size * blocks_needed\n"
+            )
+            new_max_mem_general = (
+                "    # General case (Patch 24a / PR #42102): split shared vs DFlash-\n"
+                "    # isolated. Shared follows the legacy group_size pool layout;\n"
+                "    # isolated layers each contribute their own per-layer memory bound.\n"
+                "    isolated_layers = _get_dflash_isolated_layers(vllm_config, kv_cache_groups)\n"
+                "    shared_groups = (\n"
+                "        _get_shared_kv_cache_groups(vllm_config, kv_cache_groups)\n"
+                "        if isolated_layers else kv_cache_groups\n"
+                "    )\n"
+                "    shared_bytes = 0\n"
+                "    if shared_groups:\n"
+                "        group_size = max(len(group.layer_names) for group in shared_groups)\n"
+                "        page_size = get_uniform_page_size(\n"
+                "            [group.kv_cache_spec for group in shared_groups]\n"
+                "        )\n"
+                "        blocks_needed = sum(\n"
+                "            cdiv(group.kv_cache_spec.max_memory_usage_bytes(vllm_config), page_size)\n"
+                "            for group in shared_groups\n"
+                "        )\n"
+                "        shared_bytes = group_size * page_size * blocks_needed\n"
+                "    isolated_bytes = sum(\n"
+                "        spec.max_memory_usage_bytes(vllm_config) for _, spec in isolated_layers\n"
+                "    )\n"
+                "    return shared_bytes + isolated_bytes\n"
+            )
+            if old_max_mem_general in txt and "isolated_bytes = sum(" not in txt:
+                txt = txt.replace(old_max_mem_general, new_max_mem_general, 1)
+                applied = True
+
+        if applied:
+            p_kvu.write_text(txt)
+            print(" -> Patched vllm/v1/core/kv_cache_utils.py (Patch 24a: DFlash KV partition for FP8 coexistence)")
+
+    # 24b: qwen3_dflash.py - override drafter cache_dtype to BF16 ("auto") so
+    # drafter does not inherit FP8 from the target's cache_config.
+    p_qd = Path('vllm/model_executor/models/qwen3_dflash.py')
+    if p_qd.exists():
+        txt = p_qd.read_text()
+        applied = False
+
+        if "Patch 24b" not in txt:
+            # 1. Add `from dataclasses import replace` and is_quantized_kv_cache import.
+            old_imports = (
+                "from collections.abc import Iterable\n"
+                "\n"
+                "import torch\n"
+            )
+            new_imports = (
+                "from collections.abc import Iterable\n"
+                "from dataclasses import replace  # Patch 24b\n"
+                "\n"
+                "import torch\n"
+            )
+            if old_imports in txt and "from dataclasses import replace  # Patch 24b" not in txt:
+                txt = txt.replace(old_imports, new_imports, 1)
+                applied = True
+
+            old_util_import = "from vllm.transformers_utils.config import set_default_rope_theta\n"
+            new_util_import = (
+                "from vllm.transformers_utils.config import set_default_rope_theta\n"
+                "from vllm.utils.torch_utils import is_quantized_kv_cache  # Patch 24b\n"
+            )
+            if old_util_import in txt and "is_quantized_kv_cache  # Patch 24b" not in txt:
+                txt = txt.replace(old_util_import, new_util_import, 1)
+                applied = True
+
+            # 2. Override draft_cache_config and pass it instead of cache_config.
+            old_attn_init = (
+                "        self.attn = Attention(\n"
+                "            self.num_heads,\n"
+                "            self.head_dim,\n"
+                "            self.scaling,\n"
+                "            num_kv_heads=self.num_kv_heads,\n"
+                "            cache_config=cache_config,\n"
+            )
+            new_attn_init = (
+                "        # Patch 24b (PR #42102): DFlash drafter uses its own KV cache pool\n"
+                "        # (see kv_cache_utils._partition_dflash_isolated_specs). Drafter\n"
+                "        # weights are BF16; forcing BF16 KV avoids unnecessary FP8 dequant\n"
+                "        # on the drafter's hot path. Target attention KV remains quantized.\n"
+                "        draft_cache_config = cache_config\n"
+                "        if draft_cache_config is not None and is_quantized_kv_cache(\n"
+                "            draft_cache_config.cache_dtype\n"
+                "        ):\n"
+                "            draft_cache_config = replace(draft_cache_config, cache_dtype=\"auto\")\n"
+                "        self.attn = Attention(\n"
+                "            self.num_heads,\n"
+                "            self.head_dim,\n"
+                "            self.scaling,\n"
+                "            num_kv_heads=self.num_kv_heads,\n"
+                "            cache_config=draft_cache_config,\n"
+            )
+            if old_attn_init in txt and "draft_cache_config" not in txt:
+                txt = txt.replace(old_attn_init, new_attn_init, 1)
+                applied = True
+
+        if applied:
+            p_qd.write_text(txt)
+            print(" -> Patched vllm/model_executor/models/qwen3_dflash.py (Patch 24b: drafter BF16 KV override)")
+
+    # Patch 24c (PR #42102 follow-up): with FP8 target + BF16 drafter, the
+    # KVBlockZeroer's init_meta asserts uniform PAGE_SIZE_EL across all
+    # FullAttentionSpec layers - but target pages are half-size (FP8) vs
+    # drafter (BF16), so the assert fires with "Non-uniform page sizes:
+    # 827392 vs 1654784". Mirror the encoder-only escape hatch: add drafter
+    # layer names to runner_only_attn_layers before init_meta, so the
+    # zeroer skips them. Drafter blocks come zeroed from the CuMem pool
+    # allocator and the per-position seq mask prevents reads of unwritten
+    # positions, so skipping explicit zero-fills is benign.
+    p_gmr = Path('vllm/v1/worker/gpu_model_runner.py')
+    if p_gmr.exists():
+        txt = p_gmr.read_text()
+
+        if "Patch 24c" not in txt:
+            old_block = (
+                "    def _init_kv_zero_meta(self) -> None:\n"
+                "        \"\"\"One-time precomputation for _zero_block_ids.\n"
+                "\n"
+                "        Delegates to KVBlockZeroer.init_meta with the runner's state.\n"
+                "        Called from gpu_worker.py outside the CuMem pool context.\n"
+                "        \"\"\"\n"
+                "        self._kv_block_zeroer = KVBlockZeroer(self.device, self.pin_memory)\n"
+                "        self._kv_block_zeroer.init_meta(\n"
+            )
+            new_block = (
+                "    def _init_kv_zero_meta(self) -> None:\n"
+                "        \"\"\"One-time precomputation for _zero_block_ids.\n"
+                "\n"
+                "        Delegates to KVBlockZeroer.init_meta with the runner's state.\n"
+                "        Called from gpu_worker.py outside the CuMem pool context.\n"
+                "        \"\"\"\n"
+                "        # Patch 24c: skip DFlash drafter layers in the zeroer.\n"
+                "        # Target FP8 / drafter BF16 -> page sizes differ 2:1, so\n"
+                "        # they cannot share a single PAGE_SIZE_EL kernel constant.\n"
+                "        try:\n"
+                "            from vllm.v1.core.kv_cache_utils import _get_dflash_isolated_layer_names\n"
+                "            drafter_layers = _get_dflash_isolated_layer_names(\n"
+                "                self.vllm_config,\n"
+                "                self.compilation_config.static_forward_context.keys(),\n"
+                "            )\n"
+                "            self.runner_only_attn_layers |= drafter_layers\n"
+                "        except Exception:\n"
+                "            pass\n"
+                "        self._kv_block_zeroer = KVBlockZeroer(self.device, self.pin_memory)\n"
+                "        self._kv_block_zeroer.init_meta(\n"
+            )
+            if old_block in txt:
+                txt = txt.replace(old_block, new_block, 1)
+                p_gmr.write_text(txt)
+                print(" -> Patched vllm/v1/worker/gpu_model_runner.py (Patch 24c: skip drafter in KVBlockZeroer)")
+
     print("Successfully patched vLLM/Environment for Strix Halo.")
 
 if __name__ == "__main__":

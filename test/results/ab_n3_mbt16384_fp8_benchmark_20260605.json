@@ -1,0 +1,40 @@
+{
+  "date": "2026-06-05",
+  "note": "single-run normal case, 512 max decode tokens; fp8 KV after live Patch 24a/b/c verify and temporary image commit/tag",
+  "files": {
+    "baseline_n4_mbt8192_fp8": "test/results/bench_matrix_patch20_21_retest_20260605.json",
+    "n3_mbt8192_fp8": "test/results/bench_matrix_ab_n3_mbt8192_fp8_20260605.json",
+    "n4_mbt16384_fp8": "test/results/bench_matrix_ab_n4_mbt16384_fp8_20260605.json"
+  },
+  "decode_tps": {
+    "baseline_n4_mbt8192_fp8": {
+      "0": 14.567,
+      "8192": 12.043,
+      "16384": 10.561,
+      "32768": 7.325
+    },
+    "n3_mbt8192_fp8": {
+      "0": 12.486,
+      "8192": 12.568,
+      "16384": 10.404,
+      "32768": 7.724
+    },
+    "n4_mbt16384_fp8": {
+      "0": 14.515,
+      "8192": 13.508,
+      "16384": 10.635,
+      "32768": 7.422
+    }
+  },
+  "mean_decode_tps": {
+    "baseline_n4_mbt8192_fp8": 11.124,
+    "n3_mbt8192_fp8": 10.795,
+    "n4_mbt16384_fp8": 11.52
+  },
+  "best_by_context": {
+    "0": "baseline_n4_mbt8192_fp8",
+    "8192": "n4_mbt16384_fp8",
+    "16384": "n4_mbt16384_fp8",
+    "32768": "n3_mbt8192_fp8"
+  }
+}

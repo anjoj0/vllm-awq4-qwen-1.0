@@ -1,0 +1,144 @@
+{
+  "raw": [
+    {
+      "ctx": 0,
+      "case": "normal",
+      "run": 0,
+      "prompt": 96,
+      "decode": 512,
+      "ttft": 1.0,
+      "total": 36.3,
+      "pp_tps": 92.4,
+      "dec_tps": 14.5
+    },
+    {
+      "ctx": 8192,
+      "case": "normal",
+      "run": 0,
+      "prompt": 8293,
+      "decode": 512,
+      "ttft": 77.6,
+      "total": 120.8,
+      "pp_tps": 106.9,
+      "dec_tps": 11.83
+    },
+    {
+      "ctx": 16384,
+      "case": "normal",
+      "run": 0,
+      "prompt": 16485,
+      "decode": 512,
+      "ttft": 171.6,
+      "total": 219.5,
+      "pp_tps": 96.1,
+      "dec_tps": 10.69
+    },
+    {
+      "ctx": 32768,
+      "case": "normal",
+      "run": 0,
+      "prompt": 32869,
+      "decode": 512,
+      "ttft": 432.0,
+      "total": 501.0,
+      "pp_tps": 76.1,
+      "dec_tps": 7.42
+    }
+  ],
+  "summary": {
+    "0_normal": {
+      "prefill": {
+        "mean": 92.4,
+        "median": 92.4,
+        "min": 92.4,
+        "max": 92.4,
+        "n": 1
+      },
+      "decode": {
+        "mean": 14.5,
+        "median": 14.5,
+        "min": 14.5,
+        "max": 14.5,
+        "n": 1
+      },
+      "n": 1
+    },
+    "8192_normal": {
+      "prefill": {
+        "mean": 106.9,
+        "median": 106.9,
+        "min": 106.9,
+        "max": 106.9,
+        "n": 1
+      },
+      "decode": {
+        "mean": 11.83,
+        "median": 11.83,
+        "min": 11.83,
+        "max": 11.83,
+        "n": 1
+      },
+      "n": 1
+    },
+    "16384_normal": {
+      "prefill": {
+        "mean": 96.1,
+        "median": 96.1,
+        "min": 96.1,
+        "max": 96.1,
+        "n": 1
+      },
+      "decode": {
+        "mean": 10.69,
+        "median": 10.69,
+        "min": 10.69,
+        "max": 10.69,
+        "n": 1
+      },
+      "n": 1
+    },
+    "32768_normal": {
+      "prefill": {
+        "mean": 76.1,
+        "median": 76.1,
+        "min": 76.1,
+        "max": 76.1,
+        "n": 1
+      },
+      "decode": {
+        "mean": 7.42,
+        "median": 7.42,
+        "min": 7.42,
+        "max": 7.42,
+        "n": 1
+      },
+      "n": 1
+    }
+  },
+  "config": {
+    "contexts": [
+      0,
+      8192,
+      16384,
+      32768
+    ],
+    "cases": [
+      "normal"
+    ],
+    "runs": 1,
+    "max_tokens": 512,
+    "out": "test/results/bench_matrix_patch24_fp8_kv.json",
+    "kv_cache_dtype": "fp8",
+    "spec_n": 4,
+    "gpu_memory_util": 0.6,
+    "max_model_len": 65536,
+    "patches": [
+      "20",
+      "21",
+      "24a",
+      "24b",
+      "24c"
+    ],
+    "image": "vllm-awq4-qwen:patches-20-21+24abc-live"
+  }
+}
