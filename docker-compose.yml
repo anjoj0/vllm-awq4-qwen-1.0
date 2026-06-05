@@ -1,6 +1,6 @@
 services:
   vllm:
-    image: vllm-awq4-qwen:patches-20-21
+    image: vllm-awq4-qwen:patches-20-21-24abc
     build:
       context: .
       network: host

@@ -123,7 +123,10 @@ RUN if [ -n "$VLLM_COMMIT" ]; then \
     fi
 
 COPY scripts/patch_strix.py /opt/vllm/patch_strix.py
-RUN python /opt/vllm/patch_strix.py
+RUN python /opt/vllm/patch_strix.py && \
+    grep -q "Patch 24a" /opt/vllm/vllm/v1/core/kv_cache_utils.py && \
+    grep -q "Patch 24b" /opt/vllm/vllm/model_executor/models/qwen3_dflash.py && \
+    grep -q "Patch 24c" /opt/vllm/vllm/v1/worker/gpu_model_runner.py
 
 COPY scripts/start_vllm_awq.sh /usr/local/bin/start-vllm-awq
 RUN chmod +x /usr/local/bin/start-vllm-awq
@@ -156,6 +159,9 @@ RUN export HIP_DEVICE_LIB_PATH=$(find /opt/rocm -type d -name bitcode -print -qu
     echo "Building with bitcode: $HIP_DEVICE_LIB_PATH" && \
     export CMAKE_ARGS="-DROCM_PATH=/opt/rocm -DHIP_PATH=/opt/rocm -DGPU_TARGETS=gfx1151 -DHIP_ARCHITECTURES=gfx1151" && \
     uv pip install --no-build-isolation --no-deps -v . && \
+    grep -q "Patch 24a" /opt/venv/lib/python3.12/site-packages/vllm/v1/core/kv_cache_utils.py && \
+    grep -q "Patch 24b" /opt/venv/lib/python3.12/site-packages/vllm/model_executor/models/qwen3_dflash.py && \
+    grep -q "Patch 24c" /opt/venv/lib/python3.12/site-packages/vllm/v1/worker/gpu_model_runner.py && \
     rm -rf /root/.cache/uv /root/.cache/pip /tmp/*
 
 # 8b. vLLM runtime dependencies.
