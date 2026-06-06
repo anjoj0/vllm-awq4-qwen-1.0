@@ -7,7 +7,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Working-brightgreen" alt="Status" />
-  <img src="https://img.shields.io/badge/Single--stream-24.8_t%2Fs_peak-red" alt="Speed" />
+  <img src="https://img.shields.io/badge/Single--stream-28.3_t%2Fs_peak-red" alt="Speed" />
   <img src="https://img.shields.io/badge/3--stream_aggregate-41_t%2Fs_peak-red" alt="3-stream aggregate" />
   <img src="https://img.shields.io/badge/Prefill-105--134_t%2Fs_(0--32K,_HIP_kernel)-brightgreen" alt="Prefill" />
   <img src="https://img.shields.io/badge/Model-Qwen3.6--27B--AWQ4-0b7285" alt="Model" />
@@ -81,10 +81,10 @@
 | 🟩 *Our BF16 sibling repo, no spec* | 4.3 | AMD Strix Halo |
 | 🟩 *Our AWQ4, no spec (this repo, baseline)* | 5.6 | AMD Strix Halo |
 | 🟧 *DGX Spark FP8 + DFlash + MTP (claimed)* | 20-25 | NVIDIA GB10 Blackwell |
-| 🟥 **Our AWQ4 + DFlash N=8 (this repo)** | **24.8 peak / 18.5 mean** | **AMD Strix Halo** |
+| 🟥 **Our AWQ4 + DFlash N=8 (this repo)** | **28.3 peak / 20.0 mean** | **AMD Strix Halo** |
 | ⚪ *DGX Spark NVFP4 + DFlash, Blackwell-locked* | 83.9 median | NVIDIA GB10 sm_121a only |
 
-> **+340% over no-spec baseline** - *5.6 → 24.8 t/s* on `/v1/responses`, single-stream, full 256K context, on a fanless integrated GPU.
+> **+405% over no-spec baseline** - *5.6 → 28.3 t/s* on `/v1/responses`, single-stream, full 256K context, on a fanless integrated GPU. Re-verified 2026-06-06 with `test/bench_full.py --runs 3` under `kv_cache_dtype=fp8, max_model_len=262144, gpu_memory_utilization=0.90, max_num_batched_tokens=16384`.
 
 ### 📈 Prefill (input processing) speed
 
@@ -152,21 +152,21 @@ The streaming-vs-non-streaming behavior is the part most people get wrong. To be
 
 ---
 
-## 📊 Bench (DFlash N=8, 3 runs each, median)
+## 📊 Bench (DFlash N=8, 3 runs each, median, re-verified 2026-06-06)
 
 | Endpoint | Test | Prompt tok | Output tok | t/s |
 |---|---|---:|---:|---:|
-| chat | factual ("speed of light") | 29 | 232 | 21.82 |
-| chat | explainer ("entanglement") | 27 | 1 562 | 18.50 |
-| **responses** | reasoning ("3 trains") | 57 | 1 216 | **24.80 ⚡** |
-| chat + image (1280×720) | scene description | 910 | 1 014 | 13.84 |
-| chat + image (1024×1024) | object list | 1 053 | 857 | 13.82 |
-| chat + tools | get_weather (Tokyo) | 318 | 142 | 15.53 |
-| **responses + tools** | get_weather (Paris) | 336 | 95 | **13.26 ✅** *non-stream, thinking on; streaming variant verified separately in T2/T4 of [`verify_responses_streaming.py`](test/verify_responses_streaming.py)* |
-| completions | short factual ("capital of France") | 5 | 8 | 6.34 *(8 tokens, dominated by first-token overhead)* |
+| chat | factual ("speed of light") | 29 | 213 | 22.47 |
+| chat | explainer ("entanglement") | 27 | 1 329 - 1 469 | 19.96 |
+| **responses** | reasoning ("3 trains") | 57 | 910 | **28.29 ⚡** |
+| chat + image (`forest.png`, 1280×720) | scene description | 910 | 691 | 16.22 |
+| chat + image (`fly.png`, 1024×1024) | object list | 1 053 | 651 | 16.78 |
+| chat + tools | get_weather (Tokyo) | 318 | 137 | 13.87 |
+| **responses + tools** | get_weather (Paris) | 336 | 110 | **14.25 ✅** *non-stream, thinking on; streaming variant verified separately in T2/T4 of [`verify_responses_streaming.py`](test/verify_responses_streaming.py)* |
+| completions | short factual ("capital of France") | 5 | 8 | 6.11 *(8 tokens, dominated by first-token overhead)* |
 | chat | 25K-token long-context synthesis | ~22 000 | up to 2 048 | not captured cleanly  -  *see [Honest limitations](#%EF%B8%8F-honest-limitations)* |
 
-> Wall-clock client-side. `temperature=0`, max-num-seqs=1, single-stream. The vLLM engine logs report ~25-27 t/s internal (excludes round-trip + initial prefill). Run yourself: `python3 test/bench_full.py` (writes raw results to `test/bench_full_results.json`, gitignored).
+> Wall-clock client-side. `temperature=0`, max-num-seqs=1, single-stream. The vLLM engine logs report ~25-30 t/s internal (excludes round-trip + initial prefill). Re-verified 2026-06-06 under `kv_cache_dtype=fp8, max_model_len=262144, gpu_memory_utilization=0.90, max_num_batched_tokens=16384`. Run yourself: `python3 test/bench_full.py` (writes raw results to `test/bench_full_results.json`, gitignored).
 
 ---
 
@@ -263,7 +263,7 @@ The drafter is **genuinely guessing the right tokens**, not just running and get
 | 0 (no spec) | n/a | n/a | 5.64 |
 | 1 | 1.52 | 52% | 8.95 |
 | 4 | 3.20 | 64% | 17.92 |
-| 8 | 5.64 to 6.35 | 51-67% (varies by content) | 19.80 (chat) / **24.80 (responses)** |
+| 8 | 5.64 to 6.35 | 51-67% (varies by content) | 19.96 (chat) / **28.29 (responses)** *(re-verified 2026-06-06)* |
 
 Per-position acceptance falls off as N grows (drafter is less confident predicting 8 tokens ahead than 4). Position-0 stays in the 83-95% range  -  i.e. the very next token is almost always right.
 
@@ -273,8 +273,8 @@ Per-position acceptance falls off as N grows (drafter is less confident predicti
 
 | | Strix Halo + AWQ4 + DFlash (this repo) | DGX Spark FP8 + DFlash + MTP | DGX Spark NVFP4 + DFlash (Blackwell-only) |
 |---|---|---|---|
-| Single-stream median | **18.5 t/s** | 20-25 t/s | 83.9 t/s |
-| Single-stream peak | **24.8 t/s** | 25 t/s | 127.5 t/s |
+| Single-stream median | **20.0 t/s** | 20-25 t/s | 83.9 t/s |
+| Single-stream peak | **28.3 t/s** *(exceeds DGX Spark FP8+DFlash 25 t/s)* | 25 t/s | 127.5 t/s |
 | Aggregate at 3 concurrent streams | **27-41 t/s peak** (~13.5 t/s/stream) | *not published* | n/a |
 | Context | 256K | 256K | 256K |
 | Vision support | ✅ | ✅ | ✅ |
