@@ -1,0 +1,168 @@
+{
+  "awq_root": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260615-dflash-n8-systemd",
+  "bf16_root": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd",
+  "primary_rows": [
+    {
+      "benchmark": "GSM8K",
+      "capability": "math reasoning; 5-shot greedy exact_match",
+      "metric": "exact_match,flexible-extract",
+      "bf16": 0.6504927975739196,
+      "awq": 0.6724791508718726,
+      "delta": 0.021986353297952954,
+      "bf16_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/gsm8k_dflash_n8_full/Qwen3.6-27B/results_2026-06-17T10-00-48.648519.json",
+      "awq_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260615-dflash-n8-systemd/gsm8k_dflash_n8_full/Qwen3.6-27B-AWQ4/results_2026-06-15T20-07-25.616784.json"
+    },
+    {
+      "benchmark": "HellaSwag",
+      "capability": "commonsense; 0-shot loglikelihood acc_norm",
+      "metric": "acc_norm,none",
+      "bf16": 0.840071698864768,
+      "awq": 0.8302131049591714,
+      "delta": -0.009858593905596513,
+      "bf16_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/hellaswag_dflash_n8_full/Qwen3.6-27B/results_2026-06-17T14-59-53.939152.json",
+      "awq_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260615-dflash-n8-systemd/hellaswag_dflash_n8_full/Qwen3.6-27B-AWQ4/results_2026-06-16T04-18-12.855441.json"
+    },
+    {
+      "benchmark": "ARC Challenge",
+      "capability": "science QA; 25-shot loglikelihood acc_norm",
+      "metric": "acc_norm,none",
+      "bf16": 0.7636518771331058,
+      "awq": 0.7627986348122867,
+      "delta": -0.0008532423208190698,
+      "bf16_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/arc_challenge_dflash_n8_full/Qwen3.6-27B/results_2026-06-17T17-52-30.829255.json",
+      "awq_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260615-dflash-n8-systemd/arc_challenge_dflash_n8_full/Qwen3.6-27B-AWQ4/results_2026-06-16T12-56-44.693993.json"
+    },
+    {
+      "benchmark": "HumanEval",
+      "capability": "Python code generation; 0-shot greedy pass@1",
+      "metric": "pass@1,create_test",
+      "bf16": 0.8536585365853658,
+      "awq": 0.8414634146341463,
+      "delta": -0.012195121951219523,
+      "bf16_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/humaneval_dflash_n8_full/Qwen3.6-27B/results_2026-06-17T18-36-16.688100.json",
+      "awq_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260615-dflash-n8-systemd/humaneval_dflash_n8_full/Qwen3.6-27B-AWQ4/results_2026-06-16T15-42-41.632057.json"
+    },
+    {
+      "benchmark": "MT-Bench",
+      "capability": "multi-turn dialogue; DeepSeek V4 Flash judge, not official GPT-4 judge",
+      "metric": "deepseek_judge_mean",
+      "bf16": 4.4,
+      "awq": 4.03125,
+      "delta": -0.36875000000000036,
+      "bf16_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/mt_bench/deepseek_v4_flash_judge_summary.json",
+      "awq_path": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260615-dflash-n8-systemd/mt_bench/deepseek_v4_flash_judge_summary.json"
+    }
+  ],
+  "secondary_rows": [
+    {
+      "benchmark": "GSM8K strict",
+      "capability": "math reasoning; strict extract",
+      "metric": "exact_match,strict-match",
+      "bf16": 0.6588324488248674,
+      "awq": 0.6709628506444276,
+      "delta": 0.012130401819560266
+    },
+    {
+      "benchmark": "HellaSwag raw acc",
+      "capability": "commonsense raw acc",
+      "metric": "acc,none",
+      "bf16": 0.6409081856203943,
+      "awq": 0.6342362079267079,
+      "delta": -0.006671977693686437
+    },
+    {
+      "benchmark": "ARC Challenge raw acc",
+      "capability": "science QA raw acc",
+      "metric": "acc,none",
+      "bf16": 0.7312286689419796,
+      "awq": 0.7209897610921502,
+      "delta": -0.010238907849829393
+    }
+  ],
+  "mt_bench_by_category": {
+    "bf16": {
+      "coding": {
+        "count": 10,
+        "mean": 4.1,
+        "median": 4.0
+      },
+      "extraction": {
+        "count": 10,
+        "mean": 3.7,
+        "median": 3.0
+      },
+      "humanities": {
+        "count": 10,
+        "mean": 3.8,
+        "median": 4.0
+      },
+      "math": {
+        "count": 10,
+        "mean": 5.7,
+        "median": 5.0
+      },
+      "reasoning": {
+        "count": 10,
+        "mean": 6.55,
+        "median": 6.0
+      },
+      "roleplay": {
+        "count": 10,
+        "mean": 3.9,
+        "median": 4.0
+      },
+      "stem": {
+        "count": 10,
+        "mean": 3.8,
+        "median": 4.0
+      },
+      "writing": {
+        "count": 10,
+        "mean": 3.65,
+        "median": 3.0
+      }
+    },
+    "awq": {
+      "coding": {
+        "count": 10,
+        "mean": 3.7,
+        "median": 4.0
+      },
+      "extraction": {
+        "count": 10,
+        "mean": 3.3,
+        "median": 3.0
+      },
+      "humanities": {
+        "count": 10,
+        "mean": 3.7,
+        "median": 4.0
+      },
+      "math": {
+        "count": 10,
+        "mean": 5.4,
+        "median": 4.5
+      },
+      "reasoning": {
+        "count": 10,
+        "mean": 4.8,
+        "median": 4.5
+      },
+      "roleplay": {
+        "count": 10,
+        "mean": 4.0,
+        "median": 4.0
+      },
+      "stem": {
+        "count": 10,
+        "mean": 3.8,
+        "median": 4.0
+      },
+      "writing": {
+        "count": 10,
+        "mean": 3.55,
+        "median": 3.0
+      }
+    }
+  }
+}

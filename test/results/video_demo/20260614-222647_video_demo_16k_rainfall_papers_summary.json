@@ -1,0 +1,35 @@
+{
+  "run": {
+    "host": "http://127.0.0.1:8001",
+    "model": "Qwen3.6-27B-AWQ4",
+    "source": "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt",
+    "label": "video_demo_16k_rainfall_papers_summary",
+    "mode": "nonstream",
+    "requested_prompt_tokens": 16000,
+    "max_tokens": 256,
+    "source_chars": 1325827,
+    "source_bytes": 1341329,
+    "full_prompt_tokens": 353625,
+    "actual_prompt_tokens_before_chat_template": 16000,
+    "truncated_from_full": true
+  },
+  "generation": {
+    "ok": true,
+    "status": 200,
+    "error": null,
+    "wall_seconds": 181.47683690800022,
+    "ttft_seconds": null,
+    "payload_ttft_seconds": null,
+    "event_count": null,
+    "payload_event_count": null,
+    "prompt_tokens": 16010,
+    "completion_tokens": 256,
+    "total_tokens": 16266,
+    "prefill_tokens_per_ttft": null,
+    "decode_tokens_per_second_stream": null,
+    "output_tokens_per_second_e2e": 1.4106483469831432,
+    "finish_reason": "length",
+    "content": "",
+    "reasoning_content": ""
+  }
+}

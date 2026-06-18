@@ -1,0 +1,257 @@
+{
+  "meta": {
+    "host": "http://127.0.0.1:8001",
+    "model": "Qwen3.6-27B-AWQ4",
+    "backend": "ROCM_ATTN + DFlash",
+    "runs_per_test": 1,
+    "started_at": "2026-06-06 20:26:54",
+    "finished_at": "2026-06-06 20:30:22",
+    "wall_seconds": 208.29
+  },
+  "tests": {
+    "completions_short": {
+      "name": "completions short factual",
+      "runs": [
+        {
+          "output": "Paris.\n\n<think>\n\n</think>\n\nThat",
+          "wall": 1.116857889923267,
+          "tps": 7.16295248677487,
+          "completion_tokens": 8,
+          "prompt_tokens": 5
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 7.163,
+        "median": 7.163,
+        "mean": 7.163,
+        "max": 7.163,
+        "p95": 7.163
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 8,
+        "median": 8,
+        "mean": 8,
+        "max": 8,
+        "p95": 8
+      }
+    },
+    "chat_factual": {
+      "name": "chat factual (speed of light)",
+      "runs": [
+        {
+          "output": "\n\n299792458",
+          "reasoning": "",
+          "wall": 9.666127742035314,
+          "tps": 22.03571126767981,
+          "completion_tokens": 213,
+          "prompt_tokens": 29
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 22.036,
+        "median": 22.036,
+        "mean": 22.036,
+        "max": 22.036,
+        "p95": 22.036
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 213,
+        "median": 213,
+        "mean": 213,
+        "max": 213,
+        "p95": 213
+      }
+    },
+    "chat_explainer": {
+      "name": "chat explainer (entanglement)",
+      "runs": [
+        {
+          "output": "\n\nQuantum entanglement happens when two tiny particles become linked so closely that they share a single existence, no matter how far apart they are. If you measure one particle, the other instantly settles into a matching state, even across the universe. This isn\u2019t magic but a proven rule of nature that scientists are already using to build super-fast computers and unhackable communication.",
+          "reasoning": "",
+          "wall": 66.36523740296252,
+          "tps": 20.025544275995824,
+          "completion_tokens": 1329,
+          "prompt_tokens": 27
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 20.026,
+        "median": 20.026,
+        "mean": 20.026,
+        "max": 20.026,
+        "p95": 20.026
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 1329,
+        "median": 1329,
+        "mean": 1329,
+        "max": 1329,
+        "p95": 1329
+      }
+    },
+    "responses_reasoning": {
+      "name": "responses reasoning (trains)",
+      "runs": [
+        {
+          "output": "\n\n1. 90 mph\n2. 75 mph\n3. 60 mph",
+          "wall": 32.14957378897816,
+          "tps": 28.30519639149852,
+          "completion_tokens": 910,
+          "prompt_tokens": 57
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 28.305,
+        "median": 28.305,
+        "mean": 28.305,
+        "max": 28.305,
+        "p95": 28.305
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 910,
+        "median": 910,
+        "mean": 910,
+        "max": 910,
+        "p95": 910
+      }
+    },
+    "vision_frost": {
+      "name": "vision (frost_1.png  -  1280x720)",
+      "runs": [
+        {
+          "image": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/images/forest.png",
+          "prompt": "Describe this scene in two sentences. What is the dominant color and the apparent setting?",
+          "output": "\n\nA vast, mountainous landscape is densely packed with evergreen trees that stretch across rolling hills and valleys. Wisps of white mist drift through the lower elevations, creating a hazy, atmospheric effect that contrasts with the sharp details of the foreground foliage.\n\n**Dominant Color:** Green\n**Apparent Setting:** A mountain forest or wilderness area",
+          "wall": 42.61045799404383,
+          "tps": 16.216676199457638,
+          "completion_tokens": 691,
+          "prompt_tokens": 100
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 16.217,
+        "median": 16.217,
+        "mean": 16.217,
+        "max": 16.217,
+        "p95": 16.217
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 691,
+        "median": 691,
+        "mean": 691,
+        "max": 691,
+        "p95": 691
+      }
+    },
+    "vision_splash": {
+      "name": "vision (splash.png  -  1024x1024)",
+      "runs": [
+        {
+          "image": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/images/fly.png",
+          "prompt": "What objects can you identify in this image? Reply as a bulleted list.",
+          "output": "\n\nBased on the image, here are the objects I can identify:\n\n*   **Airplane:** A large, white turboprop aircraft with red and blue stripes.\n*   **Propellers:** Two visible propellers on the left wing.\n*   **Wings:** The main wings extending from the fuselage.\n*   **Tail Fin:** The vertical stabilizer at the rear, featuring a logo.\n*   **Landing Gear:** The wheels supporting the aircraft on the ground.\n*   **Cargo Door:** A large open door on the side of the fuselage.\n*   **Cockpit Windows:** The windows at the front of the plane.\n*   **People:** Two individuals standing near the landing gear.\n*   **Runway/Tarmac:** The paved surface the plane is parked on.\n*   **Grass/Field:** The dry, grassy area surrounding the runway.\n*   **Sky:** The clear blue sky in the background.\n*   **Trees:** Distant vegetation on the horizon.",
+          "wall": 38.79233665706124,
+          "tps": 16.781665042636728,
+          "completion_tokens": 651,
+          "prompt_tokens": 101
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 16.782,
+        "median": 16.782,
+        "mean": 16.782,
+        "max": 16.782,
+        "p95": 16.782
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 651,
+        "median": 651,
+        "mean": 651,
+        "max": 651,
+        "p95": 651
+      }
+    },
+    "tool_chat": {
+      "name": "tool calling /v1/chat/completions",
+      "runs": [
+        {
+          "tool_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Tokyo\", \"units\": \"c\"}"
+            }
+          ],
+          "tool_call_count": 1,
+          "content": "",
+          "wall": 9.879650349961594,
+          "tps": 13.86688750584504,
+          "completion_tokens": 137,
+          "prompt_tokens": 318
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 13.867,
+        "median": 13.867,
+        "mean": 13.867,
+        "max": 13.867,
+        "p95": 13.867
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 137,
+        "median": 137,
+        "mean": 137,
+        "max": 137,
+        "p95": 137
+      }
+    },
+    "tool_responses": {
+      "name": "tool calling /v1/responses",
+      "runs": [
+        {
+          "function_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Paris\", \"units\": \"c\"}"
+            }
+          ],
+          "function_call_count": 1,
+          "text": "",
+          "wall": 7.70598962996155,
+          "tps": 14.274610437095651,
+          "completion_tokens": 110,
+          "prompt_tokens": 336
+        }
+      ],
+      "tps_stats": {
+        "n": 1,
+        "min": 14.275,
+        "median": 14.275,
+        "mean": 14.275,
+        "max": 14.275,
+        "p95": 14.275
+      },
+      "completion_token_stats": {
+        "n": 1,
+        "min": 110,
+        "median": 110,
+        "mean": 110,
+        "max": 110,
+        "p95": 110
+      }
+    }
+  }
+}

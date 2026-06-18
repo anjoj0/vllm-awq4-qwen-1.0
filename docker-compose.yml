@@ -74,6 +74,10 @@ services:
       AWQ_ROCM_PAGED_ATTN_STATS_INTERVAL: "${AWQ_ROCM_PAGED_ATTN_STATS_INTERVAL:-128}"
       AWQ_ROCM_PAGED_ATTN_STATS_PATH: "${AWQ_ROCM_PAGED_ATTN_STATS_PATH:-}"
       AWQ_DFLASH_DRAFT_BLOCK16_PROTOTYPE: "${AWQ_DFLASH_DRAFT_BLOCK16_PROTOTYPE:-0}"
+      # Correctness A/B switch. Default keeps DFlash enabled. Set
+      # VLLM_DISABLE_DFLASH=1 before container recreate to remove
+      # --speculative-config and launch the same AWQ4 target without DFlash.
+      VLLM_DISABLE_DFLASH: "${VLLM_DISABLE_DFLASH:-0}"
       # Avoid the EngineCore pickling regression that surfaces on
       # cold-start with the v0.20.0 compile-cache pipeline.
       VLLM_DISABLE_COMPILE_CACHE: "1"

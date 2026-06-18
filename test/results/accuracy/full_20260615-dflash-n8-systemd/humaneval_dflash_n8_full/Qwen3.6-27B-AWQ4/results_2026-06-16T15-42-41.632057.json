@@ -1,0 +1,166 @@
+{
+  "results": {
+    "humaneval": {
+      "name": "humaneval",
+      "alias": "humaneval",
+      "sample_len": 164,
+      "pass@1,create_test": 0.8414634146341463,
+      "pass@1_stderr,create_test": 0.028608070471683643
+    }
+  },
+  "group_subtasks": {},
+  "configs": {
+    "humaneval": {
+      "task": "humaneval",
+      "dataset_path": "openai/openai_humaneval",
+      "test_split": "test",
+      "doc_to_text": "{{prompt}}",
+      "doc_to_target": "{{test}}\ncheck({{entry_point}})",
+      "unsafe_code": true,
+      "description": "",
+      "target_delimiter": " ",
+      "fewshot_delimiter": "\n\n",
+      "fewshot_config": {
+        "sampler": "default",
+        "split": null,
+        "process_docs": null,
+        "fewshot_indices": null,
+        "samples": null,
+        "doc_to_text": "{{prompt}}",
+        "doc_to_choice": null,
+        "doc_to_target": "{{test}}\ncheck({{entry_point}})",
+        "gen_prefix": null,
+        "fewshot_delimiter": "\n\n",
+        "target_delimiter": " "
+      },
+      "num_fewshot": 0,
+      "metric_list": [
+        {
+          "metric": "def pass_at_k(references: list[str], predictions: list[list[str]], k: list[int] = None):\n    global compute_\n    assert k is not None\n    if isinstance(k, int):\n        k = [k]\n    res = compute_.compute(\n        references=references,\n        predictions=predictions,\n        k=k,\n    )\n    return res[0]\n",
+          "aggregation": "mean",
+          "higher_is_better": true,
+          "k": [
+            1
+          ]
+        }
+      ],
+      "output_type": "generate_until",
+      "generation_kwargs": {
+        "until": [
+          "\nclass",
+          "\ndef",
+          "\n#",
+          "\nif",
+          "\nprint"
+        ],
+        "max_gen_toks": 1024,
+        "do_sample": false,
+        "temperature": 0
+      },
+      "repeats": 1,
+      "filter_list": [
+        {
+          "name": "create_test",
+          "filter": [
+            {
+              "function": "custom",
+              "filter_fn": "<function build_predictions at 0x7fe0a002dc60>"
+            }
+          ]
+        }
+      ],
+      "should_decontaminate": false,
+      "metadata": {
+        "version": 1.0,
+        "model": "Qwen3.6-27B-AWQ4",
+        "base_url": "http://127.0.0.1:8001/v1/completions",
+        "tokenizer_backend": "huggingface",
+        "tokenizer": "/home/xqhpc/data/AI_project/hf-cache/hub/models--cyankiwi--Qwen3.6-27B-AWQ-INT4/snapshots/c9b937c5466c5c0575fc15edd1f8c516cb1e62fd",
+        "tokenized_requests": false,
+        "num_concurrent": 1,
+        "max_retries": 3,
+        "timeout": 300,
+        "max_length": 262144,
+        "config_source": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/.venv-lm-eval-py313/lib/python3.13/site-packages/lm_eval/tasks/humaneval/humaneval.yaml"
+      }
+    }
+  },
+  "versions": {
+    "humaneval": 1.0
+  },
+  "n-shot": {
+    "humaneval": 0
+  },
+  "higher_is_better": {
+    "humaneval": {
+      "pass_at_k": true,
+      "pass@1": true
+    }
+  },
+  "n-samples": {
+    "humaneval": {
+      "original": 164,
+      "effective": 164
+    }
+  },
+  "config": {
+    "model": "local-completions",
+    "model_args": {
+      "model": "Qwen3.6-27B-AWQ4",
+      "base_url": "http://127.0.0.1:8001/v1/completions",
+      "tokenizer_backend": "huggingface",
+      "tokenizer": "/home/xqhpc/data/AI_project/hf-cache/hub/models--cyankiwi--Qwen3.6-27B-AWQ-INT4/snapshots/c9b937c5466c5c0575fc15edd1f8c516cb1e62fd",
+      "tokenized_requests": false,
+      "num_concurrent": 1,
+      "max_retries": 3,
+      "timeout": 300,
+      "max_length": 262144
+    },
+    "batch_size": "1",
+    "batch_sizes": [],
+    "device": "cuda:0",
+    "use_cache": null,
+    "limit": null,
+    "bootstrap_iters": 100000,
+    "gen_kwargs": {
+      "temperature": 0,
+      "max_gen_toks": 1024
+    },
+    "random_seed": 0,
+    "numpy_seed": 1234,
+    "torch_seed": 1234,
+    "fewshot_seed": 1234
+  },
+  "git_hash": "d5a75eb",
+  "date": 1781595133.0767782,
+  "pretty_env_info": "N/A (torch not installed)",
+  "transformers_version": "5.12.0",
+  "lm_eval_version": "0.4.12",
+  "upper_git_hash": null,
+  "tokenizer_pad_token": [
+    "<|endoftext|>",
+    "248044"
+  ],
+  "tokenizer_eos_token": [
+    "<|im_end|>",
+    "248046"
+  ],
+  "tokenizer_bos_token": [
+    null,
+    "None"
+  ],
+  "eot_token_id": 248046,
+  "max_length": 262143,
+  "task_hashes": {
+    "humaneval": "c122632f0bdffdd0162cc8033a879dfe9d3b35e82c52eda6a767069e0a2beb40"
+  },
+  "model_source": "local-completions",
+  "model_name": "Qwen3.6-27B-AWQ4",
+  "model_name_sanitized": "Qwen3.6-27B-AWQ4",
+  "system_instruction": null,
+  "system_instruction_sha": null,
+  "fewshot_as_multiturn": null,
+  "chat_template": null,
+  "chat_template_sha": null,
+  "total_evaluation_time_seconds": "630.9797380910022"
+}

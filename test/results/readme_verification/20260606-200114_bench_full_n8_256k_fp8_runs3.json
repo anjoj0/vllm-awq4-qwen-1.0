@@ -1,0 +1,369 @@
+{
+  "meta": {
+    "host": "http://127.0.0.1:8001",
+    "model": "Qwen3.6-27B-AWQ4",
+    "backend": "ROCM_ATTN + DFlash",
+    "runs_per_test": 3,
+    "started_at": "2026-06-06 20:01:14",
+    "finished_at": "2026-06-06 20:07:53",
+    "wall_seconds": 399.13
+  },
+  "tests": {
+    "completions_short": {
+      "name": "completions short factual",
+      "runs": [
+        {
+          "output": "Paris.\n\n<think>\n\n</think>\n\nThat",
+          "wall": 3.084901981987059,
+          "tps": 2.593275263432198,
+          "completion_tokens": 8,
+          "prompt_tokens": 5
+        },
+        {
+          "output": "Paris.\n\n<think>\n\n</think>\n\nThat",
+          "wall": 1.3089691649656743,
+          "tps": 6.111679491097705,
+          "completion_tokens": 8,
+          "prompt_tokens": 5
+        },
+        {
+          "output": "Paris.\n\n<think>\n\n</think>\n\nThat",
+          "wall": 1.3053865759866312,
+          "tps": 6.128452787216291,
+          "completion_tokens": 8,
+          "prompt_tokens": 5
+        }
+      ],
+      "tps_stats": {
+        "n": 3,
+        "min": 2.593,
+        "median": 6.112,
+        "mean": 4.944,
+        "max": 6.128,
+        "p95": 6.112
+      },
+      "completion_token_stats": {
+        "n": 3,
+        "min": 8,
+        "median": 8,
+        "mean": 8,
+        "max": 8,
+        "p95": 8
+      }
+    },
+    "chat_factual": {
+      "name": "chat factual (speed of light)",
+      "runs": [
+        {
+          "output": "\n\n299792458",
+          "reasoning": "",
+          "wall": 11.85242331889458,
+          "tps": 17.97100848232828,
+          "completion_tokens": 213,
+          "prompt_tokens": 29
+        },
+        {
+          "output": "\n\n299792458",
+          "reasoning": "",
+          "wall": 9.478057460975833,
+          "tps": 22.472959346046224,
+          "completion_tokens": 213,
+          "prompt_tokens": 29
+        },
+        {
+          "output": "\n\n299792458",
+          "reasoning": "",
+          "wall": 9.35167499189265,
+          "tps": 22.776668370602955,
+          "completion_tokens": 213,
+          "prompt_tokens": 29
+        }
+      ],
+      "tps_stats": {
+        "n": 3,
+        "min": 17.971,
+        "median": 22.473,
+        "mean": 21.074,
+        "max": 22.777,
+        "p95": 22.473
+      },
+      "completion_token_stats": {
+        "n": 3,
+        "min": 213,
+        "median": 213,
+        "mean": 213,
+        "max": 213,
+        "p95": 213
+      }
+    },
+    "chat_explainer": {
+      "name": "chat explainer (entanglement)",
+      "runs": [
+        {
+          "output": "\n\nQuantum entanglement happens when two tiny particles become linked so closely that they share a single existence, no matter how far apart they are. If you measure one particle, the other instantly settles into a matching state, even across the universe. This isn\u2019t magic but a proven rule of nature that scientists are already using to build super-fast computers and unhackable communication.",
+          "reasoning": "",
+          "wall": 66.0004608760355,
+          "tps": 20.136223025717605,
+          "completion_tokens": 1329,
+          "prompt_tokens": 27
+        },
+        {
+          "output": "\n\nQuantum entanglement happens when two tiny particles become linked so closely that they share a single existence, no matter how far apart they are. If you measure one particle, the other instantly settles into a matching state, even across the universe. This isn\u2019t magic but a proven rule of nature that scientists are already using to build super-fast computers and unhackable communication.",
+          "reasoning": "",
+          "wall": 73.64793656300753,
+          "tps": 19.94624789987478,
+          "completion_tokens": 1469,
+          "prompt_tokens": 27
+        },
+        {
+          "output": "\n\nQuantum entanglement happens when two tiny particles become linked so closely that they share a single existence, no matter how far apart they are. If you measure one particle, the other instantly settles into a matching state, even across the universe. This isn\u2019t magic but a proven rule of nature that scientists are already using to build super-fast computers and unhackable communication.",
+          "reasoning": "",
+          "wall": 73.59665246808436,
+          "tps": 19.960146973220567,
+          "completion_tokens": 1469,
+          "prompt_tokens": 27
+        }
+      ],
+      "tps_stats": {
+        "n": 3,
+        "min": 19.946,
+        "median": 19.96,
+        "mean": 20.014,
+        "max": 20.136,
+        "p95": 19.96
+      },
+      "completion_token_stats": {
+        "n": 3,
+        "min": 1329,
+        "median": 1469,
+        "mean": 1422.333,
+        "max": 1469,
+        "p95": 1469
+      }
+    },
+    "responses_reasoning": {
+      "name": "responses reasoning (trains)",
+      "runs": [
+        {
+          "output": "\n\n1. 90 mph\n2. 75 mph\n3. 60 mph",
+          "wall": 32.19764476106502,
+          "tps": 28.26293683134292,
+          "completion_tokens": 910,
+          "prompt_tokens": 57
+        },
+        {
+          "output": "\n\n1. 90 mph\n2. 75 mph\n3. 60 mph",
+          "wall": 32.159734698943794,
+          "tps": 28.296253327919608,
+          "completion_tokens": 910,
+          "prompt_tokens": 57
+        },
+        {
+          "output": "\n\n1. 90 mph\n2. 75 mph\n3. 60 mph",
+          "wall": 32.16431315999944,
+          "tps": 28.2922254696769,
+          "completion_tokens": 910,
+          "prompt_tokens": 57
+        }
+      ],
+      "tps_stats": {
+        "n": 3,
+        "min": 28.263,
+        "median": 28.292,
+        "mean": 28.284,
+        "max": 28.296,
+        "p95": 28.292
+      },
+      "completion_token_stats": {
+        "n": 3,
+        "min": 910,
+        "median": 910,
+        "mean": 910,
+        "max": 910,
+        "p95": 910
+      }
+    },
+    "vision_frost": {
+      "name": "vision (frost_1.png  -  1280x720)",
+      "runs": [
+        {
+          "error": "image not found: /home/hec/Pictures/frost_1.png",
+          "wall": 0,
+          "tps": 0,
+          "completion_tokens": 0,
+          "prompt_tokens": 0
+        },
+        {
+          "error": "image not found: /home/hec/Pictures/frost_1.png",
+          "wall": 0,
+          "tps": 0,
+          "completion_tokens": 0,
+          "prompt_tokens": 0
+        },
+        {
+          "error": "image not found: /home/hec/Pictures/frost_1.png",
+          "wall": 0,
+          "tps": 0,
+          "completion_tokens": 0,
+          "prompt_tokens": 0
+        }
+      ],
+      "tps_stats": {},
+      "completion_token_stats": {}
+    },
+    "vision_splash": {
+      "name": "vision (splash.png  -  1024x1024)",
+      "runs": [
+        {
+          "error": "image not found: /home/hec/Pictures/splash.png",
+          "wall": 0,
+          "tps": 0,
+          "completion_tokens": 0,
+          "prompt_tokens": 0
+        },
+        {
+          "error": "image not found: /home/hec/Pictures/splash.png",
+          "wall": 0,
+          "tps": 0,
+          "completion_tokens": 0,
+          "prompt_tokens": 0
+        },
+        {
+          "error": "image not found: /home/hec/Pictures/splash.png",
+          "wall": 0,
+          "tps": 0,
+          "completion_tokens": 0,
+          "prompt_tokens": 0
+        }
+      ],
+      "tps_stats": {},
+      "completion_token_stats": {}
+    },
+    "tool_chat": {
+      "name": "tool calling /v1/chat/completions",
+      "runs": [
+        {
+          "tool_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Tokyo\", \"units\": \"c\"}"
+            }
+          ],
+          "tool_call_count": 1,
+          "content": "",
+          "wall": 9.859370733029209,
+          "tps": 13.895410134142294,
+          "completion_tokens": 137,
+          "prompt_tokens": 318
+        },
+        {
+          "tool_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Tokyo\", \"units\": \"c\"}"
+            }
+          ],
+          "tool_call_count": 1,
+          "content": "",
+          "wall": 9.909453531028703,
+          "tps": 13.825182142589652,
+          "completion_tokens": 137,
+          "prompt_tokens": 318
+        },
+        {
+          "tool_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Tokyo\", \"units\": \"c\"}"
+            }
+          ],
+          "tool_call_count": 1,
+          "content": "",
+          "wall": 9.855587449972518,
+          "tps": 13.90074419159885,
+          "completion_tokens": 137,
+          "prompt_tokens": 318
+        }
+      ],
+      "tps_stats": {
+        "n": 3,
+        "min": 13.825,
+        "median": 13.895,
+        "mean": 13.874,
+        "max": 13.901,
+        "p95": 13.895
+      },
+      "completion_token_stats": {
+        "n": 3,
+        "min": 137,
+        "median": 137,
+        "mean": 137,
+        "max": 137,
+        "p95": 137
+      }
+    },
+    "tool_responses": {
+      "name": "tool calling /v1/responses",
+      "runs": [
+        {
+          "function_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Paris\", \"units\": \"c\"}"
+            }
+          ],
+          "function_call_count": 1,
+          "text": "",
+          "wall": 7.921547200996429,
+          "tps": 13.886176173533803,
+          "completion_tokens": 110,
+          "prompt_tokens": 336
+        },
+        {
+          "function_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Paris\", \"units\": \"c\"}"
+            }
+          ],
+          "function_call_count": 1,
+          "text": "",
+          "wall": 7.708347687963396,
+          "tps": 14.270243695904542,
+          "completion_tokens": 110,
+          "prompt_tokens": 336
+        },
+        {
+          "function_calls": [
+            {
+              "name": "get_weather",
+              "arguments": "{\"city\": \"Paris\", \"units\": \"c\"}"
+            }
+          ],
+          "function_call_count": 1,
+          "text": "",
+          "wall": 7.718899143044837,
+          "tps": 14.250736790506739,
+          "completion_tokens": 110,
+          "prompt_tokens": 336
+        }
+      ],
+      "tps_stats": {
+        "n": 3,
+        "min": 13.886,
+        "median": 14.251,
+        "mean": 14.136,
+        "max": 14.27,
+        "p95": 14.251
+      },
+      "completion_token_stats": {
+        "n": 3,
+        "min": 110,
+        "median": 110,
+        "mean": 110,
+        "max": 110,
+        "p95": 110
+      }
+    }
+  }
+}

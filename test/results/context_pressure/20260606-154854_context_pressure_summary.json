@@ -1,0 +1,56 @@
+{
+  "timestamp": "20260606-154854",
+  "source_file": "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt",
+  "source_file_tokens": 353478,
+  "rows": [
+    {
+      "context_class": "64K",
+      "test_type": "real generation near-boundary",
+      "max_model_len": 65536,
+      "gpu_memory_utilization": 0.6,
+      "kv_cache_dtype": "fp8 in current best profile; prior 60K note says util=0.60",
+      "prompt_tokens": 60000,
+      "max_tokens": 128,
+      "ok": true,
+      "wall_seconds": 762.486,
+      "completion_tokens": 128,
+      "gpu_kv_cache_size_tokens_latest_64k": 96960,
+      "max_concurrency_latest_64k": 2.17,
+      "source_result": "test/results/decode_backend/20260602-151019_gpu_util_060_60k_combined_papers_request.json"
+    },
+    {
+      "context_class": "128K",
+      "test_type": "startup/capacity",
+      "max_model_len": 131072,
+      "gpu_memory_utilization": 0.9,
+      "kv_cache_dtype": "fp8",
+      "prompt_tokens": null,
+      "max_tokens": null,
+      "ok": true,
+      "health_wait_seconds": 256.1,
+      "gpu_kv_cache_size_tokens": 235936,
+      "max_concurrency": 2.81,
+      "source_result": "test/results/context_pressure/20260606-154100_ctx128k_startup_capacity.json"
+    },
+    {
+      "context_class": "256K",
+      "test_type": "startup/capacity",
+      "max_model_len": 262144,
+      "gpu_memory_utilization": 0.9,
+      "kv_cache_dtype": "fp8",
+      "prompt_tokens": null,
+      "max_tokens": null,
+      "ok": true,
+      "health_wait_seconds": 215.9,
+      "gpu_kv_cache_size_tokens": 235936,
+      "max_concurrency": 1.46,
+      "source_result": "test/results/context_pressure/20260606-154736_ctx256k_startup_capacity.json"
+    }
+  ],
+  "interpretation": [
+    "32K is not the maximum. 64K generation has already been validated with a real 60K-token slice of combined_papers_for_llm.txt.",
+    "128K and 256K both start successfully under the high-memory single-user profile: gpu_memory_utilization=0.90, fp8 KV, DFlash N=4, max_num_batched_tokens=16384.",
+    "The full combined_papers_for_llm.txt is about 353,478 tokens, so even 256K is still a truncated test, not full-document ingestion.",
+    "Full 128K/256K generation was not run in this pass because the real 60K generation already took 762.486 seconds for 128 output tokens; larger generations should be scheduled as overnight tests."
+  ]
+}

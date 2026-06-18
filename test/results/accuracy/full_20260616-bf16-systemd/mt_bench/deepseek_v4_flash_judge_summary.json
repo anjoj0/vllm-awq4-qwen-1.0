@@ -1,0 +1,55 @@
+{
+  "judge": "deepseek:deepseek-v4-flash",
+  "official_mt_bench": false,
+  "count": 80,
+  "valid_count": 80,
+  "mean": 4.4,
+  "median": 4.0,
+  "min": 2.0,
+  "max": 10.0,
+  "by_category": {
+    "coding": {
+      "count": 10,
+      "mean": 4.1,
+      "median": 4.0
+    },
+    "extraction": {
+      "count": 10,
+      "mean": 3.7,
+      "median": 3.0
+    },
+    "humanities": {
+      "count": 10,
+      "mean": 3.8,
+      "median": 4.0
+    },
+    "math": {
+      "count": 10,
+      "mean": 5.7,
+      "median": 5.0
+    },
+    "reasoning": {
+      "count": 10,
+      "mean": 6.55,
+      "median": 6.0
+    },
+    "roleplay": {
+      "count": 10,
+      "mean": 3.9,
+      "median": 4.0
+    },
+    "stem": {
+      "count": 10,
+      "mean": 3.8,
+      "median": 4.0
+    },
+    "writing": {
+      "count": 10,
+      "mean": 3.65,
+      "median": 3.0
+    }
+  },
+  "answers": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/mt_bench/20260617-183617_mt_bench_Qwen3.6-27B_answers.jsonl",
+  "scores": "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/accuracy/full_20260616-bf16-systemd/mt_bench/deepseek_v4_flash_judge_scores.jsonl",
+  "base_url": "https://api.deepseek.com"
+}

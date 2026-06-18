@@ -1,0 +1,24 @@
+{
+  "timestamp": "20260606-154100",
+  "label": "ctx128k_startup_capacity_fp8_gpu090_n4_mbt16384",
+  "config": {
+    "VLLM_MAX_MODEL_LEN": 131072,
+    "VLLM_GPU_MEMORY_UTIL": 0.9,
+    "VLLM_KV_CACHE_DTYPE": "fp8",
+    "VLLM_MAX_NUM_BATCHED_TOKENS": 16384,
+    "VLLM_DFLASH_N": 4,
+    "VLLM_MAX_NUM_SEQS": 1,
+    "attention_backend": "TRITON_ATTN"
+  },
+  "startup": {
+    "healthy": true,
+    "health_wait_seconds": 256.1,
+    "model_memory_gib": 40.5,
+    "available_kv_cache_memory_gib": 58.87,
+    "gpu_kv_cache_size_tokens": 235936,
+    "max_concurrency_for_max_model_len": 2.81,
+    "init_engine_seconds": 138.34,
+    "attention_block_size_tokens": 1616
+  },
+  "source": "docker logs vllm-awq4-qwen, 2026-06-06 07:35-07:39 Asia/Shanghai"
+}

@@ -19,4 +19,22 @@ if [ -d "$AWQ_MMQ_PKG" ] && [ -f "$AWQ_MMQ_DIR/setup.py" ]; then
   fi
 fi
 
+if [ "${VLLM_DISABLE_DFLASH:-0}" = "1" ]; then
+  filtered_args=()
+  skip_next=0
+  for arg in "$@"; do
+    if [ "$skip_next" = "1" ]; then
+      skip_next=0
+      continue
+    fi
+    if [ "$arg" = "--speculative-config" ]; then
+      skip_next=1
+      continue
+    fi
+    filtered_args+=("$arg")
+  done
+  echo "VLLM_DISABLE_DFLASH=1: removed --speculative-config from vLLM argv"
+  set -- "${filtered_args[@]}"
+fi
+
 exec "$@"

@@ -1,0 +1,45 @@
+{
+  "timestamp": "20260606-154923",
+  "source_file": "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt",
+  "source_tokens": 353478,
+  "rows": [
+    {
+      "context_class": "64K",
+      "test_type": "real generation, prior run",
+      "max_model_len": 65536,
+      "prompt_tokens": 60000,
+      "max_tokens": 128,
+      "ok": true,
+      "wall_seconds": 762.486,
+      "completion_tokens": 128,
+      "source": "test/results/decode_backend/20260602-151019_gpu_util_060_60k_combined_papers_request.json",
+      "note": "64K-class real-document request under the 2026-06-02 util=0.60 profile. Exact 64K/out64 rerun was aborted after long-running behavior; prior 60K result is the usable near-boundary baseline."
+    },
+    {
+      "context_class": "128K",
+      "test_type": "startup capacity",
+      "max_model_len": 131072,
+      "gpu_memory_utilization": 0.9,
+      "kv_cache_dtype": "fp8",
+      "gpu_kv_cache_size_tokens": 235936,
+      "max_concurrency": 2.81,
+      "health_wait_seconds": 256.1,
+      "ok": true,
+      "source": "test/results/context_pressure/20260606-154100_ctx128k_startup_capacity.json",
+      "note": "Capacity verified; full generation intentionally deferred because 60K real generation took 12.7 min."
+    },
+    {
+      "context_class": "256K",
+      "test_type": "startup capacity",
+      "max_model_len": 262144,
+      "gpu_memory_utilization": 0.9,
+      "kv_cache_dtype": "fp8",
+      "gpu_kv_cache_size_tokens": 235936,
+      "max_concurrency": 1.46,
+      "health_wait_seconds": 215.9,
+      "ok": true,
+      "source": "test/results/context_pressure/20260606-154736_ctx256k_startup_capacity.json",
+      "note": "README 256K capacity validated for startup/admission profile; full 353K file still exceeds 256K."
+    }
+  ]
+}

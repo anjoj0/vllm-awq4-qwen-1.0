@@ -1,5 +1,6 @@
 # Secrets  -  only .env.template is committed
 .env
+*.env
 .env.local
 *.key
 *.pem
@@ -20,6 +21,21 @@ logs/
 # Benchmark output (regenerated each run)
 test/*.json
 test/results/
+!test/results/accuracy/
+!test/results/accuracy/20260618_awq4_dflash_vs_bf16_5bench_comparison.md
+!test/results/accuracy/20260618_awq4_dflash_vs_bf16_5bench_comparison.json
+!test/results/accuracy/accuracy_summary_current.md
+test/results/accuracy/**/*.jsonl
+test/results/accuracy/**/*.log
+test/results/accuracy/**/*.pid
+test/results/accuracy/full_*/
+!test/results/readme_verification/
+!test/results/readme_verification/**
+!test/results/context_pressure/
+!test/results/context_pressure/**
+test/results/context_pressure/*.env
+!test/results/video_demo/
+!test/results/video_demo/**
 !test/results/
 !test/results/competition/
 !test/results/competition/**
@@ -34,6 +50,7 @@ __pycache__/
 *$py.class
 .pytest_cache/
 .venv/
+.venv-lm-eval/
 venv/
 
 # C/HIP custom-op build artifacts (rebuilt on demand inside the container)
@@ -64,9 +81,29 @@ Thumbs.db
 # Logs / tmp
 *.log
 *.tmp
+*.orig
 
 # Model weights should never be in the repo
 *.safetensors
 *.gguf
 *.bin
 models/
+# Accuracy evidence kept in git: aggregate metrics and MT-Bench judge artifacts only
+!test/results/accuracy/full_20260615-dflash-n8-systemd/
+!test/results/accuracy/full_20260615-dflash-n8-systemd/**/
+!test/results/accuracy/full_20260615-dflash-n8-systemd/**/results_*.json
+!test/results/accuracy/full_20260615-dflash-n8-systemd/mt_bench/*_answers.jsonl
+!test/results/accuracy/full_20260615-dflash-n8-systemd/mt_bench/deepseek_v4_flash_judge_scores.jsonl
+!test/results/accuracy/full_20260615-dflash-n8-systemd/mt_bench/deepseek_v4_flash_judge_summary.json
+test/results/accuracy/full_20260615-dflash-n8-systemd/**/samples_*.jsonl
+test/results/accuracy/full_20260615-dflash-n8-systemd/logs/
+test/results/accuracy/full_20260615-dflash-n8-systemd/mt_bench/cache/
+!test/results/accuracy/full_20260616-bf16-systemd/
+!test/results/accuracy/full_20260616-bf16-systemd/**/
+!test/results/accuracy/full_20260616-bf16-systemd/**/results_*.json
+!test/results/accuracy/full_20260616-bf16-systemd/mt_bench/*_answers.jsonl
+!test/results/accuracy/full_20260616-bf16-systemd/mt_bench/deepseek_v4_flash_judge_scores.jsonl
+!test/results/accuracy/full_20260616-bf16-systemd/mt_bench/deepseek_v4_flash_judge_summary.json
+test/results/accuracy/full_20260616-bf16-systemd/**/samples_*.jsonl
+test/results/accuracy/full_20260616-bf16-systemd/logs/
+test/results/accuracy/full_20260616-bf16-systemd/mt_bench/cache/
