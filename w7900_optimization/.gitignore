@@ -1,0 +1,10 @@
+# Keep raw W7900 experiment outputs local by default.
+results/
+logs/
+*.log
+*.pid
+*.env
+
+# Summaries can be committed explicitly when useful.
+!results/
+!results/.gitkeep
