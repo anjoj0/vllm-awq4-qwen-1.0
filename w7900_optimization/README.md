@@ -5,6 +5,8 @@
 ## 已实现
 
 - `patch_w7900.py`：对 vLLM 0.23 工作树做幂等补丁，回移 PR #45207 / commit `55da232d`，开放 unified attention tile 和 2D/3D launch 参数，并检查 gfx1151 硬编码。
+- `../Dockerfile.w7900`：继承实测 ROCm 7.14/vLLM 0.23 AMD 镜像，以 `gfx1100` 重建工作树；根目录 `Dockerfile` 仍专用于 Strix Halo。
+- `vllm_overrides/rdna3_w4a16.py`：整模型 `RDNA3W4A16LinearKernel` 的非对称 `compressed-tensors` dispatcher override；它不同于下方 standalone HIP MMQ 研究扩展。
 - `csrc/awq_mmq_gfx1100/`：面向 gfx1100 的 W4A16 HIP 内核、Python binding、正确性测试与 prefill benchmark。
 - `longdoc_sanity/`：Nowcast3D 主题科研长文数据集，包含证据、数字、needle、引用和拒答测评。
 - `scripts/`：本地 vLLM 构建、单/多卡服务、长文与并发 harness、RCCL 和功耗辅助工具。
@@ -31,7 +33,9 @@ bash scripts/prepare_local_vllm.sh
 bash scripts/build_local_vllm.sh
 ```
 
-默认从 `/app/vllm` 复制到 `/workspace/vllm-w7900-023` 后修改，避免直接污染容器预装源码。路径均可由环境变量覆盖。
+若要从 Dockerfile 构建独立 W7900 镜像，使用 `.env.w7900.docker.template` 和仓库根目录的 `Dockerfile.w7900`，不要使用旧的 Strix Halo 根 Dockerfile。
+
+当前容器流程从 `/app/vllm` 复制到 `/workspace/vllm-w7900-023` 后修改；独立 Docker 镜像流程复制到 `/opt/vllm-w7900-023`。两条路径都避免直接污染基础源码，且所有架构目标均固定为 `gfx1100`。
 
 单独构建 gfx1100 算子：
 

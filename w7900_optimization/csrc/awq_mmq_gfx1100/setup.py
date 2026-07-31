@@ -1,18 +1,17 @@
 """
 Build script for the AWQ-INT4 MMQ HIP custom op targeting gfx1100 (Radeon PRO W7900).
 
-Builds a Python extension module `awq_mmq_gfx1100._C` that exposes a single
-`torch.ops.awq_mmq_gfx1100.mmq_q4_gemm` op. Only used inside the project's
-container against TheRock 7.13.0a; no fallback for other architectures.
+Builds a standalone Python extension module `awq_mmq_gfx1100._C` for kernel
+correctness and microbenchmark experiments. It is separate from the vLLM 0.23
+`RDNA3W4A16LinearKernel` dispatcher override used by the full model service.
 
-Usage (inside the running vllm-awq4-qwen container):
+Usage (inside a ROCm container with a gfx1100 toolchain):
     cd /workspace/csrc/awq_mmq_gfx1100
     python setup.py build_ext --inplace
     python test_correctness.py
 
-After the .so builds, scripts/patch_strix.py Patch 16 (Phase 3) will register
-the op with vLLM's MPLinear dispatcher so prefill-shape calls route through
-this kernel and decode falls through to the existing TritonW4A16 path.
+Building this package does not modify vLLM or register the production
+dispatcher. See `../../vllm_overrides/rdna3_w4a16.py` for the E2E path.
 """
 import os
 from setuptools import setup, find_packages

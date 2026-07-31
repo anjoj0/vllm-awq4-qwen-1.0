@@ -4,7 +4,7 @@
 //
 // version: 0 = v0 scalar reference, 1 = v1 WMMA + LDS staging, 2 = v2 small-M decode.
 //
-// Tensor contracts (verified against vLLM v0.20.0 compressed_tensors_wNa16.py):
+// Tensor contracts used by the standalone gfx1100 correctness harness:
 //   x         : (M, K)        fp16,  CUDA, contiguous
 //   w_packed  : (N, K / 8)    int32, CUDA, contiguous
 //                 8 uint4 values per int32, low-nibble first (shifts 0,4,...,28).

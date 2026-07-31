@@ -1,0 +1,73 @@
+# Radeon PRO W7900 (gfx1100) build validated against the AMD vLLM 0.23 image.
+# The root Dockerfile remains the Strix Halo/gfx1151 build; this file is the
+# discrete multi-GPU W7900 entrypoint.
+
+ARG BASE_IMAGE=rocm/vllm:rocm7.14.0_rdna_ubuntu24.04_py3.14_pytorch_2.11.0_vllm_0.23.0
+FROM ${BASE_IMAGE}
+
+USER root
+SHELL ["/bin/bash", "-lc"]
+
+ARG VLLM_SOURCE=/app/vllm
+ARG VLLM_WORKTREE=/opt/vllm-w7900-023
+ARG VLLM_VERSION_OVERRIDE=0.23.1.dev1
+ARG MAX_JOBS=8
+
+ENV VLLM_SOURCE=${VLLM_SOURCE} \
+    VLLM_WORKTREE=${VLLM_WORKTREE} \
+    VLLM_TARGET_DEVICE=rocm \
+    PYTORCH_ROCM_ARCH=gfx1100 \
+    AMDGPU_TARGETS=gfx1100 \
+    GPU_TARGETS=gfx1100 \
+    HIP_ARCHITECTURES=gfx1100 \
+    VLLM_VERSION_OVERRIDE=${VLLM_VERSION_OVERRIDE} \
+    MAX_JOBS=${MAX_JOBS} \
+    VLLM_ROCM_USE_AITER=0 \
+    VLLM_USE_TRITON_AWQ=1 \
+    HSA_NO_SCRATCH_RECLAIM=1 \
+    MIOPEN_FIND_MODE=FAST \
+    VLLM_TRITON_ATTN_PREFILL_TILE_SIZE=16
+
+RUN test -d "${VLLM_SOURCE}/vllm" && \
+    command -v hipcc && \
+    python3 - <<'PY'
+import torch, vllm
+print("base vLLM", vllm.__version__)
+print("torch", torch.__version__, "HIP", torch.version.hip)
+PY
+
+COPY w7900_optimization/patch_w7900.py /opt/w7900/patch_w7900.py
+COPY w7900_optimization/vllm_overrides/rdna3_w4a16.py \
+     /opt/w7900/rdna3_w4a16.py
+
+# Work on a private source copy. patch_w7900.py backports merged PR #45207
+# when needed and exposes gfx1100 attention tunables. The RDNA3 override is
+# the asymmetric compressed-tensors implementation used by the W7900 E2E runs.
+RUN cp -a "${VLLM_SOURCE}" "${VLLM_WORKTREE}" && \
+    python3 /opt/w7900/patch_w7900.py "${VLLM_WORKTREE}" && \
+    install -m 0644 /opt/w7900/rdna3_w4a16.py \
+      "${VLLM_WORKTREE}/vllm/model_executor/kernels/linear/mixed_precision/rdna3_w4a16.py" && \
+    ! grep -R -n -E 'return "gfx1151"|device_name = "gfx1151"' \
+      "${VLLM_WORKTREE}/vllm/platforms/rocm.py" && \
+    grep -q 'class RDNA3W4A16LinearKernel' \
+      "${VLLM_WORKTREE}/vllm/model_executor/kernels/linear/mixed_precision/rdna3_w4a16.py"
+
+# Rebuild the vLLM ROCm extension for gfx1100 using the toolchain and pinned
+# dependencies already supplied by the AMD image.
+RUN ROCM_SDK_ROOT="$(dirname "$(dirname "$(readlink -f "$(command -v hipcc)")")")" && \
+    export ROCM_HOME="${ROCM_SDK_ROOT}" ROCM_PATH="${ROCM_SDK_ROOT}" \
+           HIP_PATH="${ROCM_SDK_ROOT}" && \
+    export CMAKE_ARGS="-DROCM_PATH=${ROCM_SDK_ROOT} -DHIP_PATH=${ROCM_SDK_ROOT} -DGPU_TARGETS=gfx1100 -DHIP_ARCHITECTURES=gfx1100 -DFETCHCONTENT_SOURCE_DIR_TRITON_KERNELS=${VLLM_SOURCE}/.deps/triton_kernels-src" && \
+    export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_VLLM="${VLLM_VERSION_OVERRIDE}" && \
+    rm -rf "${VLLM_WORKTREE}/.deps/triton_kernels-subbuild" \
+           "${VLLM_WORKTREE}/.deps/triton_kernels-build" && \
+    cd "${VLLM_WORKTREE}" && \
+    python3 -m pip install --no-build-isolation --no-deps --editable . -v
+
+COPY w7900_optimization/scripts/start_container_w7900.sh \
+     /usr/local/bin/start-w7900-vllm
+RUN chmod 0755 /usr/local/bin/start-w7900-vllm
+
+ENV PYTHONPATH=${VLLM_WORKTREE}
+WORKDIR ${VLLM_WORKTREE}
+ENTRYPOINT ["/usr/local/bin/start-w7900-vllm"]

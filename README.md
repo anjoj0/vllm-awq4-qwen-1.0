@@ -124,6 +124,8 @@ bash scripts/build_local_vllm.sh
 - 2D/3D launch threshold 参数化；
 - gfx1151 强制目标检查。
 
+如需构建独立 Docker 镜像，请使用仓库根目录的 `Dockerfile.w7900` 和 `w7900_optimization/docker-compose.w7900.build.yml`。它直接继承实测的 ROCm 7.14/vLLM 0.23 镜像，并以 `gfx1100` 重编译；根目录的 `Dockerfile` 和 `docker-compose.yml` 仍然是 Strix Halo/gfx1151 路线。
+
 构建 gfx1100 W4A16 扩展：
 
 ```bash

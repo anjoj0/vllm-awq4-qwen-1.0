@@ -1,19 +1,14 @@
 services:
   vllm:
-    image: vllm-awq4-qwen:w7900-gfx1100
+    image: vllm-awq4-qwen:w7900-rocm7.14-vllm0.23
     build:
       context: ..
-      dockerfile: w7900_optimization/Dockerfile.w7900
+      dockerfile: Dockerfile.w7900
       network: host
       args:
-        VLLM_COMMIT: ${VLLM_COMMIT:-v0.20.0}
-        GFX: ${W7900_GFX:-gfx1100}
-        ROCM_WHEEL_GFX: ${W7900_ROCM_WHEEL_GFX:-gfx1100}
-        TORCH_ROCM_DATE: ${TORCH_ROCM_DATE:-20260510}
-        HTTP_PROXY: ${HTTP_PROXY:-}
-        HTTPS_PROXY: ${HTTPS_PROXY:-}
-        http_proxy: ${http_proxy:-}
-        https_proxy: ${https_proxy:-}
+        BASE_IMAGE: ${W7900_BASE_IMAGE:-rocm/vllm:rocm7.14.0_rdna_ubuntu24.04_py3.14_pytorch_2.11.0_vllm_0.23.0}
+        VLLM_VERSION_OVERRIDE: ${VLLM_VERSION_OVERRIDE:-0.23.1.dev1}
+        MAX_JOBS: ${MAX_JOBS:-8}
     container_name: vllm-awq4-qwen-w7900
     restart: "no"
     privileged: true
@@ -23,57 +18,33 @@ services:
     ports:
       - "${VLLM_HOST_PORT:-8000}:8000"
     volumes:
-      - ${VLLM_HOST_MODELS_DIR:-/abs/path/to/hf-cache}:/models:ro
+      - ${VLLM_HOST_MODELS_DIR:?Set VLLM_HOST_MODELS_DIR to the host model directory}:/models:ro
       - ${VLLM_HOST_TRITON_CACHE:-./.triton-cache-w7900}:/root/.triton/cache
       - ${VLLM_HOST_VLLM_CACHE:-./.vllm-cache-w7900}:/root/.cache/vllm
-      - ../scripts/start_vllm_awq.sh:/usr/local/bin/start-vllm-awq:ro
     ipc: host
     shm_size: "32gb"
     environment:
-      HF_HOME: /models
-      HF_HUB_OFFLINE: "1"
-      HIP_VISIBLE_DEVICES: "${W7900_VISIBLE_DEVICES:-0,1}"
-      VLLM_ROCM_USE_AITER: "0"
-      VLLM_USE_TRITON_AWQ: "1"
-      AWQ_MMQ_ENABLE: "0"
-      VLLM_DISABLE_COMPILE_CACHE: "1"
-      HSA_NO_SCRATCH_RECLAIM: "1"
-      MIOPEN_FIND_MODE: FAST
+      W7900_VISIBLE_DEVICES: "${W7900_VISIBLE_DEVICES:-0,1}"
+      VLLM_TARGET_MODEL: "${VLLM_TARGET_MODEL:-/models/Qwen3.6-27B-AWQ-INT4}"
+      VLLM_DRAFT_MODEL: "${VLLM_DRAFT_MODEL:-/models/Qwen3.6-27B-DFlash}"
+      VLLM_SERVED_MODEL_NAME: "${VLLM_SERVED_MODEL_NAME:-Qwen3.6-27B-AWQ4}"
+      VLLM_TENSOR_PARALLEL_SIZE: "${VLLM_TENSOR_PARALLEL_SIZE:-2}"
+      VLLM_DRAFT_TENSOR_PARALLEL_SIZE: "${VLLM_DRAFT_TENSOR_PARALLEL_SIZE:-1}"
+      VLLM_GPU_MEMORY_UTIL: "${VLLM_GPU_MEMORY_UTIL:-0.80}"
+      VLLM_MAX_MODEL_LEN: "${VLLM_MAX_MODEL_LEN:-131072}"
+      VLLM_MAX_NUM_BATCHED_TOKENS: "${VLLM_MAX_NUM_BATCHED_TOKENS:-16384}"
+      VLLM_MAX_NUM_SEQS: "${VLLM_MAX_NUM_SEQS:-1}"
+      VLLM_KV_CACHE_DTYPE: "${VLLM_KV_CACHE_DTYPE:-fp8}"
+      VLLM_ATTENTION_BACKEND: "${VLLM_ATTENTION_BACKEND:-TRITON_ATTN}"
+      VLLM_TRITON_ATTN_PREFILL_TILE_SIZE: "${VLLM_TRITON_ATTN_PREFILL_TILE_SIZE:-16}"
+      VLLM_DFLASH_N: "${VLLM_DFLASH_N:-8}"
       VLLM_DISABLE_DFLASH: "${VLLM_DISABLE_DFLASH:-0}"
-    entrypoint:
-      - /usr/local/bin/start-vllm-awq
-    command:
-      - vllm
-      - serve
-      - ${VLLM_MODEL_ID:-cyankiwi/Qwen3.6-27B-AWQ-INT4}
-      - --host
-      - "0.0.0.0"
-      - --port
-      - "8000"
-      - --served-model-name
-      - ${VLLM_SERVED_MODEL_NAME:-Qwen3.6-27B-AWQ4}
-      - --attention-backend
-      - TRITON_ATTN
-      - --mm-encoder-attn-backend
-      - TRITON_ATTN
-      - --reasoning-parser
-      - qwen3
-      - --tool-call-parser
-      - qwen3_coder
-      - --enable-auto-tool-choice
-      - --enforce-eager
-      - --tensor-parallel-size
-      - "${VLLM_TENSOR_PARALLEL_SIZE:-2}"
-      - --gpu-memory-utilization
-      - "${VLLM_GPU_MEMORY_UTIL:-0.80}"
-      - --max-num-seqs
-      - "${VLLM_MAX_NUM_SEQS:-1}"
-      - --max-num-batched-tokens
-      - "${VLLM_MAX_NUM_BATCHED_TOKENS:-16384}"
-      - --kv-cache-dtype
-      - "${VLLM_KV_CACHE_DTYPE:-fp8}"
-      - --max-model-len
-      - "${VLLM_MAX_MODEL_LEN:-131072}"
-      - --skip-mm-profiling
-      - --speculative-config
-      - '{"method":"dflash","model":"z-lab/Qwen3.6-27B-DFlash","num_speculative_tokens":${VLLM_DFLASH_N:-8}}'
+      VLLM_ENFORCE_EAGER: "${VLLM_ENFORCE_EAGER:-1}"
+      HF_HUB_OFFLINE: "${HF_HUB_OFFLINE:-1}"
+      TRANSFORMERS_OFFLINE: "${TRANSFORMERS_OFFLINE:-1}"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      start_period: 600s
