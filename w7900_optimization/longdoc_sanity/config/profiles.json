@@ -1,0 +1,56 @@
+{
+  "6k": {
+    "target_prompt_tokens": 6000,
+    "max_model_len": 8192,
+    "max_output_tokens": 256,
+    "description": "Short-context DFlash quality sanity"
+  },
+  "8k": {
+    "target_prompt_tokens": 8000,
+    "max_model_len": 32768,
+    "max_output_tokens": 256,
+    "description": "DFlash short-context speculative decoding point"
+  },
+  "12k": {
+    "target_prompt_tokens": 12000,
+    "max_model_len": 32768,
+    "max_output_tokens": 256,
+    "description": "DFlash medium short-context speculative decoding point"
+  },
+  "16k": {
+    "target_prompt_tokens": 16000,
+    "max_model_len": 32768,
+    "max_output_tokens": 256,
+    "description": "DFlash upper short-context speculative decoding point"
+  },
+  "24k": {
+    "target_prompt_tokens": 24000,
+    "max_model_len": 32768,
+    "max_output_tokens": 256,
+    "description": "Medium-context boundary used by DFlash routing tests"
+  },
+  "32k": {
+    "target_prompt_tokens": 32000,
+    "max_model_len": 65536,
+    "max_output_tokens": 256,
+    "description": "Scientific long-document cross-precision smoke gate"
+  },
+  "64k": {
+    "target_prompt_tokens": 64000,
+    "max_model_len": 65536,
+    "max_output_tokens": 256,
+    "description": "Long-context document QA"
+  },
+  "103k": {
+    "target_prompt_tokens": 103000,
+    "max_model_len": 131072,
+    "max_output_tokens": 256,
+    "description": "Primary W7900 long-context performance class"
+  },
+  "near256k": {
+    "target_prompt_tokens": 260000,
+    "max_model_len": 262144,
+    "max_output_tokens": 256,
+    "description": "Near-native-limit test with room for output and template tokens"
+  }
+}

@@ -81,6 +81,9 @@ Thumbs.db
 # Logs / tmp
 *.log
 *.tmp
+*.pid
+*.core
+core.*
 *.orig
 
 # Model weights should never be in the repo
@@ -88,6 +91,12 @@ Thumbs.db
 *.gguf
 *.bin
 models/
+
+# W7900 runtime/profiler output; only curated reports belong in docs/
+w7900_optimization/results/
+w7900_optimization/longdoc_sanity/results/
+w7900_optimization/.rocprofv3/
+.rocprofv3/
 # Accuracy evidence kept in git: aggregate metrics and MT-Bench judge artifacts only
 !test/results/accuracy/full_20260615-dflash-n8-systemd/
 !test/results/accuracy/full_20260615-dflash-n8-systemd/**/

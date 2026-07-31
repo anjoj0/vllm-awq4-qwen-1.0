@@ -1,4 +1,20 @@
-# Build And Run On W7900
+# Build And Run On W7900 (existing vLLM 0.23 container)
+
+The AMD container already provides vLLM 0.23.1.dev, PyTorch 2.11 and ROCm
+7.14.  For this machine use `scripts/prepare_local_vllm.sh`,
+`scripts/build_local_vllm.sh`, and `scripts/start_local_vllm.sh`.  They copy
+`/app/vllm` to persistent `/workspace/vllm-w7900-023`, build it locally, and
+run TP/Draft-TP directly in the current container.  The older Docker build
+instructions below are retained only as a reference for standalone machines.
+
+Quick start inside `xdhpc`:
+
+```bash
+cp w7900_optimization/.env.w7900.template w7900_optimization/.env
+bash w7900_optimization/scripts/prepare_local_vllm.sh
+bash w7900_optimization/scripts/build_local_vllm.sh
+bash w7900_optimization/scripts/start_local_vllm.sh
+```
 
 The root project Dockerfile is Strix Halo (`gfx1151`) first. For W7900, use the
 files in this directory.

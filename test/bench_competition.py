@@ -24,7 +24,9 @@ from typing import Any
 
 DEFAULT_HOST = "http://127.0.0.1:8001"
 DEFAULT_MODEL = "Qwen3.6-27B-AWQ4"
-DEFAULT_PAPER_PATH = "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt"
+DEFAULT_PAPER_PATH = os.getenv(
+    "VLLM_LONGTEXT", "/workspace/bench_data/combined_papers_for_llm.txt"
+)
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 SEED = (

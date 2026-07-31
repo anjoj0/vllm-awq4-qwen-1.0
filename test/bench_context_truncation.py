@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 import urllib.error
 import urllib.request
@@ -19,8 +20,10 @@ from typing import Any
 
 DEFAULT_HOST = "http://127.0.0.1:8001"
 DEFAULT_MODEL = "Qwen3.6-27B-AWQ4"
-DEFAULT_SOURCE = "/home/xqhpc/data/AI_project/combined_papers_for_llm.txt"
-DEFAULT_OUT_DIR = "/home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0/test/results/context_pressure"
+DEFAULT_SOURCE = os.getenv(
+    "VLLM_LONGTEXT", "/workspace/bench_data/combined_papers_for_llm.txt"
+)
+DEFAULT_OUT_DIR = str(Path(__file__).resolve().parent / "results" / "context_pressure")
 OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 

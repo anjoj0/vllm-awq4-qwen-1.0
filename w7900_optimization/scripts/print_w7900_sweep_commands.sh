@@ -5,7 +5,7 @@ W7900_COMPOSE="${W7900_COMPOSE:-w7900_optimization/docker-compose.w7900.build.ym
 PORT="${VLLM_HOST_PORT:-8001}"
 
 cat <<EOF
-# Run from repo root: /home/xqhpc/data/AI_project/vllm-awq4-qwen-1.0
+# Run from the repository root.
 
 # 0. Hardware smoke
 DOCKER_BIN="sudo docker" HIP_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 \

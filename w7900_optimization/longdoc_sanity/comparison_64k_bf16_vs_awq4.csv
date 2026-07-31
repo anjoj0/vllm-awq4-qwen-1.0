@@ -1,0 +1,3 @@
+config_label,profile,suite,context_mode,qa_score_fraction,quality_retention,needle_exact_match,citation_validity,evidence_support,source_accuracy,numeric_exact_match,abstention_accuracy,json_success_rate,mean_wall_s,mean_ttft_s,run_dir
+awq4_rdna3_tp4_cross_precision,64k,core,evidence,0.8833333333333333,0.9137931034482758,0.75,0.8846153846153846,0.8846153846153846,0.8461538461538461,1.0,1.0,0.9333333333333333,63.30431712766488,56.4402410628895,results/20260730T153705Z_awq4_rdna3_tp4_cross_precision_64k_core
+bf16_tp8_auto_cross_precision,64k,core,evidence,0.9666666666666667,1.0,1.0,0.9615384615384616,0.9615384615384616,0.9230769230769231,1.0,1.0,1.0,22.673677200327315,19.252727882564066,results/20260730T152341Z_bf16_tp8_auto_cross_precision_64k_core

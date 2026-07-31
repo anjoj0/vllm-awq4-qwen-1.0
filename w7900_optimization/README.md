@@ -1,101 +1,80 @@
-# W7900 Optimization Workspace
+# W7900 AWQ4 optimization
 
-This directory contains the migration plan, experiments, and W7900-specific code
-for running the AWQ4 + DFlash Qwen3.6 project on a single-node 8x Radeon PRO
-W7900 workstation.
+该目录是 Qwen3.6-27B AWQ4 + DFlash 在 8× Radeon PRO W7900（gfx1100）上的代码、启动 profile 与测评工具。它对应的是离散显存多卡系统，不复用 Strix Halo 的 UMA 参数假设。
 
-## Working Decision
+## 已实现
 
-Do not optimize only for "everything on one GPU" as the final target.
+- `patch_w7900.py`：对 vLLM 0.23 工作树做幂等补丁，回移 PR #45207 / commit `55da232d`，开放 unified attention tile 和 2D/3D launch 参数，并检查 gfx1151 硬编码。
+- `csrc/awq_mmq_gfx1100/`：面向 gfx1100 的 W4A16 HIP 内核、Python binding、正确性测试与 prefill benchmark。
+- `longdoc_sanity/`：Nowcast3D 主题科研长文数据集，包含证据、数字、needle、引用和拒答测评。
+- `scripts/`：本地 vLLM 构建、单/多卡服务、长文与并发 harness、RCCL 和功耗辅助工具。
 
-Use a staged strategy:
+## 推荐路由
 
-1. Single W7900 smoke path: prove that the current ROCm/vLLM stack, model load,
-   AWQ4 kernels, DFlash verify path, fp8 KV cache, and correctness tests work on
-   `gfx1100`.
-2. One-GPU performance baseline: measure single-stream decode, long-context
-   decode, prefill, DFlash acceptance, and KV memory pressure on one 48 GB card.
-3. Multi-GPU production path: use the 8-card node for tensor parallel and/or
-   data-parallel serving, depending on the target workload.
+| 负载 | 推荐路线 | 依据 |
+|---|---|---|
+| 8–16K AWQ4 prefill | gfx1100 HIP W4A16 | 相对 Triton 1.816×–2.220× |
+| 约 66K AWQ4 TP=4 | HIP 可选，必须 A/B | 收益缩小到 1.284× |
+| 100K+ 单请求 | BF16 TP=8 | 比 AWQ4 TP=4 快 5.662×–6.204× |
+| 8K DFlash | 启用 | wall time 降 33.6% |
+| 12K DFlash | 视延迟目标启用 | 仅快 4.4% |
+| 16K+ DFlash | 默认关闭 | 16K 实测慢 6.6% |
+| KV 容量不足 | FP8 KV | 容量约 1.99×，但延迟更高 |
 
-The competition/project goal is not merely fitting Qwen3.6-27B AWQ4 into one
-card. One W7900 can plausibly host the quantized target plus the drafter for
-moderate contexts, but the moment the workload needs 128K/256K context, higher
-concurrency, or less fragile memory headroom, the 8-card system should be used.
+## 构建
 
-## Recommended Deployment Policy
+```bash
+cp .env.w7900.template .env.w7900
+set -a; source .env.w7900; set +a
+bash scripts/check_w7900_node.sh
+bash scripts/prepare_local_vllm.sh
+bash scripts/build_local_vllm.sh
+```
 
-### Single GPU
+默认从 `/app/vllm` 复制到 `/workspace/vllm-w7900-023` 后修改，避免直接污染容器预装源码。路径均可由环境变量覆盖。
 
-Use one W7900 for:
+单独构建 gfx1100 算子：
 
-- bring-up and correctness validation;
-- quick A/B testing of AWQ4 without DFlash vs AWQ4 + DFlash;
-- kernel compatibility checks for `gfx1100`;
-- small batch and short/mid context demos.
+```bash
+cd csrc/awq_mmq_gfx1100
+PYTORCH_ROCM_ARCH=gfx1100 python setup.py build_ext --inplace
+python test_correctness.py
+python validate_prefill_numerics_gfx1100.py
+python benchmark_prefill_gfx1100.py
+```
 
-Expected benefits:
+## 启动与测评
 
-- simplest failure surface;
-- no RCCL/tensor-parallel communication overhead;
-- easiest comparison with the current Strix Halo single-device results.
+通用 AWQ4 服务使用：
 
-Expected limits:
+```bash
+bash scripts/start_local_vllm.sh
+```
 
-- only 48 GB VRAM per card, so long context and DFlash dual-model KV pressure can
-  become the limiter;
-- no UMA spillover safety like Strix Halo, so memory failures are harder;
-- long-context decode is still KV-attention bandwidth/parallelism bound.
+容量 profile：
 
-### Multi GPU
+```bash
+bash scripts/start_awq4_tp8_capacity_w7900.sh
+```
 
-Use multiple W7900 cards for:
+长文质量门禁：
 
-- 128K/256K context;
-- batch/concurrency;
-- stable fp8 KV cache headroom;
-- target + drafter coexistence with fewer memory tradeoffs;
-- service throughput rather than single-request purity.
+```bash
+cd longdoc_sanity
+python validate_suite.py
+python run_longdoc_sanity.py --help
+python score_longdoc_sanity.py --help
+```
 
-Initial candidates:
+正式实验应先 health check、warmup，再至少重复三次热态请求。保存 tokenizer 后的实际输入长度，不以源文件字节数代替 token 数。
 
-- `tensor_parallel_size=2`: likely first serious production target. It reduces
-  per-card weights and KV pressure without excessive communication complexity.
-- `tensor_parallel_size=4`: useful if 256K context or higher concurrency needs
-  more memory headroom.
-- `tensor_parallel_size=8`: test only after TP=2/4 are understood. It can help
-  memory, but RDNA workstation PCIe/RCCL overhead may dominate small-batch decode.
-- data parallel replicas: preferred when single-GPU or TP=2 already fits and the
-  goal is aggregate QPS across independent requests.
+## 结果索引
 
-## First Experiments
+- [凝练实验结果](../docs/EXPERIMENT_RESULTS.md)
+- [W7900 第一阶段完整报告](../docs/W7900_FULL_EXPERIMENT_REPORT.md)
+- [科研长文质量与 rocprof 边界](../docs/W7900_QUALITY_AND_ROCPROF.md)
+- [图表](../docs/assets/)
 
-1. Hardware and ROCm validation:
-   - confirm 8 visible GPUs;
-   - confirm all report `gfx1100`;
-   - run torch allocation and all-reduce sanity.
-2. Single-GPU compatibility:
-   - boot AWQ4 without DFlash;
-   - boot AWQ4 + DFlash N=8;
-   - run the existing `bench_full.py` and 5-dataset accuracy smoke.
-3. Multi-GPU sweep:
-   - TP=2, 4, 8 with DFlash enabled;
-   - compare `VLLM_MAX_MODEL_LEN=65536`, `131072`, `262144`;
-   - compare `VLLM_KV_CACHE_DTYPE=auto` vs `fp8`;
-   - sweep `VLLM_MAX_NUM_BATCHED_TOKENS=8192/16384/32768`;
-   - sweep `VLLM_DFLASH_N=4/6/8`.
-4. Serving policy:
-   - if one GPU fits target latency and context: run multiple single-GPU replicas;
-   - if long context or memory headroom dominates: use TP=2/4;
-   - avoid TP=8 as default unless profiling shows communication is not the
-     bottleneck.
+## Profiler 边界
 
-## Files
-
-- `migration_plan.md`: technical reasoning and staged migration plan.
-- `build_and_run.md`: clone/build/run instructions for the W7900 image.
-- `Dockerfile.w7900`: W7900/gfx1100 source-build image.
-- `docker-compose.w7900.build.yml`: W7900 build and runtime compose entrypoint.
-- `docker-compose.w7900.tp2.yml`: legacy runtime-only TP=2 overlay for an already
-  built image; prefer `docker-compose.w7900.build.yml` for new machines.
-- `scripts/`: helper scripts for hardware validation and benchmark sweeps.
+单进程 PID 分片与 `torchrun` TP=2 kernel/RCCL trace 已成功。当前容器两套 profiler SDK 的动态库冲突使真实 vLLM attach 触发 signal 6，因此现有报告没有宣称真实请求内 kernel 百分比；只使用 standalone、microbenchmark 和端到端 A/B 形成相互约束的证据。
