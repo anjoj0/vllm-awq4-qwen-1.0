@@ -5,7 +5,7 @@
 项目并不将一种配置推广到所有负载，而是根据上下文长度、并发和显存约束进行路由：
 
 - **Strix Halo / gfx1151**：AWQ4 压缩权重，利用 128 GB UMA 支持本地长上下文；DFlash 主要加速短上下文解码。
-- **W7900 / gfx1100，8–16K**：RDNA3 W4A16 HIP 内核与 tile=16 attention 提升 prefill。
+- **W7900 / gfx1100，短中上下文**：RDNA3 W4A16 HIP、shape-aware attention 与 DFlash/target-only 路由协同降低时延。
 - **W7900 / 100K+**：切换到配套 BF16 TP=8 路线，避免 AWQ4 TP=4 长文退化。
 - **W7900 / 并发服务**：模型能由 4 卡容纳时，可用双 TP=4 实例提高聚合吞吐。
 
@@ -31,7 +31,9 @@ W7900 实测表明 dispatcher 必须感知 shape 和上下文：HIP 相对 Trito
 
 ### 3. DFlash 上下文感知路由
 
-DFlash 用小型 drafter 产生候选 token，由目标模型并行验证。W7900 上 DFlash 在 8K 快 33.6%，12K 快 4.4%，16K 慢 6.6%，说明候选接受收益会随 verify 成本和上下文长度改变。推荐将其作为有边界的短上下文 profile，而不是全局开关。
+DFlash 用小型 drafter 产生候选 token，由目标模型并行验证。恢复 checkpoint 的 `4 x SWA(2048) + 1 x full` 语义后，相对五层 full attention，8K、16K、32K wall time 分别下降 11.6%、18.2%、21.0%。在同一优化后端上，N=4 相对 target-only 在 8K 快 27.3%、12K 快 7.7%，到 16K 已变慢，因此系统使用 14K 作为保守交叉阈值：单请求且 `<=14K` 进入 DFlash N=4，长请求或 batch 进入 target-only。
+
+DFlash 的 `N+1` small-query/长 KV attention 与普通长 prefill 属于不同 shape 域。前者在 gfx1100 上选择 `tile=32, warps=4`，后者保留 `tile=16`。D-Cut 和 full-layer recent-window 压缩均已实现并通过正确性门禁，但端到端分别退化约 1%–2% 和 6.7%–17.7%，因此作为研究开关保留、默认关闭。
 
 ### 4. 离散显存与多卡策略
 
@@ -59,6 +61,8 @@ W7900 的 KV cache 不再能依赖 UMA 容量。系统联合选择 TP、`gpu_mem
 | AWQ4 66K TP=4 | 136.66 s | RDNA3 HIP 106.42 s | 1.284× |
 | 102.9K TP 扩展 | TP=2 261.947 s | TP=8 67.977 s | 3.85× |
 | 短文并发 | 单 TP=8 129.66 tok/s | 双 TP=4 159.66 tok/s | +23.1% |
+| DFlash drafter 32K | 5× full 59.93 s | 4×SWA+1×full 47.35 s | -21.0% |
+| 8K 自适应路由 | target-only 13.19 s | DFlash N=4 9.59 s | -27.3% |
 
 在 102,994 与 128,769 tokens 上，BF16 TP=8 分别比 AWQ4 TP=4 快 5.662× 和 6.204×。该结果限定了 AWQ4 的最佳工作区间，也避免把权重压缩等同于所有场景的吞吐提升。
 
@@ -80,8 +84,11 @@ W7900 的 KV cache 不再能依赖 UMA 容量。系统联合选择 TP、`gpu_mem
 ├── test/                         # API、性能、正确性和精度测评
 ├── w7900_optimization/
 │   ├── patch_w7900.py            # vLLM 回移与 gfx1100 参数化补丁
+│   ├── adaptive_dflash_router.py  # 双 TP=4 上下文感知路由
+│   ├── patches/                   # 固定 vLLM 基线的完整 DFlash 补丁
 │   ├── csrc/awq_mmq_gfx1100/     # gfx1100 W4A16 HIP 源码与测试
 │   ├── longdoc_sanity/            # 科研长文数据集、评分与回归门禁
+│   ├── results/                   # 五路线报告、CSV、图和原始日志归档
 │   └── scripts/                   # 构建、启动、benchmark、RCCL/功耗工具
 └── docs/
     ├── EXPERIMENT_RESULTS.md

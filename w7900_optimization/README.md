@@ -10,6 +10,8 @@
 - `csrc/awq_mmq_gfx1100/`：面向 gfx1100 的 W4A16 HIP 内核、Python binding、正确性测试与 prefill benchmark。
 - `longdoc_sanity/`：Nowcast3D 主题科研长文数据集，包含证据、数字、needle、引用和拒答测评。
 - `scripts/`：本地 vLLM 构建、单/多卡服务、长文与并发 harness、RCCL 和功耗辅助工具。
+- `adaptive_dflash_router.py`：在同 NUMA 的双 TP=4 服务间按真实 prompt token 数选择 DFlash 或 target-only。
+- `patches/`：相对 vLLM main `63e78ce` 的完整可审查补丁，包含混合 SWA、gfx1100 small-query attention、D-Cut V2 和回归测试。
 
 ## 推荐路由
 
@@ -18,10 +20,11 @@
 | 8–16K AWQ4 prefill | gfx1100 HIP W4A16 | 相对 Triton 1.816×–2.220× |
 | 约 66K AWQ4 TP=4 | HIP 可选，必须 A/B | 收益缩小到 1.284× |
 | 100K+ 单请求 | BF16 TP=8 | 比 AWQ4 TP=4 快 5.662×–6.204× |
-| 8K DFlash | 启用 | wall time 降 33.6% |
-| 12K DFlash | 视延迟目标启用 | 仅快 4.4% |
-| 16K+ DFlash | 默认关闭 | 16K 实测慢 6.6% |
+| <=14K 单请求 | DFlash N=4 | 8K 快 27.3%，12K 快 7.7% |
+| >14K 或 batch>1 | target-only | 16K 起 DFlash 已越过交叉点 |
 | KV 容量不足 | FP8 KV | 容量约 1.99×，但延迟更高 |
+
+DFlash drafter 使用与 checkpoint 一致的 `4 x SWA(2048) + 1 x full` 语义。相对错误地把五层都当作 full attention，8K、16K、32K wall time 分别下降 11.6%、18.2%、21.0%。DFlash 的少量 query 路径使用 `tile=32, warps=4`；普通长 prefill 仍使用独立验证过的 `tile=16`，两者不应共用一个全局 tile。
 
 ## 构建
 
@@ -55,6 +58,19 @@ python benchmark_prefill_gfx1100.py
 bash scripts/start_local_vllm.sh
 ```
 
+双 TP=4 服务分别监听 8061（DFlash N=4）和 8062（target-only）后，启动上下文感知入口：
+
+```bash
+python adaptive_dflash_router.py \
+  --tokenizer /models/Qwen3.6-27B-AWQ \
+  --dflash-url http://127.0.0.1:8061 \
+  --target-url http://127.0.0.1:8062 \
+  --threshold-tokens 14000 \
+  --port 8060
+```
+
+响应头 `X-DFlash-Route` 和 `X-Prompt-Tokens` 记录实际选择，便于复现实验和线上审计。
+
 容量 profile：
 
 ```bash
@@ -78,6 +94,8 @@ python score_longdoc_sanity.py --help
 - [W7900 第一阶段完整报告](../docs/W7900_FULL_EXPERIMENT_REPORT.md)
 - [科研长文质量与 rocprof 边界](../docs/W7900_QUALITY_AND_ROCPROF.md)
 - [图表](../docs/assets/)
+- [DFlash 五路线实验总结](results/20260802_dflash_five_routes.md)
+- [vLLM 补丁与应用说明](patches/README.md)
 
 ## Profiler 边界
 
