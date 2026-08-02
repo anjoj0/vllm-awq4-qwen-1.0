@@ -35,7 +35,7 @@
 | 自定义 All-Reduce | 未激活 | 未激活 | 当前 ROCm 构建最终仍选择 PYNCCL |
 | DCP | 理论上针对长 decode | 尚不可测 | 缺少满足 paged-KV/LSE 契约的 ROCm FlashAttention 后端 |
 | PCP | 理论上针对长 prefill | 尚不可测 | 当前实现仅支持 MLA，Qwen3.6 非 MLA |
-| Prefill/Decode 解耦 | 可能改善服务吞吐 | 尚不可测 | 容器未安装 NIXL/LMCache，不能声称性能收益 |
+| Prefill/Decode 解耦 | 未测 256K；64K 单请求慢 6.4% | 阶段隔离有效，但同资源双副本更快 | 混合状态迁移闭环；UCX 数据面回退 TCP，不作为推荐 profile |
 
 ## 4. Prefix Caching：本阶段最重要的有效优化
 
@@ -141,7 +141,11 @@ vllm/compilation/passes/pass_manager.py
 
 ### 7.5 Prefill/Decode 解耦
 
-容器中未安装 `nixl` 和 `lmcache`。P/D 解耦还需要验证 GPU KV 传输、混合 Mamba 状态迁移和 ROCm 通信正确性；仅启动两个服务并不能构成 P/D 解耦。因此本阶段不报告该路线的吞吐数字。
+后续实验从源码构建 UCX 1.22 ROCm 与 NIXL 1.4.0，使用 vLLM 原生 `NixlConnector` 实现 GPU 0-3 Prefill TP=4、GPU 4-7 Decode TP=4。设置 `VLLM_SSM_CONV_STATE_LAYOUT=DS` 后，Attention KV、Mamba convolution state 与 SSM state 均完成注册和迁移；8K/64K 固定长度热态 greedy 输出与本地 Decode 一致。
+
+P/D 相对单个 TP=4 服务能够隔离阶段干扰。4×64K 时，平均请求完成时间由 228.27 s 降到 146.34 s；但该比较使用 8 卡对 4 卡。相同 8 卡资源下，dual TP=4 的 batch wall 为 120.06 s，P/D 为 229.93 s；平均请求完成时间分别为 113.94 s 和 146.34 s。因此当前节点推荐双副本或 TP=8 compile/HIP Graph，不推荐 P/D。
+
+协议追踪显示 NIXL/UCX 的大块 GPU RMA 仍使用 `software emulation | tcp/bond0`。64K 时每个 TP rank 迁移约 1,044.7 MB，平均耗时 3.915 s。NIXL PR #1536 的 `ucx_vram_memtype_hint=rocm` 前移植版仍未使 `rocm_ipc` 成为数据 lane。完整数据见 [20260802_pd_disaggregation.md](20260802_pd_disaggregation.md)。
 
 ## 8. 最终工作负载路由结论
 

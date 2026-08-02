@@ -1,0 +1,20 @@
+{
+  "url": "http://127.0.0.1:8200/v1/completions",
+  "prompt_tokens": 64000,
+  "max_tokens": 32,
+  "concurrency": 1,
+  "batch_wall_s": 57.82648283243179,
+  "aggregate_output_tok_s": 0.5533796702235694,
+  "mean_ttft_s": 56.26811255328357,
+  "p50_ttft_s": 56.26811255328357,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 57.82638145238161,
+      "ttft_s": 56.26811255328357,
+      "completion_tokens": 32,
+      "output_tok_s": 20.535608468167673,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse, which is a common problem with"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "url": "http://127.0.0.1:8200/v1/completions",
+  "prompt_tokens": 64000,
+  "max_tokens": 32,
+  "concurrency": 4,
+  "batch_wall_s": 228.3607945535332,
+  "aggregate_output_tok_s": 0.5605165293379366,
+  "mean_ttft_s": 141.79718518583104,
+  "p50_ttft_s": 142.07892582658678,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 228.20088369585574,
+      "ttft_s": 56.29850239679217,
+      "completion_tokens": 32,
+      "output_tok_s": 0.18615216239691684,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse, which is a common problem with"
+    },
+    {
+      "request_index": 1,
+      "wall_s": 228.24712201952934,
+      "ttft_s": 113.3663732316345,
+      "completion_tokens": 32,
+      "output_tok_s": 0.2785497164462414,
+      "text": " DGMR from scratch would have required significantly more time and resources than LDC training. The training speed that weLDCast model is conditioned on a deterministic prediction"
+    },
+    {
+      "request_index": 2,
+      "wall_s": 228.29860185086727,
+      "ttft_s": 170.79147842153907,
+      "completion_tokens": 32,
+      "output_tok_s": 0.5564528025701985,
+      "text": " DGMR from scratch would have required significantly more time than LDCast. The training speed that weLDCast achieves is partly due to the use of Neural"
+    },
+    {
+      "request_index": 3,
+      "wall_s": 228.3505649957806,
+      "ttft_s": 226.73238669335842,
+      "completion_tokens": 32,
+      "output_tok_s": 19.775323863940635,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse, which is a common problem with"
+    }
+  ]
+}

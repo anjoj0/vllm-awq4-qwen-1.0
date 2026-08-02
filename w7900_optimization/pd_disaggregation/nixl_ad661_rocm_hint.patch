@@ -1,0 +1,94 @@
+diff --git a/src/plugins/ucx/ucx_utils.h b/src/plugins/ucx/ucx_utils.h
+--- a/src/plugins/ucx/ucx_utils.h
++++ b/src/plugins/ucx/ucx_utils.h
+@@ -157,6 +157,7 @@ private:
+     const nixl::ucx::mt_mode_t mtType_;
+     const unsigned ucpVersion_;
+     const std::string name_;
++    const bool forceRocmMemtypeHint_;
+ 
+ public:
+     nixlUcxContext(const std::vector<std::string> &devs,
+@@ -166,4 +167,5 @@ public:
+                    size_t num_device_channels,
+                    const std::string &engine_conf = "",
+-                   const std::string &name = "");
++                   const std::string &name = "",
++                   bool force_rocm_memtype_hint = false);
+     ~nixlUcxContext();
+diff --git a/src/plugins/ucx/ucx_utils.cpp b/src/plugins/ucx/ucx_utils.cpp
+--- a/src/plugins/ucx/ucx_utils.cpp
++++ b/src/plugins/ucx/ucx_utils.cpp
+@@ -35,5 +35,6 @@ get_ucx_backend_common_options() {
+ 
+     params.emplace(nixl_ucx_err_handling_param_name,
+                    ucx_err_mode_to_string(UCP_ERR_HANDLING_MODE_PEER));
++    params.emplace("ucx_vram_memtype_hint", "none");
+     return params;
+ }
+@@ -418,6 +419,8 @@ nixlUcxContext::nixlUcxContext(const std::vector<std::string> &devs,
+                                size_t num_device_channels,
+                                const std::string &engine_config,
+-                               const std::string &name)
++                               const std::string &name,
++                               bool force_rocm_memtype_hint)
+     : mtType_(makeMtType(prog_thread, sync_mode)),
+       ucpVersion_(makeUcpVersion()),
+-      name_(name) {
++      name_(name),
++      forceRocmMemtypeHint_(force_rocm_memtype_hint) {
+@@ -608,4 +611,9 @@ nixlUcxContext::memReg(void *addr, size_t size, nixlUcxMem &mem, nixl_mem_t nixl
+         .length = mem.size,
+     };
+ 
++    if (nixl_mem_type == nixl_mem_t::VRAM_SEG && forceRocmMemtypeHint_) {
++        mem_params.field_mask |= UCP_MEM_MAP_PARAM_FIELD_MEMORY_TYPE;
++        mem_params.memory_type = UCS_MEMORY_TYPE_ROCM;
++    }
++
+     ucs_status_t status = ucp_mem_map(ctx, &mem_params, &mem.memh);
+diff --git a/src/plugins/ucx/ucx_backend.cpp b/src/plugins/ucx/ucx_backend.cpp
+--- a/src/plugins/ucx/ucx_backend.cpp
++++ b/src/plugins/ucx/ucx_backend.cpp
+@@ -793,4 +793,13 @@ nixlUcxEngine::nixlUcxEngine(const nixlBackendInitParams &init_params, size_t num
+         err_handling_mode = ucx_err_mode_from_string(*opt);
+     }
+ 
++    bool force_rocm_memtype_hint = false;
++    if (const auto opt = nixl::getBackendParamOptional<std::string>(
++            custom_params, "ucx_vram_memtype_hint")) {
++        if (*opt != "none" && *opt != "rocm") {
++            throw std::invalid_argument("ucx_vram_memtype_hint must be none or rocm");
++        }
++        force_rocm_memtype_hint = *opt == "rocm";
++    }
++
+     const uint32_t ep_close_flags = epCloseFlags(custom_params);
+@@ -808,5 +816,6 @@ nixlUcxEngine::nixlUcxEngine(const nixlBackendInitParams &init_params, size_t num
+                                           num_device_channels,
+                                           engine_config,
+-                                          localAgent);
++                                          localAgent,
++                                          force_rocm_memtype_hint);
+ 
+     uc->warnAboutHardwareSupportMismatch();
+diff --git a/src/api/python/_api.py b/src/api/python/_api.py
+--- a/src/api/python/_api.py
++++ b/src/api/python/_api.py
+@@ -15,5 +15,6 @@
+ from __future__ import annotations
+ 
++import os
+ import pickle
+ import sys
+ from enum import Enum
+@@ -269,5 +270,9 @@ class nixl_agent:
+                     elif bknd == "UCCL":
+                         init["num_cpus"] = str(nixl_conf.num_threads)
++                if bknd == "UCX" and (
++                    vram_hint := os.environ.get("NIXL_UCX_VRAM_MEMTYPE_HINT")
++                ):
++                    init["ucx_vram_memtype_hint"] = vram_hint
+                 self.create_backend(bknd, init)
+ 
+         self.nixl_mems = {

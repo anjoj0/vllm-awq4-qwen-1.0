@@ -1,0 +1,8 @@
+{
+  "model": "Qwen3.6-27B-BF16-PD",
+  "prompt": "The capital of France is",
+  "max_tokens": 16,
+  "temperature": 0,
+  "seed": 20260802,
+  "stream": false
+}

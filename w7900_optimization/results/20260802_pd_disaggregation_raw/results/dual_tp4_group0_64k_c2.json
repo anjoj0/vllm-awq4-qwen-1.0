@@ -1,0 +1,28 @@
+{
+  "url": "http://127.0.0.1:8100/v1/completions",
+  "prompt_tokens": 64000,
+  "max_tokens": 32,
+  "concurrency": 2,
+  "batch_wall_s": 113.31115965358913,
+  "aggregate_output_tok_s": 0.5648163887445732,
+  "mean_ttft_s": 83.64116810820997,
+  "p50_ttft_s": 83.64116810820997,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 113.18317144364119,
+      "ttft_s": 55.634678695350885,
+      "completion_tokens": 32,
+      "output_tok_s": 0.5560527908170224,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse. This is particularly important for ensemble"
+    },
+    {
+      "request_index": 1,
+      "wall_s": 113.30510316044092,
+      "ttft_s": 111.64765752106905,
+      "completion_tokens": 32,
+      "output_tok_s": 19.306817213098558,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse. This is a common problem with"
+    }
+  ]
+}
