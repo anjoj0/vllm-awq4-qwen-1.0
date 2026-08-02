@@ -1,48 +1,194 @@
-# W7900 AWQ4 optimization
+# W7900 多卡推理与 DFlash 优化
 
-该目录是 Qwen3.6-27B AWQ4 + DFlash 在 8× Radeon PRO W7900（gfx1100）上的代码、启动 profile 与测评工具。它对应的是离散显存多卡系统，不复用 Strix Halo 的 UMA 参数假设。
+该目录包含 Qwen3.6-27B BF16/AWQ4 在单节点 8× AMD Radeon PRO W7900（`gfx1100`，48 GiB/卡）上的代码、vLLM 补丁、启动 profile、科研长文数据集与实验结果。
 
-## 已实现
+W7900 路线不是 Strix Halo UMA 参数的直接迁移。它围绕 RDNA 3 内核形状、离散显存 KV Cache、多卡通信、短上下文 speculative decoding 和 64K–261K 科研长文服务重新设计。
 
-- `patch_w7900.py`：对 vLLM 0.23 工作树做幂等补丁，回移 PR #45207 / commit `55da232d`，开放 unified attention tile 和 2D/3D launch 参数，并检查 gfx1151 硬编码。
-- `../Dockerfile.w7900`：继承实测 ROCm 7.14/vLLM 0.23 AMD 镜像，以 `gfx1100` 重建工作树；根目录 `Dockerfile` 仍专用于 Strix Halo。
-- `vllm_overrides/rdna3_w4a16.py`：整模型 `RDNA3W4A16LinearKernel` 的非对称 `compressed-tensors` dispatcher override；它不同于下方 standalone HIP MMQ 研究扩展。
-- `csrc/awq_mmq_gfx1100/`：面向 gfx1100 的 W4A16 HIP 内核、Python binding、正确性测试与 prefill benchmark。
-- `longdoc_sanity/`：Nowcast3D 主题科研长文数据集，包含证据、数字、needle、引用和拒答测评。
-- `scripts/`：本地 vLLM 构建、单/多卡服务、长文与并发 harness、RCCL 和功耗辅助工具。
-- `scripts/start_bf16_multicard_variant.sh`：统一记录 TP/PP/DCP/PCP、prefix cache、block size、eager/graph 和 SP/fused-comms 候选配置的 BF16 多卡启动器。
-- `scripts/bench_prefix_concurrency_stream.py`：建立长文共享前缀后并发提出不同问题，记录 TTFT、wall time 和聚合输出吞吐。
-- `adaptive_dflash_router.py`：在同 NUMA 的双 TP=4 服务间按真实 prompt token 数选择 DFlash 或 target-only。
-- `patches/`：相对 vLLM main `63e78ce` 的完整可审查补丁，包含混合 SWA、gfx1100 small-query attention、D-Cut V2 和回归测试。
+## 当前结论
 
-## 推荐路由
+系统采用按上下文长度、前缀复用关系和并发模式路由的多 profile 设计：
 
-| 负载 | 推荐路线 | 依据 |
+| 工作负载 | 推荐配置 | 决定性证据 |
 |---|---|---|
-| 8–16K AWQ4 prefill | gfx1100 HIP W4A16 | 相对 Triton 1.816×–2.220× |
-| 约 66K AWQ4 TP=4 | HIP 可选，必须 A/B | 收益缩小到 1.284× |
-| 100K+ 单请求 | BF16 TP=8 | 比 AWQ4 TP=4 快 5.662×–6.204× |
-| <=14K 单请求 | DFlash N=4 | 8K 快 27.3%，12K 快 7.7% |
-| >14K 或 batch>1 | target-only | 16K 起 DFlash 已越过交叉点 |
-| KV 容量不足 | FP8 KV | 容量约 1.99×，但延迟更高 |
+| <=14K、batch=1 | AWQ4 target TP=4 + DFlash N=4，draft TP=1 | 8K/12K 相对 target-only 快 27.3%/7.7% |
+| >14K AWQ4 | target-only TP=4 | 16K 起 DFlash 越过交叉点；32K 慢 28.7% |
+| 短上下文多租户 | 双 TP=4 独立服务 | 8 并发 159.66 tok/s，较单 TP=8 提高 23.1% |
+| 不同的 64K 文档并发 | BF16 TP=8 + compile/HIP Graph | 4 请求 wall 121.99→78.18 s，吞吐提高 56.0% |
+| 不同的 100K–261K 文档 | BF16 TP=8 + auto KV + tile=16 | 100K+ 单大请求低时延主线 |
+| 同一 64K–261K 文档连续/并发问答 | BF16 TP=8 + V1 + block=784 + prefix cache + HIP Graph | 4×261K wall 616.82→13.09 s，加速 47.1× |
+| KV 容量优先 | FP8 KV 或 TP=4×PP=2 容量 profile | FP8 KV 容量约 1.99×；PP=2 KV 容量约 205万→398万 token |
 
-DFlash drafter 使用与 checkpoint 一致的 `4 x SWA(2048) + 1 x full` 语义。相对错误地把五层都当作 full attention，8K、16K、32K wall time 分别下降 11.6%、18.2%、21.0%。DFlash 的少量 query 路径使用 `tile=32, warps=4`；普通长 prefill 仍使用独立验证过的 `tile=16`，两者不应共用一个全局 tile。
+不存在一个对所有请求都最优的固定 TP、KV dtype 或 speculative token 数。该项目的核心是 backend-aware、shape-aware 和 workload-aware 的联合路由。
+
+## 已实现的技术
+
+### gfx1100 算子与后端
+
+- `patch_w7900.py`：对 vLLM 0.23 工作树应用幂等补丁，开放 unified attention tile/launch 参数并检查残留 `gfx1151` 硬编码。
+- `vllm_overrides/rdna3_w4a16.py`：整模型 `RDNA3W4A16LinearKernel`，支持非对称 compressed-tensors W4A16、zero-point 语义和 TP 分片。
+- `csrc/awq_mmq_gfx1100/`：独立 HIP W4A16 MMQ、Python binding、数值正确性测试与 prefill microbenchmark。
+- 普通长 prefill 使用 `tile=16`；DFlash small-query verification 使用 `tile=32, warps=4`。两个 shape 域分别调度，不共享一个全局最优参数。
+
+### DFlash 五路线闭环
+
+1. 恢复 checkpoint 的 `4×SWA(2048) + 1×full` draft attention 语义。
+2. 为 `head_dim=128, GQA=4, query<=9` 的非因果 small-query 热路径设置 gfx1100 参数。
+3. 在 N=0/4/8 中按真实 prompt token 数和 batch 选择；当前有效决策是 DFlash N=4 与 target-only 的切换。
+4. 移植 D-Cut PR #47131，并补齐 V2 logits confidence、keep length 回传和 scheduler 截断。
+5. 验证 full draft layer 的 recent-window 上下文压缩。
+
+### 多卡与超长上下文
+
+- BF16 TP=8：不同 100K+ 科研长文的主速度路线。
+- 双 TP=4：两个同 NUMA 独立实例处理短请求，提高多租户聚合吞吐。
+- Prefix Caching：复用同一长文的 KV/Mamba 对齐状态，避免重复执行 261K prefill。
+- torch.compile + HIP Graph：BF16 长文多请求的默认执行方式。
+- auto/FP8 KV 双 profile：auto 优先单请求时延，FP8 优先容量。
+- `TP=4 × PP=2`：完成 V1 功能闭环和容量测试，但不作为速度 profile。
+- 统一启动器记录 TP/PP/DCP/PCP、KV dtype、prefix cache、block size、eager/graph、SP/fused-comms、工作树和完整命令。
+
+### 数据、质量与可复现性
+
+- `longdoc_sanity/`：Nowcast3D 主题科研长文数据集，覆盖事实证据、数字、needle、引用归因和拒答。
+- `adaptive_dflash_router.py`：按 tokenizer 后的真实 token 数在 DFlash 与 target-only 服务间路由。
+- `scripts/bench_prefix_reuse_stream.py`：测量同一长文连续问题的 TTFT 和 wall time。
+- `scripts/bench_prefix_concurrency_stream.py`：预填充共享长前缀，再并发提出不同问题并记录聚合吞吐。
+- 每次正式实验保存 manifest、环境版本、实际 prompt/output token、冷/热状态、TTFT、wall time 和服务日志。
+
+## DFlash 实验结果
+
+### 混合 SWA 语义
+
+DFlash checkpoint 包含 4 个 2048-token sliding-window 层和 1 个 full-attention 层。旧路径把五层都按 full attention 执行。恢复训练时语义后：
+
+| Prompt | 5×full | 4×SWA(2K)+1×full | wall 降低 |
+|---:|---:|---:|---:|
+| 8K | 10.93 s | 9.66 s | 11.6% |
+| 16K | 23.73 s | 19.40 s | 18.2% |
+| 32K | 59.93 s | 47.35 s | 21.0% |
+
+接受率没有下降。该项同时减少 4 个 draft layer 的长 KV 扫描，并使推理语义重新匹配 checkpoint 训练分布，是 DFlash 五条路线中最稳定的改进。
+
+### Triton 与 ROCM_ATTN
+
+ROCM_ATTN 在 16K target prefill 上可使总 wall 略低约 1.4%，但 DFlash decode 阶段比 Triton 慢约 20%–30%，且冷首请求出现过 0% acceptance、`QA=0/4` 和 83.4 s 异常。两种后端使用不同 KV 物理布局，不能在同一服务中直接混用。
+
+可靠默认路径为全 Triton：
+
+```text
+普通长 prefill          -> tile=16
+DFlash/verification    -> tile=32, warps=4
+```
+
+### 自适应 N 与 14K 交叉点
+
+| Prompt | Target only | DFlash N=4 | DFlash N=8 | 推荐 |
+|---:|---:|---:|---:|---|
+| 8K | 13.19 s | **9.59 s** | 9.66 s | N=4 |
+| 12K | 15.59 s | **14.39 s** | - | N=4 |
+| 16K | **18.86 s** | 19.47 s | 19.40 s | N=0 |
+| 32K | **36.80 s** | 47.90 s | 47.35 s | N=0 |
+
+N=4 与 N=8 的差异始终小于约 1.2%。增加 N 不能解决长上下文退化，真正重要的是在约 14K 处关闭 DFlash。
+
+### 已验证但默认关闭的路线
+
+| 路线 | 结果 | 结论 |
+|---|---|---|
+| D-Cut，keep ratio=0.75 | 8K/16K/并发4 分别慢 1.0%/2.1%/1.0% | 功能与质量通过，但同步开销覆盖收益 |
+| full draft layer 最近 8K/16K | 16K 慢 17.7%；32K 慢 7.3%/6.7% | 接受率下降导致 target 重算 |
+| draft TP=4 | 16K/32K 慢 0.6%/0.5% | 5 层 drafter 太小，collective 开销更高 |
+
+D-Cut 默认关闭；full draft layer 保留完整上下文；`draft_tensor_parallel_size=1`。
+
+## 多卡探索结果
+
+### 261K 共享前缀
+
+Qwen3.6 是 Attention 与 Mamba/GDN 混合模型。启用 prefix cache 后，vLLM 使用实验性的 `mamba_cache_mode=align`。默认 400-token 页使最新版工作树的 261K 首问约为 294 s；历史优化工作树的 V1 runner 可以同时使用 `block_size=784` 与 prefix cache：
+
+| 配置 | 首问 TTFT | 首问 wall | 后续问题 TTFT | 后续问题 wall |
+|---|---:|---:|---:|---:|
+| 默认 400 页，V1，prefix on | 292.76 s | 294.31 s | 1.60 s | 3.17 s |
+| 784 页，V1，prefix on | **150.72 s** | **153.95 s** | **1.43 s** | **4.67 s** |
+
+在 4 个不同问题共享同一 261K 文档的并发实验中：
+
+| 配置 | 4 请求 wall | 平均 TTFT | 聚合输出吞吐 |
+|---|---:|---:|---:|
+| Prefix cache 关闭 | 616.82 s | 383.28 s | 0.415 tok/s |
+| Prefix cache 命中 | **13.09 s** | **6.15 s** | **19.56 tok/s** |
+
+端到端加速 47.1×，平均 TTFT 下降 98.4%。该收益来自复用共同文档前缀，不适用于四篇互不相同的 261K 文档。
+
+### compile + HIP Graph
+
+相同 V1/TP=8/784 页配置下，4 个约 63.5K 请求、每请求输出 64 token：
+
+| 执行方式 | wall | 平均 TTFT | 聚合输出吞吐 |
+|---|---:|---:|---:|
+| eager | 121.99 s | 74.90 s | 2.10 tok/s |
+| compile + HIP Graph | **78.18 s** | **48.31 s** | **3.27 tok/s** |
+
+图执行使 wall 下降 35.9%，吞吐提高 56.0%。BF16 长文服务默认使用编译和图捕获；AWQ4/DFlash 的 eager 配置仅用于自定义算子和 speculative 路径的兼容性调试。
+
+### TP=4 × PP=2
+
+V1 runner 可以运行该配置，并把 KV token 容量从约 205 万提高到 398 万；但 4×约60K wall 为 295.61 s，TP=8/PP=1 基线为 109.71 s，吞吐仅为基线的 37.1%。因此 PP=2 只保留为容量 profile。
+
+V2 runner 在首 token 采样阶段触发：
+
+```text
+IndexError: index_fill_(): Expected dtype int64 for index
+vllm/v1/worker/gpu/model_states/mamba_hybrid.py
+```
+
+### 当前上游能力边界
+
+| 技术 | 当前状态 | 证据 |
+|---|---|---|
+| DCP | 未形成可运行性能路径 | Qwen3.6 TP=8/DCP=2 需要 paged-KV softmax LSE；现有 ROCm FlashAttention/Triton/ROCM_ATTN 不满足接口 |
+| PCP | 不适用 | 当前实现仅支持 MLA，Qwen3.6 非 MLA |
+| 自定义 All-Reduce | 未激活 | TP=2 移除禁用参数后 engine 仍选择 PYNCCL；PCIe-only TP=4/8 不满足全连接条件 |
+| Sequence Parallel + fused comms | 编译失败 | 强制启用后 `AsyncTPPass` 在 ROCm 构建中未定义 |
+| Prefill/Decode 解耦 | 未测试 | 当前容器没有 NIXL/LMCache，未验证混合 Mamba 状态传输 |
+
+这些项目属于已验证的能力缺口，不是负性能结果；README 不将其描述为已实现优化。
+
+## 上游来源与补丁
+
+| 能力 | 来源 |
+|---|---|
+| unified attention tile/launch 参数 | vLLM PR #45207 / commit `55da232d` |
+| DFlash 非因果/per-sequence causal attention | PR #44652 的等价上游能力 |
+| 混合 SWA、多 KV group V2 路径 | PR #47914、#48113 |
+| D-Cut confidence pruning | PR #47131，并补充本项目 V2 scheduler 路径 |
+| 固定审查基线 | vLLM main `63e78ce3652f4f94e9f484f40db71ca4cf019f21` |
+
+完整可审查补丁位于 `patches/vllm-main-63e78ce-w7900-dflash-five-routes.patch`，应用方法见 [patches/README.md](patches/README.md)。
 
 ## 构建
 
+### 现有 ROCm vLLM 容器
+
 ```bash
 cp .env.w7900.template .env.w7900
-set -a; source .env.w7900; set +a
+set -a
+source .env.w7900
+set +a
+
 bash scripts/check_w7900_node.sh
 bash scripts/prepare_local_vllm.sh
 bash scripts/build_local_vllm.sh
 ```
 
-若要从 Dockerfile 构建独立 W7900 镜像，使用 `.env.w7900.docker.template` 和仓库根目录的 `Dockerfile.w7900`，不要使用旧的 Strix Halo 根 Dockerfile。
+容器流程从 `/app/vllm` 复制到 `/workspace/vllm-w7900-023` 后修改，避免污染基础源码。
 
-当前容器流程从 `/app/vllm` 复制到 `/workspace/vllm-w7900-023` 后修改；独立 Docker 镜像流程复制到 `/opt/vllm-w7900-023`。两条路径都避免直接污染基础源码，且所有架构目标均固定为 `gfx1100`。
+### 独立 W7900 镜像
 
-单独构建 gfx1100 算子：
+使用仓库根目录 `../Dockerfile.w7900` 和本目录 `.env.w7900.docker.template`。该 Dockerfile 继承实测 ROCm 7.14/vLLM 0.23 镜像并固定 `PYTORCH_ROCM_ARCH=gfx1100`；不要使用面向 Strix Halo/`gfx1151` 的根 `../Dockerfile`。
+
+### 单独构建 W4A16 HIP 算子
 
 ```bash
 cd csrc/awq_mmq_gfx1100
@@ -52,15 +198,17 @@ python validate_prefill_numerics_gfx1100.py
 python benchmark_prefill_gfx1100.py
 ```
 
-## 启动与测评
+## 启动与复现
 
-通用 AWQ4 服务使用：
+### AWQ4 与 DFlash
+
+通用 AWQ4 服务：
 
 ```bash
 bash scripts/start_local_vllm.sh
 ```
 
-双 TP=4 服务分别监听 8061（DFlash N=4）和 8062（target-only）后，启动上下文感知入口：
+双 TP=4 服务分别监听 8061（DFlash N=4）和 8062（target-only）后，启动上下文感知路由器：
 
 ```bash
 python adaptive_dflash_router.py \
@@ -71,15 +219,48 @@ python adaptive_dflash_router.py \
   --port 8060
 ```
 
-响应头 `X-DFlash-Route` 和 `X-Prompt-Tokens` 记录实际选择，便于复现实验和线上审计。
+响应头 `X-DFlash-Route` 和 `X-Prompt-Tokens` 保存实际路由与 token 数。
 
-容量 profile：
+### BF16 TP=8 + 261K Prefix Cache
+
+该 profile 使用 V1 model runner。不要与需要 V2 混合 SWA 的 DFlash 服务合并为同一个进程。
 
 ```bash
-bash scripts/start_awq4_tp8_capacity_w7900.sh
+export VLLM_WORKTREE=/workspace/vllm-w7900-023
+export VLLM_USE_V2_MODEL_RUNNER=0
+export TP=8
+export PP=1
+export PREFIX_CACHING=enable
+export BLOCK_SIZE=784
+export KV_CACHE_DTYPE=auto
+export ENFORCE_EAGER=0
+export LOG=/workspace/multicard_frontier/bf16_tp8_prefix784.log
+
+bash scripts/start_bf16_multicard_variant.sh
 ```
 
-长文质量门禁：
+连续问题：
+
+```bash
+python scripts/bench_prefix_reuse_stream.py \
+  --file /workspace/bench_data/combined_papers_for_llm_L.txt \
+  --chars 950000 \
+  --requests 3 \
+  --max-tokens 64
+```
+
+建立一次 261K 前缀后并发提出四个不同问题：
+
+```bash
+python scripts/bench_prefix_concurrency_stream.py \
+  --file /workspace/bench_data/combined_papers_for_llm_L.txt \
+  --chars 950000 \
+  --concurrency 4 \
+  --max-tokens 64 \
+  --output /workspace/multicard_frontier/prefix_261k_c4.json
+```
+
+### 科研长文质量门禁
 
 ```bash
 cd longdoc_sanity
@@ -88,18 +269,53 @@ python run_longdoc_sanity.py --help
 python score_longdoc_sanity.py --help
 ```
 
-正式实验应先 health check、warmup，再至少重复三次热态请求。保存 tokenizer 后的实际输入长度，不以源文件字节数代替 token 数。
+正式实验应记录 tokenizer 后的真实 token 数，先执行 health check 和 shape warmup，再区分冷态与热态结果。源文件字符数只用于稳定构造输入，不能代替模型 token 数。
 
-## 结果索引
+## 目录结构
+
+```text
+w7900_optimization/
+├── adaptive_dflash_router.py
+├── csrc/awq_mmq_gfx1100/
+├── longdoc_sanity/
+├── patches/
+├── results/
+│   ├── 20260802_dflash_five_routes.md
+│   ├── 20260802_dflash_data/
+│   ├── 20260802_dflash_figures/
+│   ├── 20260802_multicard_frontier.md
+│   └── 20260802_multicard_frontier_results.jsonl
+├── scripts/
+│   ├── start_bf16_multicard_variant.sh
+│   ├── bench_prefix_reuse_stream.py
+│   ├── bench_prefix_concurrency_stream.py
+│   └── ...
+├── tests/
+├── vllm_overrides/
+└── patch_w7900.py
+```
+
+## 结果与证据
 
 - [凝练实验结果](../docs/EXPERIMENT_RESULTS.md)
-- [W7900 第一阶段完整报告](../docs/W7900_FULL_EXPERIMENT_REPORT.md)
+- [W7900 完整实验报告](../docs/W7900_FULL_EXPERIMENT_REPORT.md)
 - [科研长文质量与 rocprof 边界](../docs/W7900_QUALITY_AND_ROCPROF.md)
-- [图表](../docs/assets/)
 - [DFlash 五路线实验总结](results/20260802_dflash_five_routes.md)
-- [多卡前沿技术与 261K 共享前缀实验](results/20260802_multicard_frontier.md)
-- [vLLM 补丁与应用说明](patches/README.md)
+- [DFlash 原始聚合数据](results/20260802_dflash_data/aggregated_valid_runs.csv)
+- [多卡与 261K 共享前缀实验](results/20260802_multicard_frontier.md)
+- [多卡统一结果 JSONL](results/20260802_multicard_frontier_results.jsonl)
+- [图表](../docs/assets/)
 
 ## Profiler 边界
 
-单进程 PID 分片与 `torchrun` TP=2 kernel/RCCL trace 已成功。当前容器两套 profiler SDK 的动态库冲突使真实 vLLM attach 触发 signal 6，因此现有报告没有宣称真实请求内 kernel 百分比；只使用 standalone、microbenchmark 和端到端 A/B 形成相互约束的证据。
+单进程 PID 分片与 `torchrun` TP=2 kernel/RCCL trace 已成功。当前实验容器曾同时存在 `_rocm_sdk_devel` 与 `_rocm_sdk_core` 两套 profiler SDK，其动态库冲突会使真实 vLLM attach 触发 signal 6。
+
+因此现有结论使用 standalone kernel、RCCL microbenchmark、服务日志和端到端 A/B 相互约束；没有将不可靠 attach 结果写成真实请求内 kernel 百分比。
+
+## 验证状态
+
+- DFlash 五路线：67 次有效质量请求、34 个聚合配置点。
+- Nowcast3D 质量门禁：关键在线配置均为 `QA=4/4`。
+- D-Cut：19 个纯逻辑测试通过；9 个需要离线缺失 `facebook/opt-125m` 的 fixture 未执行。
+- Prefix cache：8K 和 261K 连续不同问题均命中；4×261K 并发完成。
+- 实验结束后停止 vLLM 服务但保留容器，GPU 显存释放。
