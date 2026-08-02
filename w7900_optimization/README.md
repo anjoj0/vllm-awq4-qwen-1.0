@@ -10,6 +10,8 @@
 - `csrc/awq_mmq_gfx1100/`：面向 gfx1100 的 W4A16 HIP 内核、Python binding、正确性测试与 prefill benchmark。
 - `longdoc_sanity/`：Nowcast3D 主题科研长文数据集，包含证据、数字、needle、引用和拒答测评。
 - `scripts/`：本地 vLLM 构建、单/多卡服务、长文与并发 harness、RCCL 和功耗辅助工具。
+- `scripts/start_bf16_multicard_variant.sh`：统一记录 TP/PP/DCP/PCP、prefix cache、block size、eager/graph 和 SP/fused-comms 候选配置的 BF16 多卡启动器。
+- `scripts/bench_prefix_concurrency_stream.py`：建立长文共享前缀后并发提出不同问题，记录 TTFT、wall time 和聚合输出吞吐。
 - `adaptive_dflash_router.py`：在同 NUMA 的双 TP=4 服务间按真实 prompt token 数选择 DFlash 或 target-only。
 - `patches/`：相对 vLLM main `63e78ce` 的完整可审查补丁，包含混合 SWA、gfx1100 small-query attention、D-Cut V2 和回归测试。
 
@@ -95,6 +97,7 @@ python score_longdoc_sanity.py --help
 - [科研长文质量与 rocprof 边界](../docs/W7900_QUALITY_AND_ROCPROF.md)
 - [图表](../docs/assets/)
 - [DFlash 五路线实验总结](results/20260802_dflash_five_routes.md)
+- [多卡前沿技术与 261K 共享前缀实验](results/20260802_multicard_frontier.md)
 - [vLLM 补丁与应用说明](patches/README.md)
 
 ## Profiler 边界
