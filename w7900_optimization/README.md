@@ -146,11 +146,13 @@ vllm/v1/worker/gpu/model_states/mamba_hybrid.py
 
 ### Prefill/Decode 解耦
 
-本项目从源码构建 UCX 1.22 ROCm 与 NIXL 1.4.0，并用 vLLM 原生 `NixlConnector` 打通 Qwen3.6-27B BF16 的 TP=4 Prefill 与 TP=4 Decode。该模型需要同时迁移 Attention KV、Mamba convolution state 和 SSM state；设置 `VLLM_SSM_CONV_STATE_LAYOUT=DS` 后，8K 与 64K 固定长度热态 greedy 输出通过逐字一致性检查。
+本项目从源码构建 UCX 1.22 ROCm 与 NIXL 1.4.0，并用 vLLM 原生 `NixlConnector` 打通 Qwen3.6-27B BF16 的 TP=4 Prefill 与 TP=4 Decode。该模型需要同时迁移 Attention KV、Mamba convolution state 和 SSM state；设置 `VLLM_SSM_CONV_STATE_LAYOUT=DS` 后，8K 短请求热态 greedy 输出与直接 Decode 逐字一致。
 
 P/D 相对单个 TP=4 服务体现出阶段隔离：4×64K 的平均请求完成时间由 228.27 s 降到 146.34 s，下降 35.9%，已进入 Decode 的请求不再被后续长 Prefill 阻塞。但该比较使用 8 卡对 4 卡。相同 8 卡资源下，两个独立 TP=4 副本的 batch wall 为 120.06 s，P/D 为 229.93 s；dual TP=4 的聚合吞吐约为 P/D 的 1.91 倍。
 
-当前 P/D 不进入推荐 profile。原因不是功能失败，而是 W7900 上 NIXL/UCX 的 GPU RMA 仍回退到 `tcp/bond0`：64K 时每个 TP rank 迁移约 1,044.7 MB，平均耗时 3.915 s。完整构建、正确性与公平基线见 [pd_disaggregation/README.md](pd_disaggregation/README.md) 和 [P/D 实验报告](results/20260802_pd_disaggregation.md)。
+UCX/TCP 基线在 W7900 上将 GPU RMA 回退到 `tcp/bond0`：64K 时每个 TP rank 迁移约 1.02 GiB，平均耗时约 3.9 s。为此项目实现了 NIXL 动态 backend `W7900_HIP_IPC`，保留 NIXL scheduler、metadata、TP mapping、KV block lease 和 metrics，只将同节点 GPU payload 改为 `hipIpcGetMemHandle` / `hipIpcOpenMemHandle` / `hipMemcpyAsync`。1 GiB 裸 NIXL plugin 达到 `25.12 GiB/s`；64K vLLM 单请求的有效 payload 带宽约 `25.26 GB/s`。
+
+原生 plugin 的 64K 热态 TTFT 为 `55.633 s`、wall 为 `57.292 s`，相对 UCX/TCP 分别下降约 `7.2%` 和 `6.9%`。并发 4 的 batch wall 下降约 `2.0%`，mean TTFT 下降约 `3.3%`；累计 28 次 rank transfer、30.67 GB payload 无传输或通知失败。该 backend 已成为本项目 P/D 场景的推荐同节点数据面，但 P/D 架构本身仍不是固定并发下的最高聚合吞吐 profile：同资源 dual TP=4 仍能避免阶段解耦带来的排队和容量分割。完整实现与数据见 [HIP IPC transport](hip_ipc_transport/README.md)、[P/D 环境](pd_disaggregation/README.md) 和 [实验报告](results/20260803_w7900_hip_ipc_transport.md)。
 
 ### 当前上游能力边界
 
@@ -160,7 +162,7 @@ P/D 相对单个 TP=4 服务体现出阶段隔离：4×64K 的平均请求完成
 | PCP | 不适用 | 当前实现仅支持 MLA，Qwen3.6 非 MLA |
 | 自定义 All-Reduce | 未激活 | TP=2 移除禁用参数后 engine 仍选择 PYNCCL；PCIe-only TP=4/8 不满足全连接条件 |
 | Sequence Parallel + fused comms | 编译失败 | 强制启用后 `AsyncTPPass` 在 ROCm 构建中未定义 |
-| Prefill/Decode 解耦 | 功能闭环，非推荐性能路径 | 混合状态迁移正确；同资源 dual TP=4 更快，NIXL/UCX 数据面回退 TCP |
+| Prefill/Decode 解耦 | 同节点数据面已优化 | 原生 `W7900_HIP_IPC` backend 完成混合状态迁移；64K TTFT 较 UCX/TCP 下降约 7.2%，但固定并发聚合吞吐仍低于 dual TP=4 |
 
 这些项目属于已验证的能力缺口，不是负性能结果；README 不将其描述为已实现优化。
 
@@ -174,6 +176,7 @@ P/D 相对单个 TP=4 服务体现出阶段隔离：4×64K 的平均请求完成
 | D-Cut confidence pruning | PR #47131，并补充本项目 V2 scheduler 路径 |
 | P/D 混合状态迁移 | vLLM 原生 `NixlConnector`，NIXL 1.4.0，UCX 1.22 ROCm |
 | VRAM memtype hint 实验 | NIXL PR #1536 核心逻辑的 1.4.0 前移植；协议仍回退 TCP |
+| 同节点 GPU 数据面 | 本项目 `W7900_HIP_IPC` NIXL backend；HIP IPC payload + Unix datagram notification |
 | 固定审查基线 | vLLM main `63e78ce3652f4f94e9f484f40db71ca4cf019f21` |
 
 完整可审查补丁位于 `patches/vllm-main-63e78ce-w7900-dflash-five-routes.patch`，应用方法见 [patches/README.md](patches/README.md)。
@@ -211,7 +214,7 @@ python benchmark_prefill_gfx1100.py
 
 ### Prefill/Decode 解耦环境
 
-Python 3.14 容器不能直接安装要求 Python `<3.14` 的 LMCache 0.3.6。使用 vLLM 原生 NIXL connector 的 UCX/NIXL 源码构建和启动方法见 [pd_disaggregation/README.md](pd_disaggregation/README.md)。
+Python 3.14 容器不能直接安装要求 Python `<3.14` 的 LMCache 0.3.6。使用 vLLM 原生 NIXL connector 的 UCX/NIXL 源码构建和启动方法见 [pd_disaggregation/README.md](pd_disaggregation/README.md)；同节点 HIP IPC backend 的构建与分层门禁见 [hip_ipc_transport/README.md](hip_ipc_transport/README.md)。
 
 ## 启动与复现
 
