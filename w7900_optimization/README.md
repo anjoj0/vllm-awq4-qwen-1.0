@@ -154,6 +154,8 @@ UCX/TCP 基线在 W7900 上将 GPU RMA 回退到 `tcp/bond0`：64K 时每个 TP 
 
 原生 plugin 的 64K 热态 TTFT 为 `55.633 s`、wall 为 `57.292 s`，相对 UCX/TCP 分别下降约 `7.2%` 和 `6.9%`。并发 4 的 batch wall 下降约 `2.0%`，mean TTFT 下降约 `3.3%`；累计 28 次 rank transfer、30.67 GB payload 无传输或通知失败。该 backend 已成为本项目 P/D 场景的推荐同节点数据面，但 P/D 架构本身仍不是固定并发下的最高聚合吞吐 profile：同资源 dual TP=4 仍能避免阶段解耦带来的排队和容量分割。完整实现与数据见 [HIP IPC transport](hip_ipc_transport/README.md)、[P/D 环境](pd_disaggregation/README.md) 和 [实验报告](results/20260803_w7900_hip_ipc_transport.md)。
 
+在此基础上，非对称启动器将 8 张卡统一组织为 TP2 副本，并支持 `p2_d6`（1 Prefill + 3 Decode）、`p4_d4`（2 + 2）和 `p6_d2`（3 + 1）。64K 输入、32-token 输出、并发 6 时，`p6_d2` 相对 `p2_d6` 将 batch wall 从 642.43 s 降到 218.66 s，说明长输入短输出应优先增加 Prefill 副本。8K 输入、2,048-token 输出、并发 12 时最优点反转，`p2_d6` 的 wall 为 188.31 s，较 `p6_d2` 的 212.49 s 低 11.4%，聚合输出吞吐高 12.8%。因此项目不把物理 4/4 固化为唯一方案，而是依据 Prefill 工作量、Decode token 数和 TTFT/吞吐目标选择资源比例。128K、3 并发在 TP2+FP8 KV、16K chunk 下能够完成，但约 15 分钟 TTFT，仅定义为容量模式。完整矩阵见 [非对称 P/D 实验](results/20260804_asymmetric_pd_matrix.md)。
+
 ### 当前上游能力边界
 
 | 技术 | 当前状态 | 证据 |
@@ -302,10 +304,14 @@ w7900_optimization/
 │   ├── start_prefill_tp4.sh
 │   ├── start_decode_tp4.sh
 │   ├── start_proxy.sh
+│   ├── start_asymmetric_pd.sh
+│   ├── start_pd_worker.sh
+│   ├── stop_asymmetric_pd.sh
 │   └── benchmark_pd.py
 ├── results/
 │   ├── 20260802_dflash_five_routes.md
 │   ├── 20260802_pd_disaggregation.md
+│   ├── 20260804_asymmetric_pd_matrix.md
 │   ├── 20260802_dflash_data/
 │   ├── 20260802_dflash_figures/
 │   ├── 20260802_multicard_frontier.md
@@ -329,6 +335,7 @@ w7900_optimization/
 - [DFlash 原始聚合数据](results/20260802_dflash_data/aggregated_valid_runs.csv)
 - [多卡与 261K 共享前缀实验](results/20260802_multicard_frontier.md)
 - [Prefill/Decode 解耦实验](results/20260802_pd_disaggregation.md)
+- [非对称 Prefill/Decode 资源矩阵](results/20260804_asymmetric_pd_matrix.md)
 - [多卡统一结果 JSONL](results/20260802_multicard_frontier_results.jsonl)
 - [图表](../docs/assets/)
 

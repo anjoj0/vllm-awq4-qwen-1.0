@@ -72,10 +72,15 @@ hipcc -O3 -std=c++17 hip_ipc_bench.cpp -o hip_ipc_bench
 
 ```bash
 source /workspace/pd_disagg_20260802/scripts/activate_pd_env.sh
-python nixl_plugin/test_nixl_plugin.py --bytes 1073741824
+python nixl_plugin/test_nixl_plugin.py \
+  --exchange /tmp/nixl_hip_ipc_gate \
+  --bytes 1073741824 \
+  --reposts 3 \
+  --exercise-active-repost \
+  --exercise-recovery
 ```
 
-双进程 `HIP_VISIBLE_DEVICES=0,1,2,3` 与 `4,5,6,7` 下，64 MiB 和 1 GiB 均 `valid=true`；1 GiB NIXL 端到端带宽为 `25.12 GiB/s`，与裸 HIP IPC 一致。
+双进程 `HIP_VISIBLE_DEVICES=0,1,2,3` 与 `4,5,6,7` 下，64 MiB 和 1 GiB 均 `valid=true`。最终源码重编译后的 1 GiB prepared handle 连续三轮带宽为 `14.77/25.19/25.24 GiB/s`，后两轮热态与裸 HIP IPC 一致。活动请求的立即 repost 返回 `NIXL_ERR_REPOST_ACTIVE`，且原请求仍正确完成；超大通知触发 `NIXL_ERR_INVALID_PARAM` 后，同一 handle 可重建 stream/event 并恢复 repost，故障轮与恢复轮的 payload 校验均通过。
 
 ### vLLM 原生 `NixlConnector`
 
@@ -120,7 +125,7 @@ MAX_MODEL_LEN=65536 MAX_NUM_BATCHED_TOKENS=65536 \
 ## 当前边界
 
 - 仅支持同一 Linux 主机内的 HIP IPC；跨主机应回退 UCX/RDMA 等 backend。
-- 当前 request handle 是单次提交语义；`postXfer()` 后不能 repost 同一 handle。vLLM NIXL connector 符合该生命周期。若作为通用上游 backend，需要补 event reset/repost 语义与更完整的错误恢复。
+- prepared request 支持完成后 repost，并允许每轮更新 notification；活动请求 repost 被明确拒绝。HIP copy 与 notification 分阶段记账，暂时性 socket 拥塞可重试，终态失败后下一轮会重建 request-owned stream/event。完整状态机和上游边界见 `nixl_plugin/UPSTREAM.md`。
 - Unix datagram 只承载小型通知，不用于 payload；socket path 依赖同一 mount namespace 可见的 `/tmp`。
 - 64K 并发 4 的主要时间仍是串行/排队的 Prefill，替换数据面只能消除约 4 s 的 TCP 迁移，不能替代调度层的并发优化。
 

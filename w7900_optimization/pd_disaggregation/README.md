@@ -133,6 +133,35 @@ python benchmark_pd.py \
 
 64K、32-token、并发 1 的原生 HIP IPC plugin 热态结果为 TTFT `55.633 s`、wall `57.292 s`，相对 UCX/TCP 分别下降约 `7.2%` 和 `6.9%`。并发 4 的 batch wall 从 `229.934 s` 降至 `225.259 s`，mean TTFT 从 `144.757 s` 降至 `139.922 s`。短请求与直接 Decode 输出逐字一致，累计 28 次 rank transfer 无传输或通知失败。完整数据见 [20260803 HIP IPC 报告](../results/20260803_w7900_hip_ipc_transport.md)。
 
+## 非对称 8 卡资源划分
+
+Qwen3.6-27B 的 head 和线性层维度不适合 TP=6，因此物理 `2/6` 不直接使用 TP2 + TP6。为隔离资源比例与 TP 宽度的影响，三种 profile 均由 TP2 副本组成：
+
+| Profile | Prefill | Decode | 物理卡比例 |
+|---|---|---|---:|
+| `p2_d6` | 1 x TP2 | 3 x TP2 | 2 + 6 |
+| `p4_d4` | 2 x TP2 | 2 x TP2 | 4 + 4 |
+| `p6_d2` | 3 x TP2 | 1 x TP2 | 6 + 2 |
+
+启动器逐组加载模型并健康检查；某个 TP2 group 若在 RCCL rendezvous 阶段超时，只回收并重试该组。每个 engine 使用独立 HTTP、distributed-init 和 NIXL side-channel 端口，run 目录保存 PID、worker 映射、manifest、health 和日志。停止脚本只结束该 run 的服务，不停止容器：
+
+```bash
+RUN_ID=p6_d2_example \
+MAX_MODEL_LEN=65536 MAX_NUM_BATCHED_TOKENS=65536 \
+  bash start_asymmetric_pd.sh p6_d2
+
+python benchmark_pd.py \
+  --url http://127.0.0.1:8192/v1/completions \
+  --source /workspace/bench_data/combined_papers_for_llm.txt \
+  --prompt-tokens 64000 --max-tokens 32 --concurrency 6 \
+  --output /workspace/pd_disagg_20260802/runs/p6_d2_example/result.json
+
+bash stop_asymmetric_pd.sh \
+  /workspace/pd_disagg_20260802/runs/p6_d2_example
+```
+
+决定性结果如下：64K 输入、32-token 输出、并发 6 时，`p6_d2` 的 218.66 s wall 相对 `p2_d6` 的 642.43 s 降低 66.0%；8K 输入、2,048-token 输出、并发 12 时，`p2_d6` 的 188.31 s wall 相对 `p6_d2` 的 212.49 s 降低 11.4%。前者由 Prefill 主导，后者已进入 Decode 副本扩展能够覆盖 Prefill 排队的区间。128K TP2+FP8 KV 在 16K chunk 和 600 s worker watchdog 下容量可行，但 Mean TTFT 为 892.29 s，应视为容量 profile。完整配置、失败边界和原始证据见 [非对称 P/D 实验报告](../results/20260804_asymmetric_pd_matrix.md)。
+
 ## ROCm IPC 前移植实验
 
 [nixl_ad661_rocm_hint.patch](nixl_ad661_rocm_hint.patch) 将 NIXL PR #1536 的核心 memtype hint 前移植到带 ROCm wheel 支持的 1.4.0 快照，并通过 `NIXL_UCX_VRAM_MEMTYPE_HINT=rocm` 启用。该版本编译和数值校验均通过，但 `UCX_PROTO_INFO=y` 仍显示：

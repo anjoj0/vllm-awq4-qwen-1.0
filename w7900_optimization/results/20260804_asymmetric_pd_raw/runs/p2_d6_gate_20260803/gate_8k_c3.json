@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8192/v1/completions",
+  "prompt_tokens": 8000,
+  "max_tokens": 32,
+  "concurrency": 3,
+  "batch_wall_s": 20.55154637247324,
+  "aggregate_output_tok_s": 4.671181343734917,
+  "mean_ttft_s": 13.407270297408104,
+  "p50_ttft_s": 13.056149553507566,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 9.782759511843324,
+      "ttft_s": 8.220284482464194,
+      "completion_tokens": 32,
+      "output_tok_s": 20.480327300152524,
+      "text": ".\n\n==================================================\nDOCUMENT_END:\n==================================================\n\n<think>\nHere's a thinking process:\n\n1.  **Analyze User Input:**\n  "
+    },
+    {
+      "request_index": 1,
+      "wall_s": 14.685209468007088,
+      "ttft_s": 13.056149553507566,
+      "completion_tokens": 32,
+      "output_tok_s": 19.64323086903223,
+      "text": ".\n\n==================================================\nDOCUMENT_END:\n==================================================\n\n<think>\nHere's a thinking process:\n\n1.  **Analyze User Input:**\n  "
+    },
+    {
+      "request_index": 2,
+      "wall_s": 20.547416295856237,
+      "ttft_s": 18.94537685625255,
+      "completion_tokens": 32,
+      "output_tok_s": 19.974539458227184,
+      "text": ".\n\n==================================================\nDOCUMENT_END:\n==================================================\n\n<think>\nHere's a thinking process:\n\n1.  **Analyze User Input:**\n  "
+    }
+  ]
+}

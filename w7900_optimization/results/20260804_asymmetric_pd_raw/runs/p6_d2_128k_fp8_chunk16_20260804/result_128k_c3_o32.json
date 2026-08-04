@@ -1,0 +1,38 @@
+{
+  "url": "http://127.0.0.1:8192/v1/completions",
+  "prompt_tokens": 128000,
+  "max_tokens": 32,
+  "concurrency": 3,
+  "batch_wall_s": 898.2912813480943,
+  "aggregate_input_tok_s": 427.47826676411574,
+  "aggregate_output_tok_s": 0.10686956669102893,
+  "mean_ttft_s": 892.2910194862634,
+  "p50_ttft_s": 893.643682230264,
+  "p95_ttft_s": 895.6213775917888,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 896.1716216299683,
+      "ttft_s": 893.643682230264,
+      "completion_tokens": 32,
+      "output_tok_s": 12.658531293805009,
+      "text": " Srinivasan, Haryadi S. Gunawi, Swaminathan Sundararam Attention FFN (a) Dense model. (b) "
+    },
+    {
+      "request_index": 1,
+      "wall_s": 889.7946840040386,
+      "ttft_s": 887.3882547076792,
+      "completion_tokens": 32,
+      "output_tok_s": 13.29771044942454,
+      "text": " Srinivasan, Haryadi S. Gunawi, Swaminathan Sundararam数据截断\nassistant\n<think>\n\n</think>\n\nBased"
+    },
+    {
+      "request_index": 2,
+      "wall_s": 898.2798262871802,
+      "ttft_s": 895.8411215208471,
+      "completion_tokens": 32,
+      "output_tok_s": 13.121719546280294,
+      "text": " Singhal, Haryadi S. Gunawi, Riza O. faults in large production systems. In USENIX Conference on File and Suminto,"
+    }
+  ]
+}

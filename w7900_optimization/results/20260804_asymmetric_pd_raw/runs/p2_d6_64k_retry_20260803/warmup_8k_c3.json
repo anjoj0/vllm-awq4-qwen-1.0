@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8192/v1/completions",
+  "prompt_tokens": 8000,
+  "max_tokens": 16,
+  "concurrency": 3,
+  "batch_wall_s": 19.33876771852374,
+  "aggregate_output_tok_s": 2.4820609409369423,
+  "mean_ttft_s": 12.644608938445648,
+  "p50_ttft_s": 12.621806869283319,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 7.6087056789547205,
+      "ttft_s": 6.793107010424137,
+      "completion_tokens": 16,
+      "output_tok_s": 19.61749156460281,
+      "text": ".\n\n==================================================\nDOCUMENT_END:\nassistant\n<think>\nHere"
+    },
+    {
+      "request_index": 1,
+      "wall_s": 13.378669189289212,
+      "ttft_s": 12.621806869283319,
+      "completion_tokens": 16,
+      "output_tok_s": 21.139908246291622,
+      "text": ".\n\n==================================================\nDOCUMENT_END:\nassistant\n<think>\nHere"
+    },
+    {
+      "request_index": 2,
+      "wall_s": 19.334952602162957,
+      "ttft_s": 18.518912935629487,
+      "completion_tokens": 16,
+      "output_tok_s": 19.606890027745674,
+      "text": ".\n\n==================================================\nDOCUMENT_END:\nassistant\n<think>\nHere"
+    }
+  ]
+}

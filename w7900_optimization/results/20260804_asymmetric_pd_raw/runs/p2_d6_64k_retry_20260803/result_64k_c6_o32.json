@@ -1,0 +1,60 @@
+{
+  "url": "http://127.0.0.1:8192/v1/completions",
+  "prompt_tokens": 64000,
+  "max_tokens": 32,
+  "concurrency": 6,
+  "batch_wall_s": 642.4278653040528,
+  "aggregate_output_tok_s": 0.2988662391055047,
+  "mean_ttft_s": 373.2179393960784,
+  "p50_ttft_s": 373.1483954768628,
+  "requests": [
+    {
+      "request_index": 0,
+      "wall_s": 214.30684691295028,
+      "ttft_s": 212.575318897143,
+      "completion_tokens": 32,
+      "output_tok_s": 18.480786743193985,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse, which is a common problem with"
+    },
+    {
+      "request_index": 1,
+      "wall_s": 107.71051097102463,
+      "ttft_s": 105.98146113567054,
+      "completion_tokens": 32,
+      "output_tok_s": 18.507274542174642,
+      "text": " DGMR from scratch would have required significantly more time than LDCast. The training speed that weLDCast achieves is partly due to the use of Neural"
+    },
+    {
+      "request_index": 2,
+      "wall_s": 642.4203600212932,
+      "ttft_s": 640.680165072903,
+      "completion_tokens": 32,
+      "output_tok_s": 18.38874433557203,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse, which is a common problem with"
+    },
+    {
+      "request_index": 3,
+      "wall_s": 321.31641110405326,
+      "ttft_s": 319.5624320320785,
+      "completion_tokens": 32,
+      "output_tok_s": 18.244231365869222,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse. This is particularly important for ensemble"
+    },
+    {
+      "request_index": 4,
+      "wall_s": 428.468655904755,
+      "ttft_s": 426.7343589216471,
+      "completion_tokens": 32,
+      "output_tok_s": 18.451280439094585,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse. This is particularly important for ensemble"
+    },
+    {
+      "request_index": 5,
+      "wall_s": 535.5019097160548,
+      "ttft_s": 533.7739003170282,
+      "completion_tokens": 32,
+      "output_tok_s": 18.518417792186334,
+      "text": " DGMR from scratch would have required significantly more time and computational resources than LDCast. Another advantage of immune to mode collapse, which is a common problem with"
+    }
+  ]
+}

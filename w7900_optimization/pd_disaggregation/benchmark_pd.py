@@ -14,6 +14,17 @@ import httpx
 from transformers import AutoTokenizer
 
 
+def percentile(values: list[float], fraction: float) -> float | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * fraction
+    lower = int(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    weight = position - lower
+    return ordered[lower] * (1 - weight) + ordered[upper] * weight
+
+
 def build_prompt_tokens(tokenizer, source: Path, target_tokens: int) -> list[int]:
     text = source.read_text(encoding="utf-8", errors="replace")
     tokens = tokenizer.encode(text, add_special_tokens=False)
@@ -115,9 +126,11 @@ async def main() -> None:
         "max_tokens": args.max_tokens,
         "concurrency": args.concurrency,
         "batch_wall_s": batch_wall_s,
+        "aggregate_input_tok_s": len(prompt) * args.concurrency / batch_wall_s,
         "aggregate_output_tok_s": total_output / batch_wall_s,
         "mean_ttft_s": statistics.mean(valid_ttft) if valid_ttft else None,
         "p50_ttft_s": statistics.median(valid_ttft) if valid_ttft else None,
+        "p95_ttft_s": percentile(valid_ttft, 0.95),
         "requests": results,
     }
     rendered = json.dumps(report, ensure_ascii=False, indent=2)

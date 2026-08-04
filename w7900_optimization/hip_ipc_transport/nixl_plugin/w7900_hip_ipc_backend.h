@@ -61,7 +61,6 @@ private:
                             const std::string& msg) const;
 
     int device_ = 0;
-    hipStream_t stream_ = nullptr;
     int notif_fd_ = -1;
     std::string socket_path_;
     mutable std::mutex mutex_;
