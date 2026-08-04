@@ -336,6 +336,7 @@ w7900_optimization/
 - [多卡与 261K 共享前缀实验](results/20260802_multicard_frontier.md)
 - [Prefill/Decode 解耦实验](results/20260802_pd_disaggregation.md)
 - [非对称 Prefill/Decode 资源矩阵](results/20260804_asymmetric_pd_matrix.md)
+- [UCX RMA pipeline READ/WRITE 复核](results/20260804_ucx_rma_ppln.md)
 - [多卡统一结果 JSONL](results/20260802_multicard_frontier_results.jsonl)
 - [图表](../docs/assets/)
 

@@ -17,6 +17,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bytes", type=int, default=64 * 1024 * 1024)
     parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--iterations", type=int, default=5)
+    parser.add_argument("--operation", choices=("READ", "WRITE"), default="READ")
     return parser.parse_args()
 
 
@@ -36,7 +37,10 @@ def main() -> None:
         nixl_agent_config(True, True, listen_port, backends=["UCX"]),
     )
 
-    fill = 7 if args.role == "target" else 0
+    if args.operation == "READ":
+        fill = 7 if args.role == "target" else 0
+    else:
+        fill = 0 if args.role == "target" else 7
     tensor = torch.full((args.bytes,), fill, dtype=torch.int8, device="cuda:0")
     registered = agent.register_memory(tensor, backends=["UCX"])
     descriptors = agent.get_xfer_descs(tensor)
@@ -49,7 +53,21 @@ def main() -> None:
             in b"".join(agent.get_new_notifs().get("initiator", [])),
             timeout_s=120.0,
         )
-        print(json.dumps({"role": "target", "status": "complete"}))
+        torch.cuda.synchronize()
+        expected = 7 if args.operation == "WRITE" else fill
+        if not bool(torch.all(tensor[:4096] == expected).item()) or int(
+            tensor[-1]
+        ) != expected:
+            raise RuntimeError("Target GPU buffer failed verification")
+        print(
+            json.dumps(
+                {
+                    "role": "target",
+                    "status": "verified",
+                    "operation": args.operation,
+                }
+            )
+        )
     else:
         agent.fetch_remote_metadata("target", args.ip, args.port)
         agent.send_local_metadata(args.ip, args.port)
@@ -67,7 +85,7 @@ def main() -> None:
         total = args.warmup + args.iterations
         for index in range(total):
             handle = agent.initialize_xfer(
-                "READ", descriptors, remote_descriptors, "target"
+                args.operation, descriptors, remote_descriptors, "target"
             )
             start = time.perf_counter()
             state = agent.transfer(handle)
@@ -90,6 +108,7 @@ def main() -> None:
         result = {
             "role": "initiator",
             "status": "verified",
+            "operation": args.operation,
             "bytes": args.bytes,
             "iterations": args.iterations,
             "mean_s": mean_s,

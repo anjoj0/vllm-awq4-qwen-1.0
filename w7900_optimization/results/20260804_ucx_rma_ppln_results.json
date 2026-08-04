@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-04",
+  "gpu_pair": [0, 1],
+  "gpu": "Radeon PRO W7900 gfx1100",
+  "rocm": "7.14",
+  "ucx": "1.22.0 95865d6365b08b5c2b437be37375eac55f31533f",
+  "nixl": "1.4",
+  "ucx_tls": "rocm_ipc,rocm_copy,self,tcp",
+  "warmup_iterations": 1,
+  "timed_iterations": 3,
+  "results": [
+    {"operation": "READ", "bytes": 67108864, "rma_ppln_enable": false, "mean_GBps": 0.2971224010330537, "verified": true},
+    {"operation": "READ", "bytes": 67108864, "rma_ppln_enable": true, "mean_GBps": 1.4251771273452312, "verified": true},
+    {"operation": "READ", "bytes": 1073741824, "rma_ppln_enable": false, "mean_GBps": 0.2968845483664029, "verified": true},
+    {"operation": "READ", "bytes": 1073741824, "rma_ppln_enable": true, "mean_GBps": 1.0600092449582295, "verified": true},
+    {"operation": "WRITE", "bytes": 67108864, "rma_ppln_enable": false, "mean_GBps": 0.28515670172016705, "verified": true},
+    {"operation": "WRITE", "bytes": 67108864, "rma_ppln_enable": true, "mean_GBps": 1.387411103621838, "verified": true},
+    {"operation": "WRITE", "bytes": 1073741824, "rma_ppln_enable": false, "mean_GBps": 0.23284656337182005, "verified": true},
+    {"operation": "WRITE", "bytes": 1073741824, "rma_ppln_enable": true, "mean_GBps": 1.0559575583785938, "verified": true}
+  ],
+  "protocol": "host-staged RMA pipeline using rocm_copy fragments over tcp/bond0",
+  "direct_rocm_ipc_selected": false
+}

@@ -172,3 +172,9 @@ software emulation | tcp/bond0
 ```
 
 因此该实验补丁不进入默认环境。`UCX_TLS` 仍需包含 `tcp`，因为 `rocm_ipc`/`rocm_copy` 不提供 NIXL 所需的 active-message 控制通道。正式路径改为动态加载 `W7900_HIP_IPC` backend，由 HIP IPC 处理 GPU payload、Unix datagram 处理 notification，同时继续使用 NIXL 原生 scheduler、metadata 和 metrics。
+
+### UCX RMA pipeline 缓解项
+
+UCX 1.22 设置 `UCX_RMA_PPLN_ENABLE=y` 后，W7900 双进程 READ/WRITE 均能通过数值校验，64 MiB 吞吐提高约 4.8 倍，1 GiB 提高约 3.6-4.5 倍。1 GiB READ/WRITE 分别达到 `1.060/1.056 GB/s`。但 `UCX_PROTO_INFO` 显示的仍是 `rocm_copy`、host fragments 和 `tcp/bond0`，不是直接 `rocm_ipc` lane。
+
+因此 UCX fallback profile 建议启用该变量，但正式同节点数据面仍使用 `W7900_HIP_IPC`。后者热态约 25.2 GiB/s，按相同十进制单位仍约为 pipeline 的 25 倍。完整 A/B、协议日志和 READ/WRITE probe 见 [UCX RMA pipeline 复核](../results/20260804_ucx_rma_ppln.md)。
