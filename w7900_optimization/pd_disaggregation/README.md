@@ -203,3 +203,5 @@ UCX_ROOT=/path/to/experimental-ucx \
 ```
 
 传输前退出和 8 GiB 在途 READ/WRITE 均未挂死；stale registration 会暴露 ROCm IPC 既有的失效 rkey 错误传播缺口。该 flag 因而仍标记为实验性，不应在缺少额外架构 CI 时直接作为默认生产补丁。完整根因、性能表、故障语义和日志哈希见 [UCX error mode 根因报告](../results/20260805_nixl_ucx_error_mode_root_cause.md)。
+
+OpenUCX PR [#9751](https://github.com/openucx/ucx/pull/9751) 是该设计的重要先例：上游删除了 `cuda_ipc` 自身的 `EP_CHECK`，但保留 `ERRHANDLE_PEER_FAILURE`，由独立 AM transport 承担 endpoint keepalive。W7900 的候选结构同样是 TCP AM/keepalive 与 `rocm_ipc` RMA 数据 lane 的组合，后续回归测试应验证该多 lane endpoint，而不是要求纯 ROCm IPC transport 独立建立控制面。

@@ -56,6 +56,18 @@ NIXL UCX backend default: peer
 
 因此，UCP 为 peer-error endpoint 选择数据 lane 时会排除 `rocm_ipc`。CUDA IPC 已声明该 flag，这也解释了相同 NIXL 配置在 CUDA 与 ROCm 上的路径差异。
 
+### 2.1 CUDA IPC 的上游设计先例
+
+OpenUCX PR [#9751](https://github.com/openucx/ucx/pull/9751) 在 2024 年删除了 `cuda_ipc` 自身的 `EP_CHECK` 实现，但有意保留 `UCT_IFACE_FLAG_ERRHANDLE_PEER_FAILURE`。该 PR 的设计说明是：UCP 在 lane selection 中只选择一条独立 keepalive lane；IPC RMA 数据 lane 不需要同时提供 keepalive。可作为 keepalive 的 transport 需满足下列条件之一：
+
+1. `CONNECT_TO_EP + EP_CHECK`；
+2. `CONNECT_TO_IFACE + AM_BCOPY`；
+3. `CONNECT_TO_EP + EP_KEEPALIVE`。
+
+当前 W7900 NIXL endpoint 正好形成相同的多 lane 结构：TCP 负责 AM/keepalive，实验性 `rocm_ipc` 负责 RMA。因此，“ROCm IPC 本身没有 `EP_CHECK`”并不自动否定 peer-failure capability；更合适的回归目标是验证组合 endpoint 在 peer 退出时完成或报错，而不是要求纯 `rocm_ipc` 独立承担控制面 keepalive。
+
+这一先例不能替代 ROCm 的运行时验证，但说明实验补丁与 CUDA IPC 的现有 UCX 语义一致，而不是创造新的 capability 解释。
+
 ## 3. 直接 UCP 单变量复现
 
 `ucx_perftest` 的 `-e` 明确定义为“create endpoints with error handling support”。其他变量保持不变，64 MiB 结果如下：
@@ -154,6 +166,8 @@ UCX 要求远端 registration/rkey 在可能被访问期间保持有效。因此
 4. `ucx_perftest -e` 的所有通用 endpoint 形态都能只依赖 ROCm transport。
 
 建议先向 UCX/ROCm 维护者提交 RFC 或 draft PR：补丁、W7900 性能数据和 peer-exit 测试一并提供，同时请求其他架构 CI。stale-rkey 防御性恢复应独立成 issue，避免把合法 peer failure 与应用违反 rkey 生命周期混成一个问题。
+
+候选回归测试应采用 `TCP/CMA keepalive + rocm_ipc RMA` 的多 lane endpoint，并覆盖传输前退出与在途 READ/WRITE。OpenUCX PR #9751 已明确表明不应要求 IPC transport 自身成为 keepalive lane。
 
 ## 7. 复现与归档
 
