@@ -218,6 +218,8 @@ python benchmark_prefill_gfx1100.py
 
 Python 3.14 容器不能直接安装要求 Python `<3.14` 的 LMCache 0.3.6。使用 vLLM 原生 NIXL connector 的 UCX/NIXL 源码构建和启动方法见 [pd_disaggregation/README.md](pd_disaggregation/README.md)；同节点 HIP IPC backend 的构建与分层门禁见 [hip_ipc_transport/README.md](hip_ipc_transport/README.md)。
 
+NIXL #2039 的上游复核表明，UCX 1.22 在两张 W7900 间能够直接使用 `rocm_ipc`，1 GiB UCP GET/PUT 分别为 `18.243/11.261 GB/s`；当前 NIXL 路径尚未保留该 lane。UCX fallback 默认采用 `UCX_TLS=sm,rocm,tcp,self` 与 `UCX_RMA_PPLN_ENABLE=y`，上游工作聚焦修复 NIXL UCX backend，而不是新增重复 transport plugin。实验见 [UCX `sm` 上游复核](results/20260805_ucx_sm_upstream_followup.md)。
+
 ## 启动与复现
 
 ### AWQ4 与 DFlash

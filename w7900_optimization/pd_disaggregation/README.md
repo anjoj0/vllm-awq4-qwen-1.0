@@ -162,19 +162,19 @@ bash stop_asymmetric_pd.sh \
 
 决定性结果如下：64K 输入、32-token 输出、并发 6 时，`p6_d2` 的 218.66 s wall 相对 `p2_d6` 的 642.43 s 降低 66.0%；8K 输入、2,048-token 输出、并发 12 时，`p2_d6` 的 188.31 s wall 相对 `p6_d2` 的 212.49 s 降低 11.4%。前者由 Prefill 主导，后者已进入 Decode 副本扩展能够覆盖 Prefill 排队的区间。128K TP2+FP8 KV 在 16K chunk 和 600 s worker watchdog 下容量可行，但 Mean TTFT 为 892.29 s，应视为容量 profile。完整配置、失败边界和原始证据见 [非对称 P/D 实验报告](../results/20260804_asymmetric_pd_matrix.md)。
 
-## ROCm IPC 前移植实验
+## ROCm 内存类型提示实验
 
-[nixl_ad661_rocm_hint.patch](nixl_ad661_rocm_hint.patch) 将 NIXL PR #1536 的核心 memtype hint 前移植到带 ROCm wheel 支持的 1.4.0 快照，并通过 `NIXL_UCX_VRAM_MEMTYPE_HINT=rocm` 启用。该版本编译和数值校验均通过，但 `UCX_PROTO_INFO=y` 仍显示：
+[nixl_ad661_rocm_hint.patch](nixl_ad661_rocm_hint.patch) 将 NIXL PR #1536 的核心 memtype hint 前移植到带 ROCm wheel 支持的 1.4.0 快照，并通过 `NIXL_UCX_VRAM_MEMTYPE_HINT=rocm` 启用。该补丁只强化 `ucp_mem_map` 的 ROCm 内存类型注册语义，不参与 UCP RMA/rendezvous 协议选择；二者应独立评价。该版本编译和数值校验均通过，当时使用的不完整 TLS 配置仍显示：
 
 ```text
 remote memory read by ucp_get*(multi) into rocm/GPU1 from rocm/dev[0]
 software emulation | tcp/bond0
 ```
 
-因此该实验补丁不进入默认环境。`UCX_TLS` 仍需包含 `tcp`，因为 `rocm_ipc`/`rocm_copy` 不提供 NIXL 所需的 active-message 控制通道。正式路径改为动态加载 `W7900_HIP_IPC` backend，由 HIP IPC 处理 GPU payload、Unix datagram 处理 notification，同时继续使用 NIXL 原生 scheduler、metadata 和 metrics。
+因此不能将该结果解释为 PR #1536 修复失败，也不能用它判断 `rocm_ipc` 能否工作。`UCX_TLS` 需要同时包含 `sm` 和控制面 transport；当前推荐值为 `sm,rocm,tcp,self`。
 
 ### UCX RMA pipeline 缓解项
 
-UCX 1.22 设置 `UCX_RMA_PPLN_ENABLE=y` 后，W7900 双进程 READ/WRITE 均能通过数值校验，64 MiB 吞吐提高约 4.8 倍，1 GiB 提高约 3.6-4.5 倍。1 GiB READ/WRITE 分别达到 `1.060/1.056 GB/s`。但 `UCX_PROTO_INFO` 显示的仍是 `rocm_copy`、host fragments 和 `tcp/bond0`，不是直接 `rocm_ipc` lane。
+UCX 1.22 设置 `UCX_RMA_PPLN_ENABLE=y` 后，W7900 双进程 READ/WRITE 均能通过数值校验。仅加入 pipeline、未加入 `sm` 时，1 GiB READ/WRITE 为 `1.060/1.056 GB/s`；使用完整的 `sm,rocm,tcp,self` 后进一步提高到 `3.844/3.475 GB/s`。NIXL 的 `UCX_PROTO_INFO` 仍显示 `rocm_copy`、host fragments 和 `cma/memory`，不是直接 `rocm_ipc` lane。
 
-因此 UCX fallback profile 建议启用该变量，但正式同节点数据面仍使用 `W7900_HIP_IPC`。后者热态约 25.2 GiB/s，按相同十进制单位仍约为 pipeline 的 25 倍。完整 A/B、协议日志和 READ/WRITE probe 见 [UCX RMA pipeline 复核](../results/20260804_ucx_rma_ppln.md)。
+纯 UCX 1.22 跨物理 GPU0/GPU1 对照可以直接选择 `rocm_ipc/rocm_ipc`：1 GiB GET/PUT 分别达到 `18.243/11.261 GB/s`。这说明 UCX transport 本身可用，剩余问题位于 NIXL UCX worker-address/endpoint 集成路径。上游方向因此调整为修复现有 NIXL UCX backend；`W7900_HIP_IPC` 保留为性能与生命周期回归原型，不再作为新增 NIXL plugin 的首选提案。完整证据见 [NIXL #2039 `sm` 与原生 UCX ROCm IPC 复核](../results/20260805_ucx_sm_upstream_followup.md)。
