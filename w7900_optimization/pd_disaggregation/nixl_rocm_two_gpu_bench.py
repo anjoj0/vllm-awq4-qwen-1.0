@@ -18,6 +18,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--warmup", type=int, default=1)
     parser.add_argument("--iterations", type=int, default=5)
     parser.add_argument("--operation", choices=("READ", "WRITE"), default="READ")
+    parser.add_argument(
+        "--ucx-error-handling",
+        choices=("peer", "none"),
+        default="peer",
+        help="UCX endpoint error handling mode used by the NIXL backend",
+    )
     return parser.parse_args()
 
 
@@ -34,7 +40,10 @@ def main() -> None:
     listen_port = args.port if args.role == "target" else 0
     agent = nixl_agent(
         args.role,
-        nixl_agent_config(True, True, listen_port, backends=["UCX"]),
+        nixl_agent_config(True, True, listen_port, backends=[]),
+    )
+    agent.create_backend(
+        "UCX", {"ucx_error_handling_mode": args.ucx_error_handling}
     )
 
     if args.operation == "READ":
@@ -111,6 +120,7 @@ def main() -> None:
             "operation": args.operation,
             "bytes": args.bytes,
             "iterations": args.iterations,
+            "ucx_error_handling": args.ucx_error_handling,
             "mean_s": mean_s,
             "min_s": min(elapsed),
             "max_s": max(elapsed),

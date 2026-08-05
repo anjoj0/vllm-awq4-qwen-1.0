@@ -10,6 +10,16 @@ TLS="${TLS:-sm,rocm,tcp,self}"
 SIZE="${SIZE:-67108864}"
 ITERATIONS="${ITERATIONS:-10}"
 WARMUP="${WARMUP:-1}"
+ERROR_HANDLING="${ERROR_HANDLING:-none}"
+
+case "${ERROR_HANDLING}" in
+    none) ERROR_ARGS=() ;;
+    peer) ERROR_ARGS=(-e) ;;
+    *)
+        echo "ERROR_HANDLING must be none or peer, got: ${ERROR_HANDLING}" >&2
+        exit 2
+        ;;
+esac
 
 export LD_LIBRARY_PATH="${UCX_ROOT}/lib:${UCX_ROOT}/lib/ucx:${LD_LIBRARY_PATH:-}"
 export UCX_TLS="${TLS}"
@@ -20,12 +30,13 @@ mkdir -p "${OUT}"
 run_case() {
     local test="$1"
     local port="$2"
-    local server_log="${OUT}/${test}_server.log"
-    local client_log="${OUT}/${test}_client.log"
+    local server_log="${OUT}/${test}_${ERROR_HANDLING}_server.log"
+    local client_log="${OUT}/${test}_${ERROR_HANDLING}_client.log"
     local args=(-t "${test}" -m rocm -s "${SIZE}" -n "${ITERATIONS}" \
                 -w "${WARMUP}" -p "${port}" -f -X)
+    args+=("${ERROR_ARGS[@]}")
 
-    echo "CASE test=${test} size=${SIZE} iterations=${ITERATIONS} tls=${UCX_TLS}"
+    echo "CASE test=${test} size=${SIZE} iterations=${ITERATIONS} tls=${UCX_TLS} error_handling=${ERROR_HANDLING}"
     ROCR_VISIBLE_DEVICES=0,1 \
         "${PERFTEST}" "${args[@]}" >"${server_log}" 2>&1 &
     local server_pid=$!

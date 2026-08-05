@@ -1,5 +1,7 @@
 # NIXL #2039 `sm` 与原生 UCX ROCm IPC 复核
 
+> 更新说明（2026-08-05）：本文第 5 节的 worker-address 推断已被后续单变量实验推翻。根因是 NIXL UCX backend 默认启用 `UCP_ERR_HANDLING_MODE_PEER`，而 UCX 1.22 的 `rocm_ipc` 没有声明 peer-failure capability，因而在 endpoint 选择阶段被排除。最新证据、实验补丁与故障语义见 [UCX error mode 根因报告](20260805_nixl_ucx_error_mode_root_cause.md)。本文保留为定位过程记录。
+
 ## 1. 实验动机
 
 NIXL RFC [#2039](https://github.com/ai-dynamo/nixl/issues/2039) 的维护者提出两项关键判断：

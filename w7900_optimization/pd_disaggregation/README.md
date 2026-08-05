@@ -178,3 +178,28 @@ software emulation | tcp/bond0
 UCX 1.22 设置 `UCX_RMA_PPLN_ENABLE=y` 后，W7900 双进程 READ/WRITE 均能通过数值校验。仅加入 pipeline、未加入 `sm` 时，1 GiB READ/WRITE 为 `1.060/1.056 GB/s`；使用完整的 `sm,rocm,tcp,self` 后进一步提高到 `3.844/3.475 GB/s`。NIXL 的 `UCX_PROTO_INFO` 仍显示 `rocm_copy`、host fragments 和 `cma/memory`，不是直接 `rocm_ipc` lane。
 
 纯 UCX 1.22 跨物理 GPU0/GPU1 对照可以直接选择 `rocm_ipc/rocm_ipc`：1 GiB GET/PUT 分别达到 `18.243/11.261 GB/s`。这说明 UCX transport 本身可用，剩余问题位于 NIXL UCX worker-address/endpoint 集成路径。上游方向因此调整为修复现有 NIXL UCX backend；`W7900_HIP_IPC` 保留为性能与生命周期回归原型，不再作为新增 NIXL plugin 的首选提案。完整证据见 [NIXL #2039 `sm` 与原生 UCX ROCm IPC 复核](../results/20260805_ucx_sm_upstream_followup.md)。
+
+### UCX error mode 根因与实验修复
+
+后续单变量实验推翻了“worker address 丢失 lane”的初步推断。NIXL UCX backend 默认使用 `UCP_ERR_HANDLING_MODE_PEER`，而 UCX 1.22 的 `rocm_ipc` 只声明 `error handling: none`，所以 UCP 在 endpoint capability 筛选时排除了该数据 lane。
+
+基准脚本通过 `--ucx-error-handling peer|none` 控制该变量：
+
+```bash
+ERROR_HANDLING=none CASE_SET=hip_single_READ \
+  bash run_nixl_visibility_matrix.sh
+
+ERROR_HANDLING=peer CASE_SET=hip_single_READ \
+  bash run_nixl_visibility_matrix.sh
+```
+
+原 UCX 在 1 GiB READ/WRITE 下，`none` 的 `27.399/23.600 GB/s` 相对默认 `peer` 的 `5.203/4.962 GB/s` 提高 `5.27x/4.76x`。实验性 UCX flag 在保留 `peer` 时达到 `27.382/23.512 GB/s`，并恢复 `rocm_ipc/rocm_ipc`。
+
+故障矩阵使用：
+
+```bash
+UCX_ROOT=/path/to/experimental-ucx \
+  bash run_nixl_peer_failure_matrix.sh
+```
+
+传输前退出和 8 GiB 在途 READ/WRITE 均未挂死；stale registration 会暴露 ROCm IPC 既有的失效 rkey 错误传播缺口。该 flag 因而仍标记为实验性，不应在缺少额外架构 CI 时直接作为默认生产补丁。完整根因、性能表、故障语义和日志哈希见 [UCX error mode 根因报告](../results/20260805_nixl_ucx_error_mode_root_cause.md)。
