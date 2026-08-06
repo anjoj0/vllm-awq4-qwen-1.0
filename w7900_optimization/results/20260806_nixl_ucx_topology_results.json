@@ -1,0 +1,51 @@
+{
+  "date": "2026-08-06",
+  "platform": {
+    "gpu": "AMD Radeon PRO W7900 48 GiB",
+    "gpu_count": 8,
+    "numa_mapping": {
+      "numa0": [0, 1, 2, 3],
+      "numa1": [4, 5, 6, 7]
+    },
+    "rocm": "7.14",
+    "ucx": "1.22.0",
+    "nixl": "1.4",
+    "tls": "sm,rocm,tcp,self",
+    "rma_pipeline": true,
+    "payload_bytes": 1073741824,
+    "warmup": 1,
+    "timed_iterations": 3,
+    "verification": "initiator and target payload checks passed"
+  },
+  "topology_bandwidth_gbps": [
+    {"pair": "0-1", "numa": "same", "mode": "peer_flag", "read": 27.3783409693, "write": 23.5458989545},
+    {"pair": "4-5", "numa": "same", "mode": "peer_flag", "read": 27.3861428419, "write": 23.5350365483},
+    {"pair": "0-4", "numa": "cross", "mode": "peer_flag", "read": 27.3939643497, "write": 23.5283531048},
+    {"pair": "4-5", "numa": "same", "mode": "original_peer", "read": 5.0647477177, "write": 4.9098968803},
+    {"pair": "0-4", "numa": "cross", "mode": "original_peer", "read": 4.7746680782, "write": 4.0818611007},
+    {"pair": "0-4", "numa": "cross", "mode": "original_none", "read": 27.3999191510, "write": 23.5756188154}
+  ],
+  "speedup_over_original_peer": [
+    {"pair": "0-1", "read": 5.262, "write": 4.746},
+    {"pair": "4-5", "read": 5.407, "write": 4.793},
+    {"pair": "0-4", "read": 5.737, "write": 5.764}
+  ],
+  "cross_numa_peer_failure": [
+    {"rep": 1, "case": "exit_before_transfer_READ", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.0001987},
+    {"rep": 2, "case": "exit_before_transfer_READ", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.0001909},
+    {"rep": 3, "case": "exit_before_transfer_READ", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.0002006},
+    {"rep": 1, "case": "clean_exit_before_transfer_READ", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.0001967},
+    {"rep": 2, "case": "clean_exit_before_transfer_READ", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.0001487},
+    {"rep": 3, "case": "clean_exit_before_transfer_READ", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.0001924},
+    {"rep": 1, "case": "exit_after_post_READ", "state": "DONE", "payload_verified": true, "elapsed_s": 0.4061133},
+    {"rep": 2, "case": "exit_after_post_READ", "state": "DONE", "payload_verified": true, "elapsed_s": 0.4064990},
+    {"rep": 3, "case": "exit_after_post_READ", "state": "DONE", "payload_verified": true, "elapsed_s": 0.4064432},
+    {"rep": 1, "case": "exit_after_post_WRITE", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.3207629},
+    {"rep": 2, "case": "exit_after_post_WRITE", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.3286710},
+    {"rep": 3, "case": "exit_after_post_WRITE", "state": "NIXL_ERR_REMOTE_DISCONNECT", "elapsed_s": 0.3278931}
+  ],
+  "raw_logs": {
+    "archive": "20260806_nixl_ucx_topology_raw.tgz",
+    "sha256": "0832286DBF70A4ADF093BBA3C508F9CE8EBC7AFD39A64061836A2D9D7737AC47"
+  }
+}

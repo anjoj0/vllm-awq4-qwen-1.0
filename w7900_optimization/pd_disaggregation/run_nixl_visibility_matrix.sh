@@ -10,6 +10,8 @@ TLS="${TLS:-sm,rocm,tcp,self}"
 PIPELINE="${PIPELINE:-y}"
 ERROR_HANDLING="${ERROR_HANDLING:-peer}"
 CASE_SET="${CASE_SET:-all}"
+TARGET_DEVICE="${TARGET_DEVICE:-0}"
+INITIATOR_DEVICE="${INITIATOR_DEVICE:-1}"
 
 source /workspace/vllm-awq4-qwen-1.0-main/w7900_optimization/pd_disaggregation/activate_pd_env.sh
 mkdir -p "${OUT}"
@@ -29,22 +31,24 @@ launch_for_role() {
 
     case "${mode}:${role}" in
         hip_single:target)
-            env -u ROCR_VISIBLE_DEVICES HIP_VISIBLE_DEVICES=0 "$@"
+            env -u ROCR_VISIBLE_DEVICES HIP_VISIBLE_DEVICES="${TARGET_DEVICE}" "$@"
             ;;
         hip_single:initiator)
-            env -u ROCR_VISIBLE_DEVICES HIP_VISIBLE_DEVICES=1 "$@"
+            env -u ROCR_VISIBLE_DEVICES HIP_VISIBLE_DEVICES="${INITIATOR_DEVICE}" "$@"
             ;;
         rocr_single:target)
-            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES ROCR_VISIBLE_DEVICES=0 "$@"
+            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES ROCR_VISIBLE_DEVICES="${TARGET_DEVICE}" "$@"
             ;;
         rocr_single:initiator)
-            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES ROCR_VISIBLE_DEVICES=1 "$@"
+            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES ROCR_VISIBLE_DEVICES="${INITIATOR_DEVICE}" "$@"
             ;;
         rocr_ordered:target)
-            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES ROCR_VISIBLE_DEVICES=0,1 "$@"
+            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES \
+                ROCR_VISIBLE_DEVICES="${TARGET_DEVICE},${INITIATOR_DEVICE}" "$@"
             ;;
         rocr_ordered:initiator)
-            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES ROCR_VISIBLE_DEVICES=1,0 "$@"
+            env -u HIP_VISIBLE_DEVICES -u CUDA_VISIBLE_DEVICES \
+                ROCR_VISIBLE_DEVICES="${INITIATOR_DEVICE},${TARGET_DEVICE}" "$@"
             ;;
         *)
             echo "Unknown visibility mode/role: ${mode}:${role}" >&2
@@ -60,7 +64,7 @@ run_case() {
     local target_log="${OUT}/${mode}_${operation}_target.log"
     local initiator_log="${OUT}/${mode}_${operation}_initiator.log"
 
-    echo "CASE mode=${mode} operation=${operation} pipeline=${PIPELINE} error_handling=${ERROR_HANDLING} bytes=${BYTES} port=${port}"
+    echo "CASE mode=${mode} operation=${operation} pipeline=${PIPELINE} error_handling=${ERROR_HANDLING} bytes=${BYTES} port=${port} target_gpu=${TARGET_DEVICE} initiator_gpu=${INITIATOR_DEVICE}"
     launch_for_role "${mode}" target python "${BENCH}" \
         --role target --port "${port}" --bytes "${BYTES}" \
         --warmup 1 --iterations "${ITERATIONS}" --operation "${operation}" \

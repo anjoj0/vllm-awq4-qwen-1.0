@@ -9,6 +9,8 @@ OUT="${OUT:-/workspace/nixl_peer_failure_$(date +%Y%m%d_%H%M%S)}"
 ERROR_HANDLING="${ERROR_HANDLING:-peer}"
 PROCESS_TIMEOUT="${PROCESS_TIMEOUT:-35}"
 CASE_SET="${CASE_SET:-all}"
+TARGET_DEVICE="${TARGET_DEVICE:-0}"
+INITIATOR_DEVICE="${INITIATOR_DEVICE:-1}"
 
 source /workspace/vllm-awq4-qwen-1.0-main/w7900_optimization/pd_disaggregation/activate_pd_env.sh
 export UCX_TLS="${UCX_TLS:-sm,rocm,tcp,self}"
@@ -25,15 +27,15 @@ run_case() {
     local target_log="${OUT}/${name}_target.log"
     local initiator_log="${OUT}/${name}_initiator.log"
 
-    echo "CASE fault=${fault} operation=${operation} bytes=${bytes} error_handling=${ERROR_HANDLING}"
+    echo "CASE fault=${fault} operation=${operation} bytes=${bytes} error_handling=${ERROR_HANDLING} target_gpu=${TARGET_DEVICE} initiator_gpu=${INITIATOR_DEVICE}"
     set +e
-    timeout "${PROCESS_TIMEOUT}s" env HIP_VISIBLE_DEVICES=0 python "${TEST}" \
+    timeout "${PROCESS_TIMEOUT}s" env HIP_VISIBLE_DEVICES="${TARGET_DEVICE}" python "${TEST}" \
         --role target --fault "${fault}" --operation "${operation}" \
         --bytes "${bytes}" --port "${port}" \
         --ucx-error-handling "${ERROR_HANDLING}" >"${target_log}" 2>&1 &
     local target_pid=$!
     sleep 2
-    timeout "${PROCESS_TIMEOUT}s" env HIP_VISIBLE_DEVICES=1 python "${TEST}" \
+    timeout "${PROCESS_TIMEOUT}s" env HIP_VISIBLE_DEVICES="${INITIATOR_DEVICE}" python "${TEST}" \
         --role initiator --fault "${fault}" --operation "${operation}" \
         --bytes "${bytes}" --port "${port}" \
         --ucx-error-handling "${ERROR_HANDLING}" >"${initiator_log}" 2>&1

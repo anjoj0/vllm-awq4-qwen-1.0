@@ -1,5 +1,6 @@
 # Keep raw W7900 experiment outputs local by default.
 results/
+results/raw_*/
 logs/
 *.log
 *.pid

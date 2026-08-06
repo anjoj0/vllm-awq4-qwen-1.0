@@ -1,0 +1,39 @@
+{
+  "date": "2026-08-06",
+  "platform": {
+    "gpu": "AMD Radeon PRO W7900 48 GiB",
+    "gpu_count": 8,
+    "numa_mapping": {"numa0": [0, 1, 2, 3], "numa1": [4, 5, 6, 7]},
+    "rocm": "7.14",
+    "ucx_build": "ROCm/ucx develop, c2567cbe5075f3aabab13731aabdc164959004ec + 61f01ab",
+    "ucx_version": "1.23.0",
+    "nixl": "1.4",
+    "tls": "sm,rocm,tcp,self",
+    "rma_pipeline": true,
+    "payload_bytes": 1073741824,
+    "warmup": 1,
+    "timed_iterations": 3,
+    "verification": "initiator and target payload checks passed"
+  },
+  "bandwidth_gbps": [
+    {"pair": "0-1", "numa": "same", "operation": "READ", "mean": 27.4093814097, "min_s": 0.0391605627, "mean_s": 0.0391742450, "max_s": 0.0391915068, "protocol": "rocm_ipc/rocm_ipc", "verified": true},
+    {"pair": "0-1", "numa": "same", "operation": "WRITE", "mean": 23.5490657719, "min_s": 0.0455690492, "mean_s": 0.0455959414, "max_s": 0.0456372164, "protocol": "rocm_ipc/rocm_ipc", "verified": true},
+    {"pair": "0-4", "numa": "cross", "operation": "READ", "mean": 27.3760257592, "min_s": 0.0392033644, "mean_s": 0.0392219760, "max_s": 0.0392421316, "protocol": "rocm_ipc/rocm_ipc", "verified": true},
+    {"pair": "0-4", "numa": "cross", "operation": "WRITE", "mean": 23.5298660169, "min_s": 0.0456110537, "mean_s": 0.0456331465, "max_s": 0.0456594732, "protocol": "rocm_ipc/rocm_ipc", "verified": true}
+  ],
+  "comparison_to_ucx_1_22_original_peer": {
+    "same_numa_0_1": {"read_speedup": 5.268, "write_speedup": 4.746},
+    "cross_numa_0_4": {"read_speedup": 5.734, "write_speedup": 5.765}
+  },
+  "cross_numa_peer_failure": {
+    "pair": "0-4",
+    "repetitions": 3,
+    "exit_before_transfer_read": {"states": ["NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT"], "elapsed_ms": [0.2142, 0.1421, 0.2008]},
+    "clean_exit_before_transfer_read": {"states": ["NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT"], "elapsed_ms": [0.2208, 0.1480, 0.2015]},
+    "exit_after_post_read_8gib": {"states": ["DONE", "DONE", "DONE"], "payload_verified": [true, true, true], "elapsed_s": [0.40160, 0.40912, 0.40684]},
+    "exit_after_post_write_8gib": {"states": ["NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT"], "elapsed_s": [0.32650, 0.32927, 0.32290]}
+  },
+  "gtest_capability_draft": {"filter": "*rocm_ipc_peer_failure_capability*", "tests": 8, "failures": 0, "effective_rocm_ipc_cases": 0, "result": "all cases skipped because the generic same-process fixture does not enumerate rocm_ipc"},
+  "archive": {"path": "w7900_20260806_ucx_develop_peerflag_raw.tgz", "sha256": "FEBF233293E6CF183CE7DC9149BAF6380EB15D33E1389401A9726158624943A6"},
+  "source_archive": {"path": "ucx-rocm-peer-failure-61f01ab.tgz", "sha256": "723C5C4100528017E861D16B5C8EAEDF37EAFB1FF8911383CB7371076E61841B"}
+}

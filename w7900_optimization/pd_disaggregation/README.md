@@ -205,3 +205,20 @@ UCX_ROOT=/path/to/experimental-ucx \
 传输前退出和 8 GiB 在途 READ/WRITE 均未挂死；stale registration 会暴露 ROCm IPC 既有的失效 rkey 错误传播缺口。该 flag 因而仍标记为实验性，不应在缺少额外架构 CI 时直接作为默认生产补丁。完整根因、性能表、故障语义和日志哈希见 [UCX error mode 根因报告](../results/20260805_nixl_ucx_error_mode_root_cause.md)。
 
 OpenUCX PR [#9751](https://github.com/openucx/ucx/pull/9751) 是该设计的重要先例：上游删除了 `cuda_ipc` 自身的 `EP_CHECK`，但保留 `ERRHANDLE_PEER_FAILURE`，由独立 AM transport 承担 endpoint keepalive。W7900 的候选结构同样是 TCP AM/keepalive 与 `rocm_ipc` RMA 数据 lane 的组合，后续回归测试应验证该多 lane endpoint，而不是要求纯 ROCm IPC transport 独立建立控制面。
+
+### W7900 topology and cross-NUMA regression
+
+`run_nixl_visibility_matrix.sh` accepts `TARGET_DEVICE` and `INITIATOR_DEVICE`, so the same harness can test arbitrary GPU pairs:
+
+```bash
+UCX_ROOT=/path/to/ucx-peer-flag \
+TARGET_DEVICE=0 INITIATOR_DEVICE=4 \
+BYTES=$((1024*1024*1024)) ITERATIONS=3 \
+CASE_SET=hip_single_READ bash run_nixl_visibility_matrix.sh
+```
+
+On this node GPU0--3 are in NUMA0 and GPU4--7 are in NUMA1. The 2026-08-06 `0-1`, `4-5` (same NUMA), and `0-4` (cross NUMA) runs all selected `rocm_ipc/rocm_ipc`. The experimental flag reached `27.378--27.394/23.528--23.546 GB/s` for 1 GiB READ/WRITE, while original `peer` reached only about `5.065--5.203/4.082--4.962 GB/s`, a `4.75--5.76x` gain. Three repetitions of legal cross-NUMA peer-exit cases all returned an explicit `DONE` or `NIXL_ERR_REMOTE_DISCONNECT`. See [the topology report](../results/20260806_nixl_ucx_topology_report.md) for methods, structured data, and raw-log hash.
+
+This evidence covers the current W7900/gfx1100 and UCX 1.22 build only; it does not replace MI300/MI350 CI. The capability change remains subject to UCX transport-owner review and cross-architecture regression before merge.
+
+The same one-line change was rebuilt from ROCm/ucx `develop` on 2026-08-06 (UCX 1.23.0) and reproduced at `27.376--27.409/23.530--23.549 GB/s` for 1 GiB READ/WRITE on same- and cross-NUMA pairs. The develop-branch report, JSON manifest and raw-log archive are [here](../results/20260806_nixl_ucx_develop_peerflag_report.md). The reproducible build entry point is [build_ucx_rocm.sh](build_ucx_rocm.sh); override `SRC`, `PREFIX`, `ROCM_DEVEL` and `JOBS` for a different checkout. The generic UCT GTest capability draft was removed after observing that all eight instances skip before enumerating `rocm_ipc`; the valid regression remains the dual-process NIXL harness, and an upstream multi-process fixture is still needed.
