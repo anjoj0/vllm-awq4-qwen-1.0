@@ -27,3 +27,30 @@ Full methods, scripts, build patch, structured results, fault matrix, and raw-lo
 https://github.com/anjoj0/vllm-awq4-qwen-1.0/blob/main/w7900_optimization/results/20260805_nixl_ucx_error_mode_root_cause.md
 
 Would you prefer the next patch to target UCX/ROCm's `rocm_ipc` capability plus a peer-exit regression test, or should I first submit a NIXL configuration/diagnostic change that makes the `peer` versus direct-ROCm-IPC tradeoff explicit?
+
+Follow-up on the stale-registration concern: I rebuilt the same #11299 + capability
+flag source with `--enable-logging` and ran one focused GPU0 -> GPU4, 1 GiB READ
+`stale_registration` case under NIXL `peer` mode. The initiator timed out at the
+35 s process limit (exit 124). UCX trace shows:
+
+```text
+rma_send.c:310       get_nbx count 1073741824
+proto_select.c:491   get(multi) into rocm/GPU4 from rocm/dev[0]
+proto_rndv.c:96      selected md rocm_ipc index 3
+proto_debug.c:112    zero-copy read from remote rocm_ipc/rocm_ipc
+```
+
+There was no UCP completion, error return, or remote-disconnect after the zcopy was
+posted. The original `#11299/none` path shows the same timeout, so this is not a
+regression created by the one-line capability change; however, the flag makes the
+same risk reachable through NIXL's default `peer` data lane. The normal peer-exit
+cases still complete or return `NIXL_ERR_REMOTE_DISCONNECT`.
+
+I therefore treat the flag as a W7900 compatibility/performance result, not as a
+complete stale-rkey recovery implementation. The trace archive and detailed report
+are available at:
+https://github.com/anjoj0/vllm-awq4-qwen-1.0/blob/main/w7900_optimization/results/20260807_ucx_pr11299_stale_trace_report.md
+
+The requested follow-up is now specifically a ROCm IPC cache/error-propagation
+design for invalid exported rkeys; I am not claiming that the capability-only patch
+is merge-ready across ROCm architectures.
