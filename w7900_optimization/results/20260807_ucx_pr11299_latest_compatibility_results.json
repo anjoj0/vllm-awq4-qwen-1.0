@@ -1,0 +1,111 @@
+{
+  "date": "2026-08-07",
+  "platform": {
+    "gpu": "8 x AMD Radeon PRO W7900 48 GiB",
+    "rocm": "7.14",
+    "nixl": "1.4",
+    "ucx_pr": "openucx/ucx#11299",
+    "ucx_pr_head": "57556bb87d6ee3caf8178f1fa28b8cac44b46f4d",
+    "capability_commit": "65b63f850",
+    "async_signal_commit": "016825a43",
+    "tls": "sm,rocm,tcp,self",
+    "error_handling": "peer",
+    "rma_pipeline": true
+  },
+  "build": {
+    "out_of_source": true,
+    "configure": "contrib/configure-devel --with-rocm --without-cuda --with-verbs --with-dm",
+    "result": "passed"
+  },
+  "gtest": {
+    "filter": "test_rocm_signal.async_error:rocm_ipc/test_rocm_ipc_rma.*:rocm_ipc/test_rocm_ipc_rma_device.*",
+    "total": 133,
+    "passed": 93,
+    "skipped": 40,
+    "failed": 0,
+    "elapsed_s": 0.274,
+    "rocm_ipc_subset": {
+      "total": 132,
+      "passed": 92,
+      "skipped": 40,
+      "failed": 0
+    }
+  },
+  "nixl_bandwidth_gbps": [
+    {
+      "pair": "0-1",
+      "numa": "same",
+      "operation": "READ",
+      "mean": 27.385342723151272,
+      "min_s": 0.03918035700917244,
+      "mean_s": 0.039208631962537766,
+      "max_s": 0.03923594392836094,
+      "protocol": "rocm_ipc/rocm_ipc",
+      "verified": true
+    },
+    {
+      "pair": "0-1",
+      "numa": "same",
+      "operation": "WRITE",
+      "mean": 23.51826037326218,
+      "min_s": 0.04561987146735191,
+      "mean_s": 0.04565566529830297,
+      "max_s": 0.04572262428700924,
+      "protocol": "rocm_ipc/rocm_ipc",
+      "verified": true
+    },
+    {
+      "pair": "0-4",
+      "numa": "cross",
+      "operation": "READ",
+      "mean": 27.597923034872483,
+      "min_s": 0.03826719522476196,
+      "mean_s": 0.03890661709010601,
+      "max_s": 0.03924959525465965,
+      "protocol": "rocm_ipc/rocm_ipc",
+      "verified": true
+    },
+    {
+      "pair": "0-4",
+      "numa": "cross",
+      "operation": "WRITE",
+      "mean": 23.543876574450213,
+      "min_s": 0.04554241895675659,
+      "mean_s": 0.045605991035699844,
+      "max_s": 0.04564675688743591,
+      "protocol": "rocm_ipc/rocm_ipc",
+      "verified": true
+    }
+  ],
+  "cross_numa_peer_failure": {
+    "pair": "0-4",
+    "repetitions": 3,
+    "exit_before_transfer_read": {
+      "states": ["NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT"],
+      "elapsed_ms": [0.2502, 0.1768, 0.2251]
+    },
+    "clean_exit_before_transfer_read": {
+      "states": ["NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT"],
+      "elapsed_ms": [0.2335, 0.1570, 0.1849]
+    },
+    "exit_after_post_read_8gib": {
+      "states": ["DONE", "DONE", "DONE"],
+      "payload_verified": [true, true, true],
+      "elapsed_s": [0.400019, 0.400145, 0.397184]
+    },
+    "exit_after_post_write_8gib": {
+      "states": ["NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT", "NIXL_ERR_REMOTE_DISCONNECT"],
+      "elapsed_s": [0.324268, 0.320911, 0.320289]
+    }
+  },
+  "archives": {
+    "source": {
+      "path": "ucx-pr11299-latest-peerflag-signal-016825a43.tar.gz",
+      "sha256": "B58120978FAFA36FBDCEC8F61ADACAA32BC1ED74C77BAB3D3A58125EC58D2ED3"
+    },
+    "raw_results": {
+      "path": "ucx_pr11299_latest_016825a43_results_20260807.tgz",
+      "sha256": "14EAD5C5E5E26509C610D3736ADC9A95A2B64893BF24B1394286E70EED1F6870"
+    }
+  }
+}
