@@ -1,0 +1,42 @@
+{
+  "date": "2026-08-07",
+  "platform": "8x Radeon PRO W7900",
+  "rocm": "7.14",
+  "base": "OpenUCX PR11299 head 4dddf15e46735555405bf678be778a23358ec45f",
+  "capability_commit": "a33495929",
+  "async_signal_commit": "47fcc361e",
+  "change": {
+    "ready_condition_before": "hsa_signal == 0",
+    "ready_condition_after": "hsa_signal <= 0",
+    "negative_signal_status": "UCS_ERR_IO_ERROR"
+  },
+  "gtest": {
+    "total": 132,
+    "passed": 92,
+    "skipped": 40,
+    "failed": 0
+  },
+  "normal_rma": {
+    "read_1gib_GBps": 27.38564455105547,
+    "pipeline_write_1gib_GBps": 23.56506709504644,
+    "iterations": 3,
+    "payload_verified": true
+  },
+  "failure_matrix": {
+    "normal_read": "DONE",
+    "exit_before_transfer_read": "NIXL_ERR_REMOTE_DISCONNECT",
+    "clean_exit_before_transfer_read": "NIXL_ERR_REMOTE_DISCONNECT",
+    "exit_after_post_read_8gib": "DONE_PAYLOAD_VERIFIED",
+    "exit_after_post_write_8gib": "NIXL_ERR_REMOTE_DISCONNECT",
+    "stale_registration_read_1gib": "PROCESS_TIMEOUT_35S"
+  },
+  "conclusion": {
+    "negative_signal_propagation_fixed": true,
+    "stale_registration_fixed": false,
+    "safe_stale_solution": "registration generation and retirement handshake"
+  },
+  "archive": {
+    "path": "ucx_rocm_async_signal_fix_20260807.tgz",
+    "sha256": "70F90831053C1CF812FD63EB8F6CF73448264E90CC23EB0DAC793B4AB7F730F5"
+  }
+}

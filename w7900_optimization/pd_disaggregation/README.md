@@ -230,4 +230,11 @@ The 2026-08-07 stale-registration trace is documented in
 [20260807_ucx_pr11299_stale_trace_report.md](../results/20260807_ucx_pr11299_stale_trace_report.md)
 and archived with SHA256 alongside it.
 
+The first repair follow-up handles negative HSA async-copy completion signals and
+maps them to `UCS_ERR_IO_ERROR`. It preserves the 92-pass ROCm IPC GTest result and
+the 27.386/23.565 GB/s NIXL READ/pipeline-WRITE paths, but W7900 ROCr leaves the
+exporter-invalidated stale-rkey signal pending rather than negative. The patch,
+validation, and the required registration-retirement handshake are documented in
+[20260807_ucx_rocm_async_signal_fix.md](../results/20260807_ucx_rocm_async_signal_fix.md).
+
 OpenUCX PR [#11299](https://github.com/openucx/ucx/pull/11299) changes the ROCm IPC handle cache and adds device-initiated PUT. A separate W7900 build of #11299 head `4dddf15e4` plus the peer-failure flag passed `92` ROCm IPC tests with `40` expected skips and no failures. NIXL same/cross-NUMA READ/WRITE remained at `27.377--27.391/23.522--23.527 GB/s`, and 12 legal cross-NUMA peer-exit injections all completed or returned remote disconnect. This demonstrates mechanical compatibility without modifying #11299's cache. See the [#11299 compatibility report](../results/20260806_ucx_pr11299_compatibility_report.md); the unposted maintainer follow-up is [kept separately](ucx_pr11299_followup_draft.md).
