@@ -8,6 +8,7 @@ ROCM_DEVEL="${ROCM_DEVEL:-/opt/python/lib/python3.14/site-packages/_rocm_sdk_dev
 JOBS="${JOBS:-$(nproc)}"
 LOG_DIR="${LOG_DIR:-/workspace/pd_disagg_20260802/logs/ucx-build-$(date +%Y%m%d_%H%M%S)}"
 ENABLE_GTEST="${ENABLE_GTEST:-y}"
+ENABLE_LOGGING="${ENABLE_LOGGING:-n}"
 
 mkdir -p "${LOG_DIR}"
 cd "${SRC}"
@@ -15,7 +16,6 @@ cd "${SRC}"
 bash ./autogen.sh >"${LOG_DIR}/autogen.log" 2>&1
 
 configure_args=(
-    --disable-logging
     --disable-debug
     --disable-assertions
     --disable-params-check
@@ -32,10 +32,17 @@ configure_args=(
     --with-verbs
     --with-dm
 )
+if [[ "${ENABLE_LOGGING}" == "y" ]]; then
+    configure_args+=(--enable-logging)
+else
+    configure_args+=(--disable-logging)
+fi
 if [[ "${ENABLE_GTEST}" == "y" ]]; then
     configure_args+=(--enable-gtest)
 fi
 
+printf '%q ' bash ./configure "${configure_args[@]}" >"${LOG_DIR}/configure_command.log"
+printf '\n' >>"${LOG_DIR}/configure_command.log"
 bash ./configure "${configure_args[@]}" >"${LOG_DIR}/configure.log" 2>&1
 make -j"${JOBS}" >"${LOG_DIR}/build.log" 2>&1
 make install >"${LOG_DIR}/install.log" 2>&1

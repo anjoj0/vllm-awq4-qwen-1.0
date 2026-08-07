@@ -1,0 +1,29 @@
+{
+  "date": "2026-08-07",
+  "host": "wx-ms-w7900d-0027",
+  "gpu_pair": "target_gpu0_to_initiator_gpu4",
+  "operation": "READ",
+  "bytes": 1073741824,
+  "fault": "stale_registration",
+  "nixl_error_handling": "peer",
+  "ucx_source": "OpenUCX PR11299 head 4dddf15e46735555405bf678be778a23358ec45f plus UCT_IFACE_FLAG_ERRHANDLE_PEER_FAILURE",
+  "ucx_prefix": "/workspace/pd_disagg_20260802/deps/ucx-pr11299-peerflag-trace-20260807",
+  "configure": "--enable-logging",
+  "ucx_log_level": "data",
+  "process_timeout_s": 35,
+  "target_exit_code": 1,
+  "initiator_exit_code": 124,
+  "initiator_final_state": "TIMEOUT",
+  "completion_or_error": false,
+  "trace_evidence": {
+    "transport": "rocm_ipc/rocm_ipc",
+    "request_line": "rma_send.c:310 get_nbx count=1073741824",
+    "protocol": "get/zcopy",
+    "remote_md": "rocm_ipc index 3",
+    "error_return_observed": false
+  },
+  "archive": {
+    "path": "nixl_ucx_pr11299_stale_trace_20260807.tgz",
+    "sha256": "D6906ADDDF2E2B1AC404A60C85AB1527C4CE7AE551A09CC6FA3886B6CACA8DC3"
+  }
+}
