@@ -93,6 +93,7 @@ W7900 的 KV cache 不再能依赖 UMA 容量。系统联合选择 TP、`gpu_mem
 └── docs/
     ├── EXPERIMENT_RESULTS.md
     ├── W7900_FULL_EXPERIMENT_REPORT.md
+    ├── W7900_DFLASH_MULTICARD_PREFIX_CACHE_PD_DISAGGREGATION.md
     ├── W7900_QUALITY_AND_ROCPROF.md
     └── assets/                    # 精选实验图
 ```
