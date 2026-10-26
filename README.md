@@ -98,6 +98,8 @@ W7900 的 KV cache 不再能依赖 UMA 容量。系统联合选择 TP、`gpu_mem
     └── assets/                    # 精选实验图
 ```
 
+DSpark / DFlash2 的候选权重、运行时兼容性、双后端设计与 AMD 验证计划见 [专项评估](docs/DSpark与DFlash2_替换DFlash可行性_双后端与开源方案评估_20261022.md)。
+
 ## 快速开始
 
 ### Strix Halo
