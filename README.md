@@ -82,6 +82,7 @@ W7900 的 KV cache 不再能依赖 UMA 容量。系统联合选择 TP、`gpu_mem
 ├── csrc/                         # Strix Halo gfx1151 HIP 算子
 ├── scripts/                      # Strix Halo 容器与服务脚本
 ├── test/                         # API、性能、正确性和精度测评
+├── expo_assistant/               # 本地编程问答展示页与阶段测速
 ├── w7900_optimization/
 │   ├── patch_w7900.py            # vLLM 回移与 gfx1100 参数化补丁
 │   ├── adaptive_dflash_router.py  # 双 TP=4 上下文感知路由
@@ -149,6 +150,17 @@ python validate_prefill_numerics_gfx1100.py
 ```
 
 启动参数、profile 与测评入口见 [W7900 README](w7900_optimization/README.md)。
+
+### 展会编程问答页
+
+模型服务启动后，可以运行 [本地编程助手](expo_assistant/README.md)。页面复用已有推理 API，支持多轮流式回答、代码复制、停止生成，以及 Prefill/Decode、首输出延迟和 token 统计；只需 Python 3.9+，无需额外安装 Python 包或前端依赖。
+
+```bash
+cd expo_assistant
+python3 server.py --upstream http://127.0.0.1:8000 --model Qwen3.6-27B-AWQ4
+```
+
+浏览器打开 `http://127.0.0.1:8088`。阶段速率在每轮结束后更新，需后端提供可归因到本次请求的 `/metrics`；数据缺失或检测到其他请求混入时显示空值。无模型时可用 `python3 server.py --demo` 预览界面，预览不显示虚构的测速数据。已通过本地 mock 接口与浏览器检查，真实展示机仍需验收问答和测速。
 
 ## 实验复现原则
 

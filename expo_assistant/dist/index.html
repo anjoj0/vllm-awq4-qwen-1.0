@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f5f1">
+  <title>本地编程助手 · AMD</title>
+  <link rel="stylesheet" href="/app.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#prompt">跳到提问</a>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="会话与示例">
+      <a class="brand" href="/" aria-label="本地编程助手首页">
+        <span class="brand-symbol" aria-hidden="true"><span></span></span>
+        <span><strong>LOCAL / CODE</strong><small>AMD 本地编程助手</small></span>
+      </a>
+      <button id="new-chat" class="new-chat" type="button"><span aria-hidden="true">＋</span> 新建对话 <span class="key-hint">NEW</span></button>
+      <section class="examples" aria-labelledby="examples-title">
+        <h2 id="examples-title">从一个问题开始</h2>
+        <button class="example" type="button" data-example="explain"><span class="example-number">01</span><span><strong>读懂一段代码</strong><small>解释逻辑、复杂度与边界条件</small></span><span class="example-arrow" aria-hidden="true">↗</span></button>
+        <button class="example" type="button" data-example="debug"><span class="example-number">02</span><span><strong>定位一个错误</strong><small>从报错到可验证的修复</small></span><span class="example-arrow" aria-hidden="true">↗</span></button>
+        <button class="example" type="button" data-example="write"><span class="example-number">03</span><span><strong>把想法写成代码</strong><small>给出实现与小型测试用例</small></span><span class="example-arrow" aria-hidden="true">↗</span></button>
+      </section>
+      <div class="sidebar-bottom">
+        <div class="local-note"><span class="local-mark" aria-hidden="true"></span><span>提问与回答，发生在这里。<small id="upstream-display">连接本地推理服务</small></span></div>
+        <button id="export-chat" class="export-button" type="button" disabled><span aria-hidden="true">↓</span> 导出本会话 <span class="export-format">.md</span></button>
+        <div class="sidebar-footer"><span>POWERED BY AMD</span><span>ROCm / vLLM</span></div>
+      </div>
+    </aside>
+    <main class="workspace">
+      <header class="topbar">
+        <div class="page-heading"><span class="eyebrow">ON-DEVICE INTELLIGENCE</span><h1>本地编程助手<span class="title-dot" aria-hidden="true">.</span></h1></div>
+        <button id="connection" class="connection" type="button" title="重新检查模型服务连接"><span id="connection-dot" class="status-dot" aria-hidden="true"></span><span id="connection-text">正在连接</span><span class="refresh-symbol" aria-hidden="true">↻</span></button>
+      </header>
+      <div id="preview-banner" class="preview-banner" role="status" hidden><strong>界面预览 · 模拟文本</strong><span>当前内容不来自真实模型推理，不展示性能数字。</span></div>
+      <section class="telemetry" aria-label="最近一次请求的实测性能">
+        <div class="telemetry-heading"><span class="telemetry-mark" aria-hidden="true"></span><span id="telemetry-label">本次推理</span><span id="telemetry-state">等待提问</span></div>
+        <div class="metric-grid">
+          <div class="metric"><span class="metric-name">Prefill</span><div><strong id="metric-prefill">—</strong><span class="metric-unit">tok/s</span></div></div>
+          <div class="metric"><span class="metric-name">Decode</span><div><strong id="metric-decode">—</strong><span class="metric-unit">tok/s</span></div></div>
+          <div class="metric"><span class="metric-name">首字延迟</span><div><strong id="metric-ttft">—</strong><span class="metric-unit">s</span></div></div>
+          <div class="metric"><span class="metric-name">总耗时</span><div><strong id="metric-total">—</strong><span class="metric-unit">s</span></div></div>
+          <div class="metric metric-tokens"><span class="metric-name">输入 / 输出</span><div><strong id="metric-input">—</strong><span class="token-divider">/</span><strong id="metric-output">—</strong><span class="metric-unit">tokens</span></div></div>
+        </div>
+        <p id="metric-note" class="metric-note">Prefill 与 Decode 在请求结束后更新；无独立可靠统计时显示 —。</p>
+      </section>
+      <div class="model-line"><span class="model-diamond" aria-hidden="true"></span><span id="model-name">Qwen3.6-27B</span><span class="model-separator" aria-hidden="true"></span><span id="model-subtitle">本地模型 · 流式回答</span></div>
+      <div id="chat-scroll" class="chat-scroll" tabindex="0" aria-label="对话记录">
+        <section id="empty-state" class="empty-state">
+          <div class="empty-monogram" aria-hidden="true"><span></span></div>
+          <p class="empty-eyebrow">YOUR IDEAS, INTO CODE.</p>
+          <h2>好代码，<br>从一个好问题开始。</h2>
+          <p class="empty-description">解释逻辑、排查错误，或实现一个小想法。<br>描述你的目标，也可以直接粘贴代码。</p>
+          <div class="empty-tags" aria-label="可提问的编程主题"><span>Python</span><span>C / C++</span><span>算法与调试</span></div>
+        </section>
+        <div id="messages" class="messages"></div>
+      </div>
+      <div id="notice" class="notice" role="status" hidden></div>
+      <section class="composer-area" aria-label="输入问题">
+        <form id="chat-form" class="composer">
+          <label for="prompt" class="sr-only">编程问题或代码</label>
+          <textarea id="prompt" rows="2" maxlength="60000" placeholder="描述问题，或粘贴一段代码…" autocomplete="off" spellcheck="false"></textarea>
+          <div class="composer-toolbar">
+            <div class="composer-options">
+              <label class="thinking-option"><input id="thinking" type="checkbox"><span class="switch" aria-hidden="true"></span><span>思考模式</span></label>
+              <label class="length-option"><span>输出上限</span><select id="max-tokens" aria-label="最大输出 token 数"><option value="512">512 tokens</option><option value="768" selected>768 tokens</option><option value="1024">1,024 tokens</option><option value="2048">2,048 tokens</option></select></label>
+            </div>
+            <div class="composer-actions">
+              <button id="stop" class="stop-button" type="button" hidden><span aria-hidden="true">■</span> 停止</button>
+              <button id="send" class="send-button" type="submit" disabled aria-label="发送问题"><span>发送</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+          </div>
+        </form>
+        <div class="composer-caption"><span>Enter 发送 <span class="caption-dot">·</span> Shift + Enter 换行</span><span>模型输出请结合实际代码验证</span></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
