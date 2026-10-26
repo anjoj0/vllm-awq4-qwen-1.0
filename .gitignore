@@ -2,6 +2,7 @@
 .env
 *.env
 .env.local
+.env.legacy-v020
 *.key
 *.pem
 
@@ -43,6 +44,8 @@ test/results/context_pressure/*.env
 # JIT caches (regenerated each run, large)
 .triton-cache/
 .vllm-cache/
+.triton-cache-v032/
+.vllm-cache-v032/
 
 # Python
 __pycache__/

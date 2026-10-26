@@ -104,14 +104,17 @@ DSpark / DFlash2 的候选权重、运行时兼容性、双后端设计与 AMD �
 
 ### Strix Halo
 
+默认构建已固定为官方 `vllm/vllm-openai-rocm:v0.32.0`，使用其配套依赖；新参数、DSpark 切换、可选项目 HIP MMQ 和回退入口见 [v0.32.0 迁移与验收](docs/STRIX_HALO_VLLM_0320_MIGRATION.md)。新版尚待雷神整机验收，前述 Strix Halo 性能数字来自旧版实测。
+
 ```bash
 cp .env.template .env
 docker compose build
+docker compose run --rm --no-deps vllm --check-env
 docker compose up -d
 curl http://127.0.0.1:8000/health
 ```
 
-完整参数和兼容版本见 [原始 Strix Halo README](docs/STRIX_HALO_ORIGINAL_README.md)。
+旧版参数和历史测试见 [原始 Strix Halo README](docs/STRIX_HALO_ORIGINAL_README.md)；旧版构建使用 `Dockerfile.legacy-v020` 和 `docker-compose.legacy-v020.yml`。
 
 ### W7900
 

@@ -3,7 +3,8 @@ vLLM MPLinearKernel adapter for the AWQ-INT4 MMQ HIP custom op (gfx1151).
 
 This module subclasses vllm's MPLinearKernel and routes apply_weights through
 torch.ops.awq_mmq_gfx1151.mmq_q4_gemm. Registration into the dispatcher
-(_POSSIBLE_KERNELS[ROCM]) is done by the patch_strix.py Patch 16, NOT here.
+(_POSSIBLE_KERNELS[ROCM]) is done by legacy patch_strix.py Patch 16 or the
+v0.32 register_mmq_stable.py build step, not here.
 
 Tensor contract verified against vllm v0.20.0 compressed_tensors_wNa16:
   weight_packed:     [N, K//8]  int32  (8 uint4b8 per int32, low nibble first)
@@ -335,7 +336,7 @@ class RocmMmqQ4LinearKernel(MPLinearKernel):
         _log.debug(
             "RocmMmqQ4.can_implement called: full=%s partition=%s wt=%s act=%s g=%d zp=%s gidx=%s",
             c.full_weight_shape, c.partition_weight_shape, c.weight_type,
-            c.act_type, c.group_size, c.zero_points, c.has_g_idx,
+            c.act_type, c.group_size, c.zero_points, getattr(c, "has_g_idx", False),
         )
         result = cls._can_implement_inner(c)
         _log.debug("RocmMmqQ4.can_implement -> %s", result)
@@ -372,7 +373,7 @@ class RocmMmqQ4LinearKernel(MPLinearKernel):
             )
 
         # Asymmetric quant (zero_points=True) supported via per-group zp tensor.
-        if c.has_g_idx:
+        if getattr(c, "has_g_idx", False):
             return False, "activation reordering (g_idx) not supported"
 
         K = c.partition_weight_shape[0]
@@ -404,7 +405,8 @@ class RocmMmqQ4LinearKernel(MPLinearKernel):
         """
         from vllm.model_executor.layers.quantization.utils import replace_parameter
 
-        w_q, w_s, w_zp, _ = self._get_weight_params(layer)
+        # v0.20 returns four values including g_idx; v0.32 returns three.
+        w_q, w_s, w_zp = self._get_weight_params(layer)[:3]
 
         if not w_q.is_contiguous():
             replace_parameter(layer, self.w_q_name,
@@ -519,7 +521,7 @@ class RocmMmqQ4LinearKernel(MPLinearKernel):
             )
         else:
             # Prefill shape: route through our HIP MMQ Q4 kernel.
-            w_q, _w_s_native, w_zp, _ = self._get_weight_params(layer)
+            w_q, _w_s_native, w_zp = self._get_weight_params(layer)[:3]
             w_s_fp16 = layer._awq_mmq_w_s_fp16  # pre-cast at process_weights time
             orig_dtype = x_2d.dtype
             if x_2d.dtype != torch.float16:
