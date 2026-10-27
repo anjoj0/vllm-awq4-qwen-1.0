@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "generated_assertions": 3,
+  "additional_boundary_cases": 5,
+  "backend": "optimized-v0320",
+  "reviewed_code": "def search(nums, target):\n    left, right = 0, len(nums) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if nums[mid] == target:\n            return mid\n        if nums[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\nassert search([1, 2, 3], 2) == 1\nassert search([1, 2, 3], 0) == -1\nassert search([1, 2, 3], 3) == 2\n"
+}

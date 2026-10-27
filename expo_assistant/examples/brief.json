@@ -1,0 +1,10 @@
+{
+  "project": "Strix Halo 展示工作台",
+  "target_date": "2026-11-06",
+  "owner": "演示小组",
+  "tasks": [
+    {"name": "模型服务验收", "status": "done", "priority": "P0"},
+    {"name": "图片与文档演示", "status": "todo", "priority": "P0"},
+    {"name": "联网搜索演示", "status": "todo", "priority": "P1"}
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-27",
+  "model": "Qwen3.6-27B-AWQ4",
+  "runtime": "existing optimized v0.32.0, DFlash N4",
+  "scope": "functional smoke checks; not a performance benchmark or comprehensive agent evaluation",
+  "unit_tests": {
+    "passed": 28,
+    "command": ".runtime/harness-venv/bin/python -m unittest discover -s expo_assistant -p \"test_*.py\" -v"
+  },
+  "real_model_read_write_edit_and_mixed_image_document": "passed",
+  "mixed_attachment_answer": "左：红色圆形；右：蓝色正方形。  \n项目暗号：MAPLE-742",
+  "ui_cases": [
+    {
+      "case": "project",
+      "status": "已完成\n复制回答",
+      "elapsed_s": 47.86466965400177,
+      "tools": [
+        "✓读取文件harness-demo/brief.json0.0 s",
+        "✓读取文件harness-demo/meeting-notes.txt0.0 s",
+        "✓浏览项目harness-demo0.0 s",
+        "✓写入文件harness-demo/checklist.md0.0 s"
+      ],
+      "answer_excerpt": "请实际读取 harness-demo/brief.json 和 harness-demo/meeting-notes.txt，生成一份 Markdown 演示准备清单，写入 harness-demo/checklist.md。清单需包含所有 3 项任务的优先级、状态、负责人、目标日期，并统计已完成和待完成数量。写入前检查该文件是否存在；如已存在，先读取后再更新。最后告诉我写入路径和待完成数量。\n✦\nQwen\nAGENT\n\n我来先读取两个源文件，并检查目标文件是否存在。\n\n✓\n读取文件\nharness-demo/brief.json\n0.0 s\n✓\n读取文件\nharness-demo/meeting-notes.txt\n0.0 s\n✓\n浏览项目\nharness-demo\n0.0 s\n\n目标文件 checklist.md 尚不存在，现在直接创建。\n\n✓\n写入文件\nharness-demo/checklist.md\n0.0 s\n\n完成。以下是结果摘要：\n\n写入路径：harness-demo/checklist.md\n待完成数量：2 项（图片与文档演示、联网搜索演示）\n已完成数量：1 项（模型服务验收）\n\n清单包含了 brief.json 中的 3 项任务（优先级、状态、目标日期）以及 meeting-notes.txt 中确认的负责人信息，并以 Markdown 表格和统计汇总呈现。\n\n已完成\n复制回答"
+    },
+    {
+      "case": "multimodal",
+      "status": "已完成\n复制回答",
+      "elapsed_s": 9.161319486003777,
+      "tools": [],
+      "answer_excerpt": "请结合这张柱状图和周目标文档回答：周一至周五分别完成多少个任务？合计多少？本周是否达标，距离目标还差多少？用简洁表格和一句结论回答。\nweekly-tasks.png\n▤\nweekly-target.txt\n✦\nQwen\nCHAT\n星期\t完成任务数\n周一\t32\n周二\t46\n周三\t41\n周四\t59\n周五\t72\n合计\t250\n\n结论：本周未达标，距离目标还差 10 个任务。\n\n已完成\n复制回答"
+    },
+    {
+      "case": "search",
+      "status": "已完成\n复制回答",
+      "elapsed_s": 81.45509417599533,
+      "tools": [
+        "!搜索网页vLLM automatic prefix caching site:docs.vllm.ai0.7 s",
+        "✓搜索网页vLLM prefix caching documentation1.8 s",
+        "✓打开网页prefix caching10.2 s",
+        "✓打开网页https://docs.vllm.ai/en/latest/features/automatic_prefix_caching/4.9 s"
+      ],
+      "answer_excerpt": "ng documentation\n1.8 s\n✓\n打开网页\nprefix caching\n10.2 s\n✓\n打开网页\nhttps://docs.vllm.ai/en/latest/features/automatic_prefix_caching/\n4.9 s\n\n已成功找到 vLLM 官方文档中关于 Automatic Prefix Caching (APC) 的页面。以下是三个要点总结：\n\n---\n\nvLLM Automatic Prefix Caching 三大要点\n1. 对 Prefill 阶段的作用：跳过重复计算\n\nAPC 会缓存已有请求的 KV Cache。当新请求与缓存中的请求共享相同的前缀（prefix）时，新请求可以直接复用该前缀的 KV Cache，跳过前缀部分的 prefill 计算。这意味着长文档或长对话历史只需计算一次，后续请求的 prefill 阶段大幅加速。\n\n2. 对 Decode 阶段的影响：无直接加速\n\nAPC 不会减少 decode 阶段的时间。它只优化 prefill 阶段（处理输入 prompt 的部分），而生成新 token 的 decode 阶段不受影响。因此，当模型需要生成长回答（decode 占主导）时，APC 带来的性能提升有限。\n\n3. 适用场景\n长文档查询：用户反复对同一份长文档（如软件手册、年报）提出不同问题。APC 只需处理文档一次，后续查询直接复用其 KV Cache，显著提升吞吐、降低延迟。\n多轮对话：同一会话中用户多次交互。APC 可跨轮次复用对话历史的计算结果，避免每轮都重新处理完整历史。\n不适用场景：新请求与已有请求没有共享前缀时，APC 无法提供加速。\n\n---\n\n官方来源链接：\n\nAutomatic Prefix Caching - vLLM\nPrefix Caching 技术设计细节\n已完成\n复制回答"
+    },
+    {
+      "case": "weather",
+      "status": "已完成\n复制回答",
+      "elapsed_s": 40.77739298400411,
+      "tools": [
+        "✓查询天气北京5.0 s"
+      ],
+      "answer_excerpt": "请查询北京当前天气和从今天起 3 天的预报，说明温度、降水概率、数据时间，并给出简短的出行建议和来源链接。\n✦\nQwen\nSEARCH\n✓\n查询天气\n北京\n5.0 s\n北京 · 北京市 · 中国\n2026-10-27 10:30 · Asia/Shanghai\n10.8°\n晴 · 体感 6.6°C · 风速 8.5 km/h\n10-27\n晴\n7° / 14°\n降水 0%\n10-28\n阴\n3° / 13°\n降水 0%\n10-29\n晴\n7° / 17°\n降水 0%\nOpen-Meteo · 数值天气预报\n北京天气查询结果\n\n匹配地点： 北京 · 北京市 · 中国（39.91°N, 116.40°E）  \n数据时间： 2026-10-27 10:30（北京时间）  \n数据来源： Open-Meteo\n\n---\n\n🌤 当前天气（10月27日）\n项目\t数值\n天气状况\t晴\n气温\t10.8°C\n体感温度\t6.6°C\n相对湿度\t28%\n风速\t8.5 km/h\n\n---\n\n📅 3 天预报\n日期\t天气\t最高温\t最低温\t降水概率\n10月27日（今天）\t☀️ 晴\t14.0°C\t6.9°C\t0%\n10月28日（明天）\t☁️ 阴\t13.4°C\t3.2°C\t0%\n10月29日（后天）\t☀️ 晴\t16.5°C\t6.7°C\t0%\n\n---\n\n🧥 出行建议\n今天（晴）：天气晴朗，但体感温度仅 6.6°C，早晚较凉，建议穿外套或薄毛衣，中午可适当减衣。\n明天（阴）：全天阴天，最低温降至 3.2°C，注意保暖，建议带一件厚外套。\n后天（晴）：气温回升至 16.5°C，天气转好，适合户外活动。\n三天均无降水，无需携带雨具；空气较干燥（湿度 28%），注意补水保湿。\n\n> ⚠️ 天气数据来自数值预报模型，仅供参考，实际天气可能有所变化。\n\n已完成\n复制回答"
+    }
+  ],
+  "browser_controls": {
+    "errors": [],
+    "checks": [
+      "file picker + preview + real uploaded document reasoning",
+      "real PDF extraction and preview",
+      "manual file edit + stale-checked save + download",
+      "real stream cancellation + follow-up recovery",
+      "conversation and cancellation status restored after reload",
+      "mobile sidebar + one-click example"
+    ]
+  },
+  "notes": [
+    "The multimodal case answered 250 and shortfall 10 correctly; an initial test assertion requiring the literal target 260 was too strict and was corrected.",
+    "Search retried a failed query, followed discovered documentation links, then cited the fetched primary page.",
+    "A chat-template restriction on mid-conversation system messages and a new-conversation UI race were found and fixed during integration."
+  ],
+  "final_deployed_browser": {
+    "errors": [],
+    "stream_export_pass": true,
+    "horizontal_overflow": false
+  },
+  "deployment": {
+    "url": "http://127.0.0.1:8088",
+    "service": "qwen-strix-expo.service",
+    "enabled_for_user_login": true,
+    "inference_port": 8000
+  }
+}

@@ -46,6 +46,7 @@ test/results/context_pressure/*.env
 .vllm-cache/
 .triton-cache-v032/
 .vllm-cache-v032/
+.runtime/
 
 # Python
 __pycache__/
@@ -119,3 +120,6 @@ test/results/accuracy/full_20260615-dflash-n8-systemd/mt_bench/cache/
 test/results/accuracy/full_20260616-bf16-systemd/**/samples_*.jsonl
 test/results/accuracy/full_20260616-bf16-systemd/logs/
 test/results/accuracy/full_20260616-bf16-systemd/mt_bench/cache/
+
+# Local Agent workbench sample tasks and generated outputs
+harness-demo/

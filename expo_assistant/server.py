@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Offline chat UI and streaming proxy for an existing vLLM service.
+"""Local multimodal Agent workbench over an existing vLLM service.
 
-Python 3.9+; standard library only. This process never loads model weights.
+This process never loads model weights. See requirements.txt for document tools.
 """
 from __future__ import annotations
 
@@ -16,12 +16,17 @@ import os
 from pathlib import Path
 import re
 import socket
+import sys
 import threading
 import time
 from typing import Any, Iterator, Optional
-from urllib.parse import urlsplit, unquote
+from urllib.parse import urlsplit, unquote, parse_qs, quote
 
 ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from agent import Agent, validate_agent_body
+from examples import load_example
 SYSTEM_PROMPT = (
     "你是一位本地运行的编程问答助手。用中文准确、简洁地回答，必要时提供可复制的代码块，"
     "并注明语言。优先给出结论和可用示例。对不确定的信息说明条件。"
@@ -47,6 +52,9 @@ class Config:
     metrics_wait: float = 1.2
     api_key: str = ""
     demo: bool = False
+    workspace: str = str(ROOT.parent)
+    data_dir: str = str(ROOT.parent / ".runtime" / "harness")
+    max_agent_steps: int = 8
 
     def __post_init__(self):
         self.upstream = self.upstream.rstrip("/")
@@ -192,6 +200,7 @@ class ActiveRequest:
     def __init__(self, request_id: str):
         self.request_id = request_id
         self.cancelled = threading.Event()
+        self.finished = threading.Event()
         self.guard = threading.Lock()
         self.sock: Optional[socket.socket] = None
 
@@ -235,6 +244,7 @@ class App:
         self.config = config
         self.guard = threading.Lock()
         self.active: Optional[ActiveRequest] = None
+        self.agent = Agent(self, make_stats, iter_sse)
 
     def begin(self, request_id: str) -> Optional[ActiveRequest]:
         with self.guard:
@@ -247,6 +257,7 @@ class App:
         with self.guard:
             if self.active is active:
                 self.active = None
+        active.finished.set()
 
     def headers(self) -> dict[str, str]:
         result = {"Accept": "application/json"}
@@ -283,6 +294,34 @@ class App:
             return Snapshot(parse_metrics(body.decode("utf-8"), self.config.model), status == 200)
         except (OSError, ValueError, http.client.HTTPException):
             return Snapshot({}, False)
+
+    def tokenize(self, messages, tools, thinking, active, continue_answer=False):
+        """Count the actual chat template, including tools, before pruning long documents."""
+        payload = {"model": self.config.model, "messages": messages,
+                   "add_generation_prompt": not continue_answer,
+                   "continue_final_message": continue_answer,
+                   "chat_template_kwargs": {"enable_thinking": thinking}}
+        if tools:
+            payload["tools"] = tools
+        conn, prefix = self.connection(active)
+        try:
+            conn.sock.settimeout(min(self.config.timeout, 20))
+            conn.request("POST", prefix + "/tokenize", json.dumps(payload, ensure_ascii=False).encode(),
+                         {**self.headers(), "Content-Type": "application/json"})
+            response = conn.getresponse()
+            if response.status != 200:
+                response.read(1000)
+                raise ValueError("tokenize HTTP " + str(response.status))
+            raw = response.read(8 * 1024 * 1024 + 1)
+            if len(raw) > 8 * 1024 * 1024:
+                raise ValueError("tokenize 响应过大")
+            result = json.loads(raw)
+            if integer(result.get("count")) is None or not integer(result.get("max_model_len")):
+                raise ValueError("tokenize 缺少可靠的 count / max_model_len")
+            return {"count": result["count"], "max_model_len": result["max_model_len"]}
+        finally:
+            active.attach(None)
+            conn.close()
 
     def completed_metrics(self, before: Snapshot, active: ActiveRequest) -> Snapshot:
         if not before.ok:
@@ -376,9 +415,11 @@ class Handler(BaseHTTPRequestHandler):
         return self.server.app
 
     def log_message(self, format, *args):
-        # HTTP paths only; never log conversations or API credentials.
-        if args and len(args) > 1 and str(args[1]) not in ("200", "304"):
-            super().log_message(format, *args)
+        # Do not log malformed request lines/bodies or URL query strings.
+        if (len(args) > 1 and str(args[1]).isdigit() and int(args[1]) >= 400
+                and self.command in ("GET", "POST") and self.path.startswith("/")):
+            sys.stderr.write("HTTP " + str(args[1]) + " " + self.command + " "
+                             + urlsplit(self.path).path[:120].replace("\n", "") + "\n")
 
     def send_json(self, status: int, body: dict):
         raw = json.dumps(body, ensure_ascii=False, allow_nan=False).encode("utf-8")
@@ -396,20 +437,71 @@ class Handler(BaseHTTPRequestHandler):
         if not self.headers.get("Content-Type", "").lower().startswith("application/json"):
             raise ValueError("Content-Type 必须是 application/json")
         size = int(self.headers.get("Content-Length", "0"))
-        if size <= 0 or size > 600000:
+        limit = 17 * 1024 * 1024 if self.path == "/api/upload" else 600000
+        if size <= 0 or size > limit:
+            self.close_connection = True
             raise ValueError("请求体大小超出范围")
         return json.loads(self.rfile.read(size))
 
+    def check_host(self):
+        # A loopback-only deployment must also reject DNS-rebinding Host names.
+        host = urlsplit("http://" + self.headers.get("Host", "")).hostname
+        if self.server.server_address[0] in ("127.0.0.1", "::1") and host not in ("127.0.0.1", "localhost", "::1"):
+            self.close_connection = True
+            self.send_json(403, {"message": "请通过本机 localhost 或 127.0.0.1 访问"})
+            return False
+        return True
+
     def do_GET(self):
+        if not self.check_host():
+            return
         path = urlsplit(self.path).path
+        params = parse_qs(urlsplit(self.path).query)
+        def param(name, default=""):
+            return params.get(name, [default])[0]
         if path == "/api/config":
             cfg = self.app.config
             self.send_json(200, {"model": cfg.model, "subtitle": cfg.subtitle,
                                 "api_mode": cfg.api_mode, "max_output_tokens": cfg.max_output_tokens,
-                                "upstream_display": cfg.upstream, "demo": cfg.demo})
+                                "upstream_display": cfg.upstream, "demo": cfg.demo,
+                                "workspace": str(self.app.agent.workspace.root),
+                                "max_agent_steps": cfg.max_agent_steps,
+                                "max_upload_bytes": 12 * 1024 * 1024,
+                                "modes": ["chat", "agent", "search"]})
             return
         if path == "/api/status":
             self.send_json(200, self.app.status())
+            return
+        try:
+            agent = self.app.agent
+            if path == "/api/sessions":
+                self.send_json(200, {"sessions": agent.store.list_sessions()})
+                return
+            if path == "/api/session":
+                self.send_json(200, agent.store.public_session(agent.store.load(param("id"))))
+                return
+            if path == "/api/files":
+                self.send_json(200, agent.workspace.list_files(param("path", ".")))
+                return
+            if path in ("/api/file", "/api/download"):
+                _, raw, content = agent.workspace._read(param("path"))
+                if path == "/api/file":
+                    from workspace import sha
+                    self.send_json(200, {"path": param("path"), "content": content[:100000],
+                                        "sha256": sha(raw), "truncated": len(content) > 100000})
+                else:
+                    self.send_blob(raw, "text/plain; charset=utf-8", Path(param("path")).name)
+                return
+            if path == "/api/attachment":
+                session = agent.store.load(param("session"))
+                item = agent.store.attachment(session, param("id"))
+                if item["kind"] == "image":
+                    self.send_blob((agent.store.root / "uploads" / item["id"] / "image.jpg").read_bytes(), "image/jpeg")
+                else:
+                    self.send_json(200, agent.store.read_attachment(session, item["id"], int(param("offset", "0")), 16000))
+                return
+        except (ValueError, OSError) as exc:
+            self.send_json(400, {"message": str(exc)})
             return
         if path.startswith("/api/"):
             self.send_json(404, {"message": "未知接口"})
@@ -433,10 +525,24 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def send_blob(self, raw, mime, filename=None):
+        self.send_response(200)
+        self.send_header("Content-Type", mime)
+        self.send_header("Content-Length", str(len(raw)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        if filename:
+            self.send_header("Content-Disposition", "attachment; filename*=UTF-8''" + quote(filename))
+        self.end_headers()
+        self.wfile.write(raw)
+
     def do_POST(self):
+        if not self.check_host():
+            return
         try:
             body = self.read_json()
         except (ValueError, UnicodeError) as exc:
+            self.close_connection = True
             self.send_json(400, {"message": str(exc)})
             return
         if self.path == "/api/cancel":
@@ -446,13 +552,44 @@ class Handler(BaseHTTPRequestHandler):
                 found = active is not None and active.request_id == request_id
                 if found:
                     active.cancel()
-            self.send_json(200, {"cancelled": found})
+            if found:
+                active.finished.wait(2)
+            self.send_json(200, {"cancelled": found, "finished": not found or active.finished.is_set()})
             return
-        if self.path != "/api/chat":
+        try:
+            if self.path in ("/api/sessions", "/api/session/delete", "/api/upload", "/api/file", "/api/example"):
+                if not isinstance(body, dict):
+                    raise ValueError("请求必须是 JSON 对象")
+                with self.app.guard:
+                    if self.app.active:
+                        self.send_json(409, {"message": "请等待当前任务完成或停止后再操作"})
+                        return
+                    agent = self.app.agent
+                    if self.path == "/api/sessions":
+                        result = agent.store.public_session(agent.store.create())
+                    elif self.path == "/api/session/delete":
+                        result = agent.store.delete(body.get("session_id"))
+                    elif self.path == "/api/upload":
+                        result = agent.store.upload(body.get("session_id"), body.get("name"), body.get("data"))
+                    elif self.path == "/api/example":
+                        result = load_example(agent, body.get("session_id"), body.get("case_id"))
+                    else:
+                        result = agent.workspace.write_file(body.get("path"), body.get("content"), body.get("expected_sha256"))
+                self.send_json(200, result)
+                return
+        except (ValueError, OSError, ImportError) as exc:
+            self.send_json(400, {"message": str(exc)})
+            return
+        if self.path not in ("/api/chat", "/api/agent"):
             self.send_json(404, {"message": "未知接口"})
             return
         try:
-            body = validate_body(body, self.app.config.max_output_tokens)
+            body = (validate_agent_body(body) if self.path == "/api/agent"
+                    else validate_body(body, self.app.config.max_output_tokens))
+            if self.path == "/api/agent":
+                session = self.app.agent.store.load(body["session_id"])
+                for attachment_id in body["attachments"]:
+                    self.app.agent.store.attachment(session, attachment_id)
         except ValueError as exc:
             self.send_json(400, {"message": str(exc)})
             return
@@ -472,6 +609,8 @@ class Handler(BaseHTTPRequestHandler):
                                 "source": "demo" if self.app.config.demo else "live"})
             if self.app.config.demo:
                 self.demo(active)
+            elif self.path == "/api/agent":
+                self.app.agent.run(self, active, body)
             else:
                 self.live(active, body)
         except (BrokenPipeError, ConnectionResetError):
@@ -620,7 +759,7 @@ def create_server(config: Config, host: str = "127.0.0.1", port: int = 8088) -> 
 
 
 def main():
-    parser = argparse.ArgumentParser(description="本地 Qwen 编程问答展示页（无第三方 Python 依赖）")
+    parser = argparse.ArgumentParser(description="本地 Qwen 工作台：多模态、文件与搜索 Agent")
     parser.add_argument("--upstream", default=os.environ.get("QWEN_UPSTREAM", "http://127.0.0.1:8000"))
     parser.add_argument("--model", default=os.environ.get("QWEN_MODEL", "Qwen3.6-27B-AWQ4"))
     parser.add_argument("--api-mode", choices=("responses", "chat"), default="responses")
@@ -630,12 +769,16 @@ def main():
     parser.add_argument("--max-output-tokens", type=int, default=1024)
     parser.add_argument("--timeout", type=float, default=600)
     parser.add_argument("--demo", action="store_true", help="只预览界面；模拟文字，不生成测速数据")
+    parser.add_argument("--workspace", default=str(ROOT.parent), help="文件工具可读写的项目根目录")
+    parser.add_argument("--data-dir", default=str(ROOT.parent / ".runtime" / "harness"))
+    parser.add_argument("--max-agent-steps", type=int, default=8)
     args = parser.parse_args()
-    if not 64 <= args.max_output_tokens <= 4096 or args.timeout <= 0:
+    if not 64 <= args.max_output_tokens <= 4096 or args.timeout <= 0 or not 2 <= args.max_agent_steps <= 16:
         parser.error("输出上限须为 64–4096，timeout 须大于 0")
     config = Config(upstream=args.upstream, model=args.model, api_mode=args.api_mode,
                     subtitle=args.subtitle, max_output_tokens=args.max_output_tokens,
-                    timeout=args.timeout, api_key=os.environ.get("QWEN_API_KEY", ""), demo=args.demo)
+                    timeout=args.timeout, api_key=os.environ.get("QWEN_API_KEY", ""), demo=args.demo,
+                    workspace=args.workspace, data_dir=args.data_dir, max_agent_steps=args.max_agent_steps)
     server = create_server(config, args.host, args.port)
     print("本地编程助手：http://" + args.host + ":" + str(server.server_port), flush=True)
     print("界面预览模式：不会调用模型或显示测速。" if config.demo else

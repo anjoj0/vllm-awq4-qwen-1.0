@@ -1,0 +1,257 @@
+{
+  "scope": "Random real-shape per-layer causal GQA6 attention. HIP event timings, independent FP32 softmax reference; not serving performance. Candidate additionally masks padded query rows to give each output one writer.",
+  "rows": [
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        16,
+        32,
+        null,
+        null
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 0.7345247410012234,
+      "reference_relative_l2": 0.00031310078338719904,
+      "native_relative_l2": 1.124678760788811e-06,
+      "n_regs": 256,
+      "n_spills": 436,
+      "shared_bytes": 32768,
+      "before_native_ms": [
+        108.05392456054688,
+        108.27339172363281,
+        109.0369644165039,
+        108.30113220214844,
+        108.1330337524414
+      ],
+      "candidate_ms": [
+        102.2529525756836,
+        102.23403930664062,
+        102.48483276367188,
+        100.94313049316406,
+        100.36045837402344
+      ],
+      "after_native_ms": [
+        105.89500427246094,
+        105.45597076416016,
+        106.72177124023438,
+        106.74104309082031,
+        105.60779571533203
+      ],
+      "speedup": 1.0505061186475841,
+      "numerics_passed": true
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        128,
+        32,
+        8,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 0.7948253870017652,
+      "reference_relative_l2": 0.00031310078338719904,
+      "native_relative_l2": 1.068033384399314e-06,
+      "n_regs": 256,
+      "n_spills": 112,
+      "shared_bytes": 65536,
+      "before_native_ms": [
+        107.42913818359375,
+        107.65946197509766,
+        107.98339080810547,
+        106.8118896484375,
+        106.2733154296875
+      ],
+      "candidate_ms": [
+        14.533601760864258,
+        14.444487571716309,
+        14.848630905151367,
+        14.608636856079102,
+        15.145520210266113
+      ],
+      "after_native_ms": [
+        106.63722229003906,
+        106.18819427490234,
+        106.96168518066406,
+        106.27880859375,
+        106.78227233886719
+      ],
+      "speedup": 7.310543895764703,
+      "numerics_passed": true
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        128,
+        32,
+        16,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 0.45740892899993923,
+      "reference_relative_l2": 0.00031310078338719904,
+      "native_relative_l2": 6.731961548211984e-07,
+      "n_regs": 256,
+      "n_spills": 35,
+      "shared_bytes": 65536,
+      "before_native_ms": [
+        107.6106185913086,
+        106.60790252685547,
+        106.50296783447266,
+        105.76768493652344,
+        105.74694061279297
+      ],
+      "candidate_ms": [
+        17.924711227416992,
+        18.20734214782715,
+        17.772811889648438,
+        19.181596755981445,
+        18.173784255981445
+      ],
+      "after_native_ms": [
+        108.26644134521484,
+        106.2583999633789,
+        106.41693115234375,
+        106.32154083251953,
+        107.34068298339844
+      ],
+      "speedup": 5.8578856221631215,
+      "numerics_passed": true
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        128,
+        64,
+        16,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 0.666722515001311,
+      "reference_relative_l2": 0.00031261128606274724,
+      "native_relative_l2": 0.00010590247256914154,
+      "n_regs": 256,
+      "n_spills": 93,
+      "shared_bytes": 65536,
+      "before_native_ms": [
+        108.30233764648438,
+        107.97236633300781,
+        108.90821075439453,
+        108.64961242675781,
+        107.99044036865234
+      ],
+      "candidate_ms": [
+        19.80869483947754,
+        19.697160720825195,
+        19.31459617614746,
+        19.638975143432617,
+        19.59162712097168
+      ],
+      "after_native_ms": [
+        107.05856323242188,
+        107.72915649414062,
+        107.78948974609375,
+        107.50727081298828,
+        106.98754119873047
+      ],
+      "speedup": 5.493205589988578,
+      "numerics_passed": true
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        256,
+        32,
+        16,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "error": "OutOfResources: out of resource: shared memory, Required: 131072, Hardware limit: 65536. Reducing block sizes or `num_stages` may help."
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        256,
+        64,
+        16,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "error": "OutOfResources: out of resource: shared memory, Required: 131072, Hardware limit: 65536. Reducing block sizes or `num_stages` may help."
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        128,
+        64,
+        8,
+        2
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 2.009235046996764,
+      "reference_relative_l2": 0.00031261128606274724,
+      "native_relative_l2": 0.0001059009155142121,
+      "n_regs": 256,
+      "n_spills": 512,
+      "shared_bytes": 65536,
+      "before_native_ms": [
+        112.51063537597656,
+        113.08751678466797,
+        112.41973114013672,
+        112.52381134033203,
+        111.99913024902344
+      ],
+      "candidate_ms": [
+        22.816787719726562,
+        23.740005493164062,
+        22.561748504638672,
+        22.796260833740234,
+        22.557647705078125
+      ],
+      "after_native_ms": [
+        111.89126586914062,
+        112.43412780761719,
+        112.31027221679688,
+        111.58731079101562,
+        112.32450866699219
+      ],
+      "speedup": 4.929410166128868,
+      "numerics_passed": true
+    }
+  ]
+}

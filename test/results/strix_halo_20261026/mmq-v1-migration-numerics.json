@@ -1,0 +1,30 @@
+{
+  "scope": "Existing HIP v1 compiled with new ROCm/Torch; two shape and zero-point migration checks, not a model quality benchmark.",
+  "passed": true,
+  "rows": [
+    {
+      "shape": [
+        65,
+        5120,
+        17408
+      ],
+      "asymmetric": false,
+      "relative_error_vs_quantized_reference": 0.000409942731494084,
+      "relative_error_vs_unquantized_activation": 0.00947801023721695,
+      "cosine_vs_unquantized_activation": 0.9999551177024841,
+      "passed": true
+    },
+    {
+      "shape": [
+        129,
+        16384,
+        5120
+      ],
+      "asymmetric": true,
+      "relative_error_vs_quantized_reference": 0.00029438635101541877,
+      "relative_error_vs_unquantized_activation": 0.008775347843766212,
+      "cosine_vs_unquantized_activation": 0.9999615550041199,
+      "passed": true
+    }
+  ]
+}

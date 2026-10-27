@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "cases": 8,
+  "backend": "dflash-n4-block64",
+  "scope": "Reviewed binary-search repair; three generated assertions plus five boundary cases."
+}

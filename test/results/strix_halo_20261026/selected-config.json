@@ -1,0 +1,40 @@
+{
+  "backend": "dflash",
+  "spec_tokens": 4,
+  "requested_block_size": 64,
+  "physical_block_size": 832,
+  "image": "vllm-awq4-qwen:optimized-v0320",
+  "image_id": "sha256:3160d4bc02acaf95c22ddf192241a462e790eae061fe45f4b1c4d3e7e38ef4d9",
+  "implementation_tag": "vllm-awq4-qwen:shape-tuned-v6",
+  "rollback_image": "vllm-awq4-qwen:stable-v0320",
+  "model_memory_GiB": 25.63,
+  "KV_budget_GiB_approx": 5.61,
+  "gpu_memory_utilization": 0.55,
+  "prefix_caching": true,
+  "enforce_eager": true,
+  "max_model_len": 32768,
+  "max_num_seqs": 1,
+  "max_num_batched_tokens": 8192,
+  "KV_dtype": "auto",
+  "dtype": "half",
+  "optimization_flags": {
+    "VLLM_QWEN27B_PREFILL_TILES": "1",
+    "VLLM_QWEN27B_PREFILL_ROCBLAS": "1",
+    "VLLM_QWEN27B_DOWN_KMAJOR": "1",
+    "VLLM_QWEN27B_PREFILL_ATTN": "1",
+    "VLLM_QWEN27B_VERIFY_ATTN": "1"
+  },
+  "default_env": "# Generated from locally audited snapshots. GPU acceptance is still required.\nVLLM_HOST_MODELS_DIR='/home/amd/hf-cache'\nVLLM_UPSTREAM_IMAGE='vllm/vllm-openai-rocm:v0.32.0@sha256:14f6a575e1fb0a580b0f633c09e06f648709d60405b85f6a7ff3f80d49f39905'\nVLLM_IMAGE='vllm-awq4-qwen:optimized-v0320'\nVLLM_HOST_PORT='8000'\nVLLM_MODEL_ID='/models/hub/models--cyankiwi--Qwen3.6-27B-AWQ-INT4/snapshots/46d3c4aca0cfa475e99283abe9fb1254df1eef03'\nVLLM_SERVED_MODEL_NAME='Qwen3.6-27B-AWQ4'\nVLLM_SPEC_METHOD='dflash'\nVLLM_DRAFT_MODEL_ID='/models/hub/models--z-lab--Qwen3.6-27B-DFlash/snapshots/0919688658996800f86b895034249700e9481106'\nVLLM_DTYPE='half'\nVLLM_DSPARK_DRAFT_TOPK=''\nVLLM_SPEC_TOKENS='4'\nVLLM_DISABLE_DFLASH='0'\nVLLM_ENABLE_PREFIX_CACHING='1'\nVLLM_ENFORCE_EAGER='1'\nVLLM_GPU_MEMORY_UTIL='0.55'\nVLLM_MAX_NUM_SEQS='1'\nVLLM_MAX_NUM_BATCHED_TOKENS='8192'\nVLLM_MAX_MODEL_LEN='32768'\nVLLM_KV_CACHE_DTYPE='auto'\nVLLM_BLOCK_SIZE='64'\nVLLM_QWEN27B_PREFILL_TILES='1'\nVLLM_QWEN27B_PREFILL_ROCBLAS='1'\nVLLM_QWEN27B_DOWN_KMAJOR='1'\nVLLM_QWEN27B_PREFILL_ATTN='1'\nVLLM_QWEN27B_VERIFY_ATTN='1'\nVLLM_DECODE_GRAPHS='0'\nVLLM_ENABLE_PROJECT_MMQ='0'\nAWQ_MMQ_DECODE_BACKEND='triton'\nAWQ_MMQ_SMALL_M_THRESHOLD='32'\n",
+  "diagnostic_mounts": false,
+  "benchmark_evidence": [
+    "decode-long-dflash-attn-v6.json",
+    "prefill-final-v6-4096.json",
+    "prefill-final-v6-8192.json",
+    "decode-long-dflash-final-v6-8k.json"
+  ],
+  "checked_at": "2026-10-26T18:15:58.992740+00:00",
+  "KV_cache_tokens": 54387,
+  "final_functional_checks": "passed",
+  "final_harness_checks": "passed",
+  "performance_summary": "performance-final.json"
+}

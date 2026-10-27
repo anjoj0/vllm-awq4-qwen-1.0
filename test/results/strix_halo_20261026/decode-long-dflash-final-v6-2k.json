@@ -1,0 +1,213 @@
+{
+  "label": "dflash-final-v6-2k",
+  "started_at": "2026-10-27T01:15:43.336211+00:00",
+  "scope": "Fixed prompts; greedy, thinking off, fresh salt. Decode TPS = (output_tokens-1)/server generation time. Length-limited outputs are throughput samples, not complete quality answers.",
+  "rows": [
+    {
+      "case": "code",
+      "run": 0,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reference notes for the coding task below:\nNote 0: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 1: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 2: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 3: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 4: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 5: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 6: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 7: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 8: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 9: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 10: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 11: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 12: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 13: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 14: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 15: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 16: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 17: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 18: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 19: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 20: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 21: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 22: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 23: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 24: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 25: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 26: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 27: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 28: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 29: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 30: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 31: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 32: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 33: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 34: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 35: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 36: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 37: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 38: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 39: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 40: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 41: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 42: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 43: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 44: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 45: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 46: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 47: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 48: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 49: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 50: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 51: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 52: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 53: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 54: \n\nNow complete this task:\nImplement a complete Python LRU cache using only the standard library. Include capacity validation, get, put, delete, clear, __len__, and thread safety with RLock. Provide type hints, concise docstrings, an explanation of O(1) operations, and unittest cases for eviction, updating existing keys, missing keys, zero capacity, and clearing. Give the full implementation followed by the full tests."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 256,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "5fafadd4dc2f43018ca35b94b77c1ff6"
+      },
+      "response": {
+        "id": "chatcmpl-b92002335a656062",
+        "object": "chat.completion",
+        "created": 1793063743,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```python\n\"\"\"\nLRU Cache Implementation\n\nThis module provides a thread-safe Least Recently Used (LRU) cache implementation\nusing only Python's standard library. It uses a combination of a doubly-linked list\n(to maintain recency order) and a hash map (for O(1) lookups) to achieve O(1) time\ncomplexity for get, put, and delete operations.\n\nO(1) Operations Explanation:\n- get(key): The hash map allows O(1) lookup of the node. Moving the node to the\n  front of the linked list is O(1) because we have direct references to the node's\n  neighbors.\n- put(key, value): If the key exists, we update the value and move the node to the\n  front (O(1)). If the key doesn't exist, we create a new node and add it to the\n  front (O(1)). If the cache is full, we remove the least recently used item from\n  the tail of the linked list (O(1) because we maintain a tail reference).\n- delete(key): The hash map allows O(1) lookup. Removing a node from the linked\n  list is O(1) because",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 2048,
+          "total_tokens": 2304,
+          "completion_tokens": 256,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 832,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 7521.3971990015125,
+          "generation_time_ms": 10936.644282002817,
+          "queue_time_ms": 0.022370993974618614,
+          "mean_itl_ms": 42.8888011058934,
+          "tokens_per_second": 13.869293785229411,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 18.465789278998272,
+      "decode_tps": 23.316109898501892,
+      "ttft_ms": 7521.3971990015125,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 73.0,
+        "vllm:spec_decode_num_draft_tokens_total": 292.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 184.0
+      },
+      "mean_acceptance_length": 3.5205479452054793,
+      "draft_acceptance_rate": 0.6301369863013698,
+      "text_sha256": "59586fa84d53c14e5768e3ab5d3bc5471c4dd8c43acb37335b48d8a40efcdca5",
+      "aggregate_metrics_check": {
+        "input_tokens": 2048,
+        "output_tokens": 256,
+        "cached_tokens": 0,
+        "prefill_tps": 272.2898346961224,
+        "decode_tps": 23.316109898501892,
+        "ttft_s": 7.5213971990015125,
+        "total_s": 18.465789278998272,
+        "delivery_tps": 23.390974859891514,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    },
+    {
+      "case": "code",
+      "run": 1,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Reference notes for the coding task below:\nNote 0: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 1: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 2: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 3: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 4: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 5: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 6: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 7: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 8: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 9: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 10: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 11: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 12: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 13: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 14: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 15: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 16: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 17: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 18: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 19: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 20: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 21: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 22: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 23: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 24: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 25: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 26: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 27: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 28: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 29: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 30: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 31: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 32: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 33: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 34: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 35: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 36: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 37: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 38: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 39: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 40: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 41: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 42: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 43: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 44: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 45: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 46: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 47: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 48: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 49: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 50: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 51: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 52: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 53: Cache capacity is a nonnegative integer. Get and put update recency. A lock protects compound state changes. Tests must check eviction and missing keys.\nNote 54: \n\nNow complete this task:\nImplement a complete Python LRU cache using only the standard library. Include capacity validation, get, put, delete, clear, __len__, and thread safety with RLock. Provide type hints, concise docstrings, an explanation of O(1) operations, and unittest cases for eviction, updating existing keys, missing keys, zero capacity, and clearing. Give the full implementation followed by the full tests."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 256,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "a0d104ec86f94713bcbff4dbd1c968f3"
+      },
+      "response": {
+        "id": "chatcmpl-a64e14fcd0437829",
+        "object": "chat.completion",
+        "created": 1793063762,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```python\n\"\"\"\nLRU Cache Implementation\n\nThis module provides a thread-safe Least Recently Used (LRU) cache implementation\nusing only Python's standard library. It uses a combination of a doubly-linked list\n(to maintain recency order) and a hash map (for O(1) lookups) to achieve O(1) time\ncomplexity for get, put, and delete operations.\n\nO(1) Operations Explanation:\n- get(key): The hash map allows O(1) lookup of the node. Moving the node to the\n  front of the linked list is O(1) because we have direct references to the node's\n  neighbors.\n- put(key, value): If the key exists, we update the value and move the node to the\n  front (O(1)). If the key doesn't exist, we create a new node and add it to the\n  front (O(1)). If the cache is full, we remove the least recently used item from\n  the tail of the linked list (O(1) because we maintain a tail reference).\n- delete(key): The hash map allows O(1) lookup. Removing a node from the linked\n  list is O(1) because",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 2048,
+          "total_tokens": 2304,
+          "completion_tokens": 256,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 832,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 7115.849734000221,
+          "generation_time_ms": 10668.098770001961,
+          "queue_time_ms": 0.021840998670086265,
+          "mean_itl_ms": 41.83568145098808,
+          "tokens_per_second": 14.395003446078837,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 17.79251272900001,
+      "decode_tps": 23.903040785209484,
+      "ttft_ms": 7115.849734000221,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 73.0,
+        "vllm:spec_decode_num_draft_tokens_total": 292.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 184.0
+      },
+      "mean_acceptance_length": 3.5205479452054793,
+      "draft_acceptance_rate": 0.6301369863013698,
+      "text_sha256": "59586fa84d53c14e5768e3ab5d3bc5471c4dd8c43acb37335b48d8a40efcdca5",
+      "aggregate_metrics_check": {
+        "input_tokens": 2048,
+        "output_tokens": 256,
+        "cached_tokens": 0,
+        "prefill_tps": 287.8082135734903,
+        "decode_tps": 23.903040785209484,
+        "ttft_s": 7.115849734000221,
+        "total_s": 17.79251272900001,
+        "delivery_tps": 23.977529319778355,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    }
+  ],
+  "requested_input_tokens": 2048,
+  "output_cap": 256,
+  "summary": {
+    "code": {
+      "runs": 2,
+      "median_decode_tps": 23.609575341855688,
+      "output_tokens": [
+        256,
+        256
+      ]
+    }
+  }
+}

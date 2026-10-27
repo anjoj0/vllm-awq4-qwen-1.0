@@ -1,0 +1,158 @@
+{
+  "date": "2026-10-27",
+  "scope": "Document-reading and UI regression checks with the existing local Qwen3.6-27B-AWQ4 + DFlash service. Functional checks, not a scientific factuality evaluation or performance benchmark.",
+  "unit_tests": {
+    "passed": 36,
+    "command": ".runtime/harness-venv/bin/python -m unittest discover -s expo_assistant -p test_*.py -v"
+  },
+  "document": {
+    "name": "2610.23787v1.pdf",
+    "pages": 14,
+    "extracted_chars": 48352
+  },
+  "fresh_chat": {
+    "mode": "chat",
+    "max_output_tokens_per_call": 1024,
+    "initial_excerpt": [
+      0,
+      6000
+    ],
+    "actual_read_ranges": [
+      {
+        "offset": 6000,
+        "next_offset": 22000,
+        "pages": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "total_chars": 48352
+      },
+      {
+        "offset": 22000,
+        "next_offset": 38000,
+        "pages": [
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "total_chars": 48352
+      },
+      {
+        "offset": 38000,
+        "next_offset": 48352,
+        "pages": [
+          11,
+          12,
+          13,
+          14
+        ],
+        "total_chars": 48352
+      }
+    ],
+    "task_status": "complete",
+    "model_rounds": 5,
+    "tool_calls": 3,
+    "automatic_continuations": 1,
+    "max_input_tokens": 17420,
+    "context_pruned": false,
+    "elapsed_s": 181.27,
+    "sections_present": [
+      "创新点",
+      "为什么有效",
+      "改进空间"
+    ]
+  },
+  "browser_sidebar": {
+    "brand": "LOCAL / CODE\nAMD 本地编程助手",
+    "file_directory_removed": true,
+    "examples": 4,
+    "file_directory_requests": [],
+    "errors": []
+  },
+  "browser_incomplete_answer": {
+    "incomplete_has_continue_button": true,
+    "attachment_tools": [
+      "✓读取附件2610.23787v1.pdf · 第 2–6 页0.0 s",
+      "✓读取附件2610.23787v1.pdf · 第 6–11 页0.0 s",
+      "✓读取附件2610.23787v1.pdf · 第 11–14 页0.0 s"
+    ],
+    "attachment_preview": true,
+    "errors": []
+  },
+  "browser_native_continuation": {
+    "single_answer_continuation": true,
+    "all_three_document_reads_visible": true,
+    "innovation_and_improvements_present_once": true,
+    "reload_preserved_answer": true,
+    "errors": []
+  },
+  "implementation_notes": [
+    "Chat exposes read/search attachment tools only for documents associated with the session.",
+    "Function-shaped prose triggers a bounded request for a genuine tool call; it is never executed as code.",
+    "Long-document context is checked with the upstream chat-template tokenizer before pruning.",
+    "An integration attempt using a new assistant turn repeated the answer. Replaced it with continue_final_message=true and add_generation_prompt=false, and verified one continuous answer.",
+    "Paper text, full conversations and upload IDs remain in private .runtime data."
+  ],
+  "deployment": {
+    "url": "http://127.0.0.1:8088",
+    "service": "qwen-strix-expo.service",
+    "active": true,
+    "attachment_api_page_range_verified": true,
+    "final_browser": {
+      "errors": [],
+      "chat_document_hint": true,
+      "brand": "LOCAL / CODE",
+      "file_directory_removed": true
+    }
+  },
+  "old_conversation_followup": {
+    "isolated_copy": true,
+    "prior_failed_turns": 3,
+    "user_text": "继续",
+    "mode": "chat",
+    "reattached_files": false,
+    "max_output_tokens_per_call": 2048,
+    "real_document_reads": [
+      {
+        "offset": 6000,
+        "next_offset": 16000,
+        "pages": [
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      {
+        "offset": 16000,
+        "next_offset": 26000,
+        "pages": [
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "offset": 26000,
+        "next_offset": 36000,
+        "pages": [
+          7,
+          8,
+          9,
+          10
+        ]
+      }
+    ],
+    "task_status": "complete",
+    "model_rounds": 4,
+    "tool_calls": 3,
+    "elapsed_s": 173.6,
+    "errors": []
+  }
+}

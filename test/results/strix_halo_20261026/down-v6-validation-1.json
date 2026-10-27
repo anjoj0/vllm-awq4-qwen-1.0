@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "scope": "Actual target layers 0/31/63, per-layer numerics and graph replay, not whole-model quality",
+  "rows": [
+    {
+      "layer": 0,
+      "K": 17408,
+      "N": 5120,
+      "M": 3,
+      "relative_error_reference": 0.0001816232834244147,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 0,
+      "K": 17408,
+      "N": 5120,
+      "M": 5,
+      "relative_error_reference": 0.00017668095824774355,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 0,
+      "K": 17408,
+      "N": 5120,
+      "M": 9,
+      "relative_error_reference": 0.00017999026749748737,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 31,
+      "K": 17408,
+      "N": 5120,
+      "M": 3,
+      "relative_error_reference": 0.0001846061204560101,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 31,
+      "K": 17408,
+      "N": 5120,
+      "M": 5,
+      "relative_error_reference": 0.00018685833492781967,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 31,
+      "K": 17408,
+      "N": 5120,
+      "M": 9,
+      "relative_error_reference": 0.0001841616176534444,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 63,
+      "K": 17408,
+      "N": 5120,
+      "M": 3,
+      "relative_error_reference": 0.00018635868036653847,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 63,
+      "K": 17408,
+      "N": 5120,
+      "M": 5,
+      "relative_error_reference": 0.00018729845760390162,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "layer": 63,
+      "K": 17408,
+      "N": 5120,
+      "M": 9,
+      "relative_error_reference": 0.00018124590860679746,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    }
+  ]
+}

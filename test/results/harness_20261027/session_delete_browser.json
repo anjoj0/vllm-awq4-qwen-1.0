@@ -1,0 +1,13 @@
+{
+  "cancel_preserves_record_and_upload": true,
+  "delete_other_preserves_current": true,
+  "delete_current_last_creates_blank": true,
+  "deleted_upload_removed": true,
+  "reload_persists": true,
+  "mobile_dialog": true,
+  "console_errors": [],
+  "isolated_data_dir": "/home/amd/demo01/vllm-awq4-qwen-1.0/.runtime/harness-search-validation",
+  "delete_current_loads_remaining": true,
+  "server_refusal_preserves_record_and_allows_retry": true,
+  "keyboard_focus_after_delete": true
+}

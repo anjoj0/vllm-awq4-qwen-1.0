@@ -1,0 +1,114 @@
+{
+  "label": "dflash2-upstream",
+  "started_at": "2026-10-26T14:46:39.945000+00:00",
+  "scope": "Two fixed prompts, 512 output-token cap; greedy, thinking off, fresh salt. Decode TPS = (output_tokens-1)/server generation time. Length-limited outputs are throughput samples, not complete quality answers.",
+  "rows": [
+    {
+      "case": "code",
+      "run": 0,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Implement a complete Python LRU cache using only the standard library. Include capacity validation, get, put, delete, clear, __len__, and thread safety with RLock. Provide type hints, concise docstrings, an explanation of O(1) operations, and unittest cases for eviction, updating existing keys, missing keys, zero capacity, and clearing. Give the full implementation followed by the full tests."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 512,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "91ff18f984d140469ba293aee948f777"
+      },
+      "response": {
+        "id": "chatcmpl-878b1461639ee9ae",
+        "object": "chat.completion",
+        "created": 1793025999,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```python\n\"\"\"\nLRU Cache Implementation\n\nThis module provides a thread-safe Least Recently Used (LRU) cache with O(1)\ntime complexity for get, put, delete, and clear operations.\n\nO(1) Operations Explanation:\n- We use a doubly linked list to maintain the order of usage. The most recently\n  used item is at the head, and the least recently used is at the tail.\n- A dictionary maps keys to nodes in the linked list for O(1) lookup.\n- get(key): Look up the key in the dictionary (O(1)), then move the corresponding\n  node to the head of the linked list (O(1) with direct node references).\n- put(key, value): If the key exists, update the value and move to head (O(1)).\n  If not, create a new node, add to head, and if capacity is exceeded, remove\n  the tail node (O(1)).\n- delete(key): Look up the key (O(1)), remove the node from the linked list (O(1)),\n  and remove from dictionary (O(1)).\n- clear(): Reset the linked list and clear the dictionary (O(1) amortized or O(n)\n  depending on implementation; here we reset pointers and clear dict).\n\"\"\"\n\nfrom __future__ import annotations\nimport threading\nfrom typing import Any, Optional\n\n\nclass _Node:\n    \"\"\"A node in the doubly linked list.\"\"\"\n\n    __slots__ = (\"key\", \"value\", \"prev\", \"next\")\n\n    def __init__(self, key: Any, value: Any) -> None:\n        self.key = key\n        self.value = value\n        self.prev: Optional[_Node] = None\n        self.next: Optional[_Node] = None\n\n\nclass LRUCache:\n    \"\"\"\n    A thread-safe Least Recently Used (LRU) cache with O(1) operations.\n\n    Attributes:\n        capacity: The maximum number of items the cache can hold.\n    \"\"\"\n\n    def __init__(self, capacity: int) -> None:\n        \"\"\"\n        Initialize the LRU cache with a given capacity.\n\n        Args:\n            capacity: The maximum number of items the cache can hold. Must be >= 0.\n\n        Raises:\n            ValueError: If capacity is negative.\n        \"\"\"\n        if capacity < 0:\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-0083cf8d",
+        "usage": {
+          "prompt_tokens": 93,
+          "total_tokens": 605,
+          "completion_tokens": 512,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 778.7256499977957,
+          "generation_time_ms": 205745.8469760022,
+          "queue_time_ms": 0.02347100235056132,
+          "mean_itl_ms": 402.63375142074796,
+          "tokens_per_second": 2.479123880949471,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 206.53324254400286,
+      "decode_tps": 2.4836467297422633,
+      "ttft_ms": 778.7256499977957,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 509.0,
+        "vllm:spec_decode_num_draft_tokens_total": 3563.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 2.0
+      },
+      "mean_acceptance_length": 1.0039292730844793,
+      "draft_acceptance_rate": 0.000561324726354196,
+      "text_sha256": "a9fc8a908a340ea4a21cca3f012e0ea616257617995085c1374ed779f5ba5913",
+      "aggregate_metrics_check": {
+        "input_tokens": 93,
+        "output_tokens": 512,
+        "cached_tokens": 0,
+        "prefill_tps": 119.42588509863936,
+        "decode_tps": 2.4836467297422633,
+        "ttft_s": 0.7787256499977957,
+        "total_s": 206.53324254400286,
+        "delivery_tps": 2.488402236456165,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    }
+  ],
+  "summary": {
+    "code": {
+      "runs": 1,
+      "median_decode_tps": 2.4836467297422633,
+      "output_tokens": [
+        512
+      ]
+    }
+  },
+  "stopped_early": "Stopped after the first complete 512-token code sample: only 2 accepted draft tokens, mean acceptance length 1.0039; remaining repeats not useful in this time budget. The next request was cancelled."
+}

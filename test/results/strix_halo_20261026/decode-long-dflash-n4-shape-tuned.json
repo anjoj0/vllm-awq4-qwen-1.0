@@ -1,0 +1,413 @@
+{
+  "label": "dflash-n4-shape-tuned",
+  "started_at": "2026-10-26T16:43:34.646370+00:00",
+  "scope": "Two fixed prompts, 512 output-token cap; greedy, thinking off, fresh salt. Decode TPS = (output_tokens-1)/server generation time. Length-limited outputs are throughput samples, not complete quality answers.",
+  "rows": [
+    {
+      "case": "code",
+      "run": 0,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Implement a complete Python LRU cache using only the standard library. Include capacity validation, get, put, delete, clear, __len__, and thread safety with RLock. Provide type hints, concise docstrings, an explanation of O(1) operations, and unittest cases for eviction, updating existing keys, missing keys, zero capacity, and clearing. Give the full implementation followed by the full tests."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 512,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "1e42627df1a84687a9e5cb3134297963"
+      },
+      "response": {
+        "id": "chatcmpl-bbca14fd539dd2a5",
+        "object": "chat.completion",
+        "created": 1793033014,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```python\n\"\"\"\nLRU Cache Implementation\n\nThis module provides a thread-safe Least Recently Used (LRU) cache with O(1)\ntime complexity for get, put, delete, and clear operations.\n\nO(1) Operations Explanation:\n- We use a doubly linked list to maintain the order of usage. The most recently\n  used item is at the head, and the least recently used is at the tail.\n- A dictionary maps keys to nodes in the linked list for O(1) lookup.\n- get(key): Look up the key in the dictionary (O(1)), then move the corresponding\n  node to the head of the linked list (O(1) with direct node references).\n- put(key, value): If the key exists, update the value and move to head (O(1)).\n  If not, create a new node, add to head, and if capacity is exceeded, remove\n  the tail node (O(1)).\n- delete(key): Look up the key (O(1)), remove the node from the linked list (O(1)),\n  and remove from dictionary (O(1)).\n- clear(): Reset the linked list and clear the dictionary (O(1) amortized or O(n)\n  depending on implementation; here we reset pointers and clear dict).\n\"\"\"\n\nfrom __future__ import annotations\nimport threading\nfrom typing import Any, Optional\n\n\nclass _Node:\n    \"\"\"A node in the doubly linked list.\"\"\"\n\n    __slots__ = (\"key\", \"value\", \"prev\", \"next\")\n\n    def __init__(self, key: Any, value: Any) -> None:\n        self.key = key\n        self.value = value\n        self.prev: Optional[_Node] = None\n        self.next: Optional[_Node] = None\n\n\nclass LRUCache:\n    \"\"\"\n    A thread-safe Least Recently Used (LRU) cache with O(1) operations.\n\n    Attributes:\n        capacity: The maximum number of items the cache can hold.\n    \"\"\"\n\n    def __init__(self, capacity: int) -> None:\n        \"\"\"\n        Initialize the LRU cache with a given capacity.\n\n        Args:\n            capacity: The maximum number of items the cache can hold. Must be >= 0.\n\n        Raises:\n            ValueError: If capacity is negative.\n        \"\"\"\n        if capacity < 0:\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 93,
+          "total_tokens": 605,
+          "completion_tokens": 512,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 851.3237439983641,
+          "generation_time_ms": 19523.083447998943,
+          "queue_time_ms": 0.049392001528758556,
+          "mean_itl_ms": 38.205642755379536,
+          "tokens_per_second": 25.129565497302135,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 20.382812245999958,
+      "decode_tps": 26.174144128466345,
+      "ttft_ms": 851.3237439983641,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 133.0,
+        "vllm:spec_decode_num_draft_tokens_total": 532.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 380.0
+      },
+      "mean_acceptance_length": 3.857142857142857,
+      "draft_acceptance_rate": 0.7142857142857143,
+      "text_sha256": "a9fc8a908a340ea4a21cca3f012e0ea616257617995085c1374ed779f5ba5913",
+      "aggregate_metrics_check": {
+        "input_tokens": 93,
+        "output_tokens": 512,
+        "cached_tokens": 0,
+        "prefill_tps": 109.24163769145233,
+        "decode_tps": 26.174144128466345,
+        "ttft_s": 0.8513237439983641,
+        "total_s": 20.382812245999958,
+        "delivery_tps": 26.214079891941164,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    },
+    {
+      "case": "code",
+      "run": 1,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Implement a complete Python LRU cache using only the standard library. Include capacity validation, get, put, delete, clear, __len__, and thread safety with RLock. Provide type hints, concise docstrings, an explanation of O(1) operations, and unittest cases for eviction, updating existing keys, missing keys, zero capacity, and clearing. Give the full implementation followed by the full tests."
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 512,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "6199cce9f18643b98833956c92757e92"
+      },
+      "response": {
+        "id": "chatcmpl-88b1f07db476ad50",
+        "object": "chat.completion",
+        "created": 1793033035,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "```python\n\"\"\"\nLRU Cache Implementation\n\nThis module provides a thread-safe Least Recently Used (LRU) cache with O(1)\ntime complexity for get, put, delete, and clear operations.\n\nO(1) Operations Explanation:\n- We use a doubly linked list to maintain the order of usage. The most recently\n  used item is at the head, and the least recently used is at the tail.\n- A dictionary maps keys to nodes in the linked list for O(1) lookup.\n- get(key): Look up the key in the dictionary (O(1)), then move the corresponding\n  node to the head of the linked list (O(1) with direct node references).\n- put(key, value): If the key exists, update the value and move to head (O(1)).\n  If not, create a new node, add to head, and if capacity is exceeded, remove\n  the tail node (O(1)).\n- delete(key): Look up the key (O(1)), remove the node from the linked list (O(1)),\n  and remove from dictionary (O(1)).\n- clear(): Reset the linked list and clear the dictionary (O(1) amortized or O(n)\n  depending on implementation; here we reset pointers and clear dict).\n\"\"\"\n\nfrom __future__ import annotations\nimport threading\nfrom typing import Any, Optional\n\n\nclass _Node:\n    \"\"\"A node in the doubly linked list.\"\"\"\n\n    __slots__ = (\"key\", \"value\", \"prev\", \"next\")\n\n    def __init__(self, key: Any, value: Any) -> None:\n        self.key = key\n        self.value = value\n        self.prev: Optional[_Node] = None\n        self.next: Optional[_Node] = None\n\n\nclass LRUCache:\n    \"\"\"\n    A thread-safe Least Recently Used (LRU) cache with O(1) operations.\n\n    Attributes:\n        capacity: The maximum number of items the cache can hold.\n    \"\"\"\n\n    def __init__(self, capacity: int) -> None:\n        \"\"\"\n        Initialize the LRU cache with a given capacity.\n\n        Args:\n            capacity: The maximum number of items the cache can hold. Must be >= 0.\n\n        Raises:\n            ValueError: If capacity is negative.\n        \"\"\"\n        if capacity < 0:\n",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 93,
+          "total_tokens": 605,
+          "completion_tokens": 512,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 775.9524100001727,
+          "generation_time_ms": 19387.518586001534,
+          "queue_time_ms": 0.025700999685795978,
+          "mean_itl_ms": 37.94034948336895,
+          "tokens_per_second": 25.392453516635427,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 20.172167543998512,
+      "decode_tps": 26.357163642848025,
+      "ttft_ms": 775.9524100001727,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 132.0,
+        "vllm:spec_decode_num_draft_tokens_total": 528.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 381.0
+      },
+      "mean_acceptance_length": 3.8863636363636362,
+      "draft_acceptance_rate": 0.7215909090909091,
+      "text_sha256": "a9fc8a908a340ea4a21cca3f012e0ea616257617995085c1374ed779f5ba5913",
+      "aggregate_metrics_check": {
+        "input_tokens": 93,
+        "output_tokens": 512,
+        "cached_tokens": 0,
+        "prefill_tps": 119.85271107023084,
+        "decode_tps": 26.357163642848025,
+        "ttft_s": 0.7759524100001727,
+        "total_s": 20.172167543998512,
+        "delivery_tps": 26.396902512312785,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    },
+    {
+      "case": "zh_explanation",
+      "run": 0,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "请详细解释大语言模型的投机解码：先分别说明主模型、草稿模型、prefill、decode 的作用，然后用具体的候选 token 序列演示一次全部接受、一次中途拒绝及回退。再分析接受率、验证成本、草稿成本与实际吞吐的关系，列出计算每轮平均提交 token 数和 decode token/s 的公式。最后给出一个适用于本地单用户编程助手的完整测量方案，并说明如何避免前缀缓存和首轮编译污染测速。请逐项解释，不要只列提纲。"
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 512,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "ec267d8913a14ef1957d317e3cfec55c"
+      },
+      "response": {
+        "id": "chatcmpl-9474cbe828e0b39b",
+        "object": "chat.completion",
+        "created": 1793033055,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "投机解码（Speculative Decoding, SD）是一种旨在加速大语言模型（LLM）推理过程的优化技术。其核心思想是利用一个较小、较快的“草稿模型”来预测后续的几个 token，然后由较大的“主模型”一次性并行验证这些预测。如果预测正确，则直接接受，从而将原本需要串行执行的多次主模型前向传播减少为一次。\n\n以下是对您提出的各个部分的详细解释。\n\n### 1. 核心组件与作用\n\n在投机解码中，主要涉及两个模型和两个阶段：\n\n*   **主模型（Target Model）**：\n    *   **作用**：这是最终生成高质量文本的模型（如 Llama-3-70B）。它拥有最高的准确性，但计算成本高、速度慢。\n    *   **在 SD 中的角色**：负责“验证”。它接收草稿模型生成的候选序列，并行计算这些候选 token 的概率分布，以判断草稿模型的预测是否正确。\n\n*   **草稿模型（Draft Model）**：\n    *   **作用**：这是一个较小、较快的模型（如 Llama-3-8B 或经过蒸馏的小模型）。它的生成速度远快于主模型，但准确性较低。\n    *   **在 SD 中的角色**：负责“预测”。它根据当前上下文，快速生成一个长度为 $K$ 的候选 token 序列（称为“草稿序列”）。\n\n*   **Prefill（预填充阶段）**：\n    *   **作用**：处理用户输入的提示词（Prompt）。模型需要计算整个提示词的隐藏状态（Hidden States），为后续的生成做准备。\n    *   **在 SD 中的角色**：通常，Prefill 阶段由主模型单独完成，因为此时没有历史生成 token 可供草稿模型参考。SD 的加速效果主要体现在后续的 Decode 阶段。\n\n*   **Decode（解码阶段）**：\n    *   **作用**：逐个生成新的 token。在传统自回归解码中，每生成一个 token 都需要一次完整的主模型前向传播。\n    *   **在 SD 中的角色**：这是 SD 发挥作用的阶段。草稿模型生成 $K$ 个候选 token，主模型并行验证这 $K$ 个 token。如果全部正确，则一次性输出 $K$ 个 token；如果部分错误，则接受正确的部分，拒绝错误的部分，并从拒绝点开始重新生成。\n\n### 2",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 122,
+          "total_tokens": 634,
+          "completion_tokens": 512,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 821.2108230000013,
+          "generation_time_ms": 30780.092130000412,
+          "queue_time_ms": 0.012300999514991418,
+          "mean_itl_ms": 60.23501395303407,
+          "tokens_per_second": 16.20186359915225,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 31.633528041002137,
+      "decode_tps": 16.601639717054127,
+      "ttft_ms": 821.2108230000013,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 209.0,
+        "vllm:spec_decode_num_draft_tokens_total": 836.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 305.0
+      },
+      "mean_acceptance_length": 2.4593301435406696,
+      "draft_acceptance_rate": 0.36483253588516745,
+      "text_sha256": "e011dda204423f0f3432d1dcfe5c2ea861a29a0ce5eec3d987bf174f710a7f95",
+      "aggregate_metrics_check": {
+        "input_tokens": 122,
+        "output_tokens": 512,
+        "cached_tokens": 0,
+        "prefill_tps": 148.56112046151128,
+        "decode_tps": 16.601639717054127,
+        "ttft_s": 0.8212108230000013,
+        "total_s": 31.633528041002137,
+        "delivery_tps": 16.616731431703663,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    },
+    {
+      "case": "zh_explanation",
+      "run": 1,
+      "request": {
+        "model": "Qwen3.6-27B-AWQ4",
+        "messages": [
+          {
+            "role": "user",
+            "content": "请详细解释大语言模型的投机解码：先分别说明主模型、草稿模型、prefill、decode 的作用，然后用具体的候选 token 序列演示一次全部接受、一次中途拒绝及回退。再分析接受率、验证成本、草稿成本与实际吞吐的关系，列出计算每轮平均提交 token 数和 decode token/s 的公式。最后给出一个适用于本地单用户编程助手的完整测量方案，并说明如何避免前缀缓存和首轮编译污染测速。请逐项解释，不要只列提纲。"
+          }
+        ],
+        "temperature": 0,
+        "max_tokens": 512,
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        },
+        "cache_salt": "d6b45eb0a4a64504b8caa3772713f2cb"
+      },
+      "response": {
+        "id": "chatcmpl-bbf04b5f3e92add5",
+        "object": "chat.completion",
+        "created": 1793033087,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "投机解码（Speculative Decoding, SD）是一种旨在加速大语言模型（LLM）推理过程的优化技术。其核心思想是利用一个较小、较快的“草稿模型”来预测后续的几个 token，然后由较大的“主模型”一次性并行验证这些预测。如果预测正确，则直接接受，从而将原本需要串行执行的多次主模型前向传播减少为一次。\n\n以下是对您提出的各个部分的详细解释。\n\n### 1. 核心组件与作用\n\n在投机解码中，主要涉及两个模型和两个阶段：\n\n*   **主模型（Target Model）**：\n    *   **作用**：这是最终生成高质量文本的模型（如 Llama-3-70B）。它拥有最高的准确性，但计算成本高、速度慢。\n    *   **在 SD 中的角色**：负责“验证”。它接收草稿模型生成的候选序列，并行计算这些候选 token 的概率分布，以判断草稿模型的预测是否正确。\n\n*   **草稿模型（Draft Model）**：\n    *   **作用**：这是一个较小、较快的模型（如 Llama-3-8B 或经过蒸馏的小模型）。它的生成速度远快于主模型，但准确性较低。\n    *   **在 SD 中的角色**：负责“预测”。它根据当前上下文，快速生成一个长度为 $K$ 的候选 token 序列（称为“草稿序列”）。\n\n*   **Prefill（预填充阶段）**：\n    *   **作用**：处理用户输入的提示词（Prompt）。模型需要计算整个提示词的隐藏状态（Hidden States），为后续的生成做准备。\n    *   **在 SD 中的角色**：通常，Prefill 阶段由主模型单独完成，因为此时没有历史生成 token 可供草稿模型参考。SD 的加速效果主要体现在后续的 Decode 阶段。\n\n*   **Decode（解码阶段）**：\n    *   **作用**：逐个生成新的 token。在传统自回归解码中，每生成一个 token 都需要一次完整的主模型前向传播。\n    *   **在 SD 中的角色**：这是 SD 发挥作用的阶段。草稿模型生成 $K$ 个候选 token，主模型并行验证这 $K$ 个 token。如果全部正确，则一次性输出 $K$ 个 token；如果部分错误，则接受正确的部分，拒绝错误的部分，并重新采样。\n\n### 2. 具体",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 122,
+          "total_tokens": 634,
+          "completion_tokens": 512,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 796.6416880008182,
+          "generation_time_ms": 30342.08409799976,
+          "queue_time_ms": 0.02216099892393686,
+          "mean_itl_ms": 59.37785537769033,
+          "tokens_per_second": 16.442548212110406,
+          "speculative_decoding": null
+        }
+      },
+      "wall_s": 31.14563873299994,
+      "decode_tps": 16.84129535563731,
+      "ttft_ms": 796.6416880008182,
+      "spec_counters_delta": {
+        "vllm:spec_decode_num_drafts_total": 206.0,
+        "vllm:spec_decode_num_draft_tokens_total": 824.0,
+        "vllm:spec_decode_num_accepted_tokens_total": 305.0
+      },
+      "mean_acceptance_length": 2.4805825242718447,
+      "draft_acceptance_rate": 0.37014563106796117,
+      "text_sha256": "613d20866f2fbcce6832e70e9f725983be4acd40af4fb052b1c4d87156625546",
+      "aggregate_metrics_check": {
+        "input_tokens": 122,
+        "output_tokens": 512,
+        "cached_tokens": 0,
+        "prefill_tps": 153.14287695156958,
+        "decode_tps": 16.84129535563731,
+        "ttft_s": 0.7966416880008182,
+        "total_s": 31.14563873299994,
+        "delivery_tps": 16.870409234309996,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      }
+    }
+  ],
+  "summary": {
+    "code": {
+      "runs": 2,
+      "median_decode_tps": 26.265653885657187,
+      "output_tokens": [
+        512,
+        512
+      ]
+    },
+    "zh_explanation": {
+      "runs": 2,
+      "median_decode_tps": 16.72146753634572,
+      "output_tokens": [
+        512,
+        512
+      ]
+    }
+  }
+}

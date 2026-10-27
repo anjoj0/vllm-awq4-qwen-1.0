@@ -1,0 +1,55 @@
+{
+  "checked_at": "2026-10-27T01:17:41.940063+00:00",
+  "image": "vllm-awq4-qwen:optimized-v0320",
+  "image_id": "sha256:3160d4bc02acaf95c22ddf192241a462e790eae061fe45f4b1c4d3e7e38ef4d9",
+  "backend": "dflash",
+  "spec_tokens": 4,
+  "input_tokens": 2048,
+  "cached_tokens_all_requests": 0,
+  "sampling": {
+    "temperature": 0,
+    "thinking": false
+  },
+  "prefill": {
+    "output_tokens": 8,
+    "tokens_per_second": [
+      263.6439352252109,
+      290.09008316220326
+    ],
+    "client_ttft_s": [
+      7.77238755000144,
+      7.064404668999487
+    ],
+    "reported_steady_tokens_per_second": 290.09008316220326,
+    "output_hashes_equal": true,
+    "evidence": "prefill-final-v6-2048.json"
+  },
+  "decode": {
+    "case": "code",
+    "output_tokens": 256,
+    "tokens_per_second": [
+      23.316109898501892,
+      23.903040785209484
+    ],
+    "median_tokens_per_second": 23.609575341855688,
+    "ttft_s": [
+      7.5213971990015125,
+      7.115849734000221
+    ],
+    "mean_acceptance_length": [
+      3.5205479452054793,
+      3.5205479452054793
+    ],
+    "draft_acceptance_rate": [
+      0.6301369863013698,
+      0.6301369863013698
+    ],
+    "wall_s": [
+      18.465789278998272,
+      17.79251272900001
+    ],
+    "output_hashes_equal": true,
+    "evidence": "decode-long-dflash-final-v6-2k.json"
+  },
+  "scope": "Two requests per measurement. Prefill uses fixed synthetic raw token IDs and reports the second call; decode uses a padded LRU coding chat and reports the median of (output_tokens-1)/server generation time. Separate prompts; not a full quality benchmark."
+}

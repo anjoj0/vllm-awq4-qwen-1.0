@@ -1,0 +1,141 @@
+{
+  "checked_at": "2026-10-26T15:34:01.967654+00:00",
+  "cache": "/home/amd/hf-cache",
+  "gpu_inference_verified": false,
+  "models": {
+    "target-only": {
+      "model_id": "cyankiwi/Qwen3.6-27B-AWQ-INT4",
+      "revision": "46d3c4aca0cfa475e99283abe9fb1254df1eef03",
+      "snapshot": "/home/amd/hf-cache/hub/models--cyankiwi--Qwen3.6-27B-AWQ-INT4/snapshots/46d3c4aca0cfa475e99283abe9fb1254df1eef03",
+      "container_path": "/models/hub/models--cyankiwi--Qwen3.6-27B-AWQ-INT4/snapshots/46d3c4aca0cfa475e99283abe9fb1254df1eef03",
+      "architectures": [
+        "Qwen3_5ForConditionalGeneration"
+      ],
+      "dtype": "float16",
+      "hidden_size": 5120,
+      "vocab_size": 248320,
+      "num_hidden_layers": 64,
+      "layer_types": [
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention",
+        "linear_attention",
+        "linear_attention",
+        "linear_attention",
+        "full_attention"
+      ],
+      "shards": [
+        {
+          "name": "model-00001-of-00004.safetensors",
+          "bytes": 5350050984,
+          "tensors": 744
+        },
+        {
+          "name": "model-00002-of-00004.safetensors",
+          "bytes": 5341886624,
+          "tensors": 338
+        },
+        {
+          "name": "model-00003-of-00004.safetensors",
+          "bytes": 4394614824,
+          "tensors": 119
+        },
+        {
+          "name": "model-00004-of-00004.safetensors",
+          "bytes": 5357436848,
+          "tensors": 1219
+        }
+      ],
+      "weight_GiB": 19.04,
+      "structural_check": "passed",
+      "payload_checksums_verified": false
+    },
+    "dflash2": {
+      "model_id": "vvsotnikov/Qwen3.6-27B-nothink-DFlash2-v0.1",
+      "revision": "a233ec768abb2ed9a2a97a294b5808d0ad10932e",
+      "snapshot": "/home/amd/hf-cache/hub/models--vvsotnikov--Qwen3.6-27B-nothink-DFlash2-v0.1/snapshots/a233ec768abb2ed9a2a97a294b5808d0ad10932e",
+      "container_path": "/models/hub/models--vvsotnikov--Qwen3.6-27B-nothink-DFlash2-v0.1/snapshots/a233ec768abb2ed9a2a97a294b5808d0ad10932e",
+      "architectures": [
+        "DFlash2DraftModel"
+      ],
+      "dtype": "bfloat16",
+      "hidden_size": 5120,
+      "vocab_size": 248320,
+      "num_hidden_layers": 5,
+      "layer_types": [
+        "sliding_attention",
+        "sliding_attention",
+        "sliding_attention",
+        "sliding_attention",
+        "sliding_attention"
+      ],
+      "shards": [
+        {
+          "name": "model.safetensors",
+          "bytes": 3848817920,
+          "tensors": 81
+        }
+      ],
+      "weight_GiB": 3.584,
+      "structural_check": "passed",
+      "payload_checksums_verified": false
+    }
+  }
+}

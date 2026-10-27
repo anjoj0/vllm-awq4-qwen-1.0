@@ -1,0 +1,25 @@
+{
+  "checks": [
+    {
+      "case": "code",
+      "run": 0,
+      "exact_target_text": true
+    },
+    {
+      "case": "code",
+      "run": 1,
+      "exact_target_text": true
+    },
+    {
+      "case": "zh_explanation",
+      "run": 0,
+      "exact_target_text": true
+    },
+    {
+      "case": "zh_explanation",
+      "run": 1,
+      "exact_target_text": false
+    }
+  ],
+  "note": "One later Chinese wording divergence; not yet assigned to numerical rounding vs state. No blanket exactness claim."
+}

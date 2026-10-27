@@ -8,7 +8,7 @@
 
 [v0.32.0 GPU 安装说明](https://docs.vllm.ai/en/v0.32.0/getting_started/installation/gpu/)列出 gfx1151，并推荐官方 ROCm 镜像。发布说明中 ROCm 默认启用 Model Runner V2；固定标签源码已包含 DFlash、DSpark、RDNA W4A16 和非因果 Triton attention。它们是选用该版本的依据，不能替代这台笔记本的验收。
 
-本次已完成发布版本核查、启动参数单元检查、Compose 配置静态检查、可选 MMQ 注册在固定版本源码上的语法与重复执行检查。**本地操作环境为 Windows，没有 Docker Engine 或这台雷神的 GPU，因此尚未完成镜像构建和整机推理实测。** 原有 28.3 token/s 属于旧环境历史结果，不作为新默认构建的性能保证。
+最初的迁移准备在 Windows 上只完成静态检查。2026-10-26 已在这台 Linux/gfx1151 机器构建上游与项目 MMQ 镜像，完成 target-only、DFlash、DSpark full/49k、DFlash2 的接口验收，并接通真实展示页。实际版本、固定权重、本机性能与验收边界见 [本地部署记录](STRIX_HALO_LOCAL_DEPLOYMENT.md)。原有 28.3 token/s 属于旧环境历史结果，不作为新默认构建的性能保证。
 
 ## 新旧构建
 
@@ -16,7 +16,7 @@
 - 回退：`Dockerfile.legacy-v020`、`docker-compose.legacy-v020.yml`、`.env.legacy-v020.template`，保留旧版 TheRock SDK 与 v0.20.0 补丁构建。
 - 新默认不执行旧 `patch_strix.py`，也不在新镜像上重新安装旧版 Torch/Triton wheel。
 - 历史 `VLLM_COMMIT` 仅供 legacy 构建使用；新默认通过 `VLLM_UPSTREAM_IMAGE` 选择基础镜像。
-- 新版默认使用上游 RDNA 算子，项目 HIP MMQ 为单独的构建开关。版本升级收益与算子收益应分别比较。
+- 新版复用上游 RDNA 算术，并提供经过本机验证的 Qwen27B 投影布局、prefill tile/rocBLAS 和 attention 启动参数适配。各开关与最新实测见本地部署记录；项目旧 HIP MMQ 仍为单独的构建开关。
 
 ## 雷神上首次部署
 
@@ -41,7 +41,7 @@ docker compose up -d --force-recreate
 docker compose logs -f --tail=100 vllm
 ```
 
-初始模板使用单流、32K、BF16/auto KV、eager 和默认 DFlash。验收后再扩大上下文或启用 FP8 KV。宿主机的 TTM/GTT、`/dev/shm` 与模型 KV 预算仍需分别按实际检测结果处理。
+模板使用单流、32K、FP16 target/auto KV、eager 和 DFlash N4。DFlash2 的本机 profile 单独使用 BF16，避免已确认的 FP16 grouped-conv 溢出。宿主机的 TTM/GTT、`/dev/shm` 与模型 KV 预算仍需按实际检测结果处理。
 
 本项目不再写死 `127.0.0.1:7890` 构建代理；需要时设置对应代理环境变量。镜像拉取经过 Docker daemon，其代理配置需单独生效。
 
@@ -65,15 +65,19 @@ curl -fsS http://127.0.0.1:8000/v1/chat/completions \
 ```dotenv
 VLLM_SPEC_METHOD=dflash
 VLLM_DRAFT_MODEL_ID=z-lab/Qwen3.6-27B-DFlash
-VLLM_SPEC_TOKENS=8
+VLLM_SPEC_TOKENS=4
 ```
+
+本机 v0.32 固定长输出对照选择 N=4；旧 v0.20 的 N=8 结论不直接移植为新版最优值。详见 [本地实测](STRIX_HALO_LOCAL_DEPLOYMENT.md)。
 
 ### DSpark 完整词表
 
 ```dotenv
 VLLM_SPEC_METHOD=dspark
 VLLM_DRAFT_MODEL_ID=abstract-extraordinary/Qwen3.6-27B-DSpark
-VLLM_SPEC_TOKENS=8
+VLLM_SPEC_TOKENS=4
+VLLM_BLOCK_SIZE=64
+VLLM_DSPARK_DRAFT_TOPK=128
 ```
 
 49k 对照只更换草稿 ID：
@@ -86,7 +90,17 @@ VLLM_DRAFT_MODEL_ID=abstract-extraordinary/Qwen3.6-27B-DSpark-49k
 
 ## 可选项目 HIP MMQ
 
-上游路径验收后，在 `.env` 设置 `VLLM_ENABLE_PROJECT_MMQ=1`，重新构建：
+本机旧 MMQ 已慢于选定配置，以下只作为研究入口。需要使用独立镜像标签，并关闭本轮目标算子适配，避免与 down dispatcher 冲突。在单独的 `.env` 副本设置后再构建：
+
+```dotenv
+VLLM_IMAGE=vllm-awq4-qwen:mmq-v0320
+VLLM_ENABLE_PROJECT_MMQ=1
+VLLM_QWEN27B_PREFILL_TILES=0
+VLLM_QWEN27B_PREFILL_ROCBLAS=0
+VLLM_QWEN27B_DOWN_KMAJOR=0
+VLLM_QWEN27B_PREFILL_ATTN=0
+VLLM_QWEN27B_VERIFY_ATTN=0
+```
 
 ```bash
 docker compose build
@@ -97,7 +111,7 @@ docker compose run --rm --no-deps \
 docker compose up -d --force-recreate
 ```
 
-镜像会使用自己的 PyTorch/HIP 编译项目扩展，注册脚本限定 v0.32.0。适配器兼容 v0.20 四元组和 v0.32 三元组权重接口，并处理新版缺少 `has_g_idx` 字段的情况。这里没有改变 HIP 数值内核；数值测试、实际路由与端到端收益仍需在机器上检查。双权重布局带来的额外占用也仍存在。
+镜像会使用自己的 PyTorch/HIP 编译项目扩展，注册脚本限定 v0.32.0。适配器兼容 v0.20 四元组和 v0.32 三元组权重接口，并处理新版缺少 `has_g_idx` 字段的情况。这里没有改变 HIP 数值内核。2026-10-26 已完成 gfx1151 编译、两项数值检查及整模型实际路由验证；本次 4K prefill 上游 RDNA hybrid 快于旧 HIP v1，所以没有把 MMQ 设为默认，详见本地记录。双权重布局带来的额外占用也仍存在。
 
 ## 回退入口
 

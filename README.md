@@ -82,7 +82,7 @@ W7900 的 KV cache 不再能依赖 UMA 容量。系统联合选择 TP、`gpu_mem
 ├── csrc/                         # Strix Halo gfx1151 HIP 算子
 ├── scripts/                      # Strix Halo 容器与服务脚本
 ├── test/                         # API、性能、正确性和精度测评
-├── expo_assistant/               # 本地编程问答展示页与阶段测速
+├── expo_assistant/               # 多模态 Agent 工作台、项目工具、搜索/天气与阶段测速
 ├── w7900_optimization/
 │   ├── patch_w7900.py            # vLLM 回移与 gfx1100 参数化补丁
 │   ├── adaptive_dflash_router.py  # 双 TP=4 上下文感知路由
@@ -105,7 +105,13 @@ DSpark / DFlash2 的候选权重、运行时兼容性、双后端设计与 AMD �
 
 ### Strix Halo
 
-默认构建已固定为官方 `vllm/vllm-openai-rocm:v0.32.0`，使用其配套依赖；新参数、DSpark 切换、可选项目 HIP MMQ 和回退入口见 [v0.32.0 迁移与验收](docs/STRIX_HALO_VLLM_0320_MIGRATION.md)。新版尚待雷神整机验收，前述 Strix Halo 性能数字来自旧版实测。
+当前这台机器的开机启动、模型验收、工作台启动、停止和排错顺序见 [本机启动指南](启动指南.md)。
+
+默认构建已固定为官方 `vllm/vllm-openai-rocm:v0.32.0`，使用其配套依赖；新参数、DSpark 切换、可选项目 HIP MMQ 和回退入口见 [v0.32.0 迁移与验收](docs/STRIX_HALO_VLLM_0320_MIGRATION.md)。2026-10-26 已完成本机 target-only、DFlash、DSpark full/49k、DFlash2 的接口验收及真实展示页接入；前述 Strix Halo 性能表仍为旧版实测。
+
+本机 `/home/amd/hf-cache` 的权重审计、固定 snapshot 配置、可选 DFlash2、实测选择与启动入口见 [Strix Halo 本地部署说明](docs/STRIX_HALO_LOCAL_DEPLOYMENT.md)。
+
+2026-10-27 的形状适配已将同一 Qwen3.6 AWQ4 的无缓存 4K / 8K prefill 提高到 **372 / 363 token/s**；DFlash N4 的短输入代码 / 中文 decode 达到 **27.5 / 17.4 token/s**，8K 编程请求的 decode 从 **15.8 提高到 22.6 token/s**。这些是最终默认配置的固定请求实测，完整条件与历史对照见 [本轮记录](test/results/strix_halo_20261026/README.md)。DFlash2 的 FP16 溢出已在本机定位，BF16 恢复有限值与接受能力；不能再将此前近零接受率当作算法排名。
 
 ```bash
 cp .env.template .env
@@ -151,16 +157,15 @@ python validate_prefill_numerics_gfx1100.py
 
 启动参数、profile 与测评入口见 [W7900 README](w7900_optimization/README.md)。
 
-### 展会编程问答页
+### 本地 Agent 工作台
 
-模型服务启动后，可以运行 [本地编程助手](expo_assistant/README.md)。页面复用已有推理 API，支持多轮流式回答、代码复制、停止生成，以及 Prefill/Decode、首输出延迟和 token 统计；只需 Python 3.9+，无需额外安装 Python 包或前端依赖。
+模型服务启动后，可以运行 [Qwen 本地工作台](expo_assistant/README.md)。页面复用已有推理 API，支持项目文件读写、图片与文档上传、工具循环、联网搜索、城市天气，以及会话保存与性能统计。左侧有四个带素材和校验点的体验案例。Python 3.11+；依赖安装在独立环境，前端无需构建。
 
 ```bash
-cd expo_assistant
-python3 server.py --upstream http://127.0.0.1:8000 --model Qwen3.6-27B-AWQ4
+bash expo_assistant/run.sh --upstream http://127.0.0.1:8000 --model Qwen3.6-27B-AWQ4
 ```
 
-浏览器打开 `http://127.0.0.1:8088`。阶段速率在每轮结束后更新，需后端提供可归因到本次请求的 `/metrics`；数据缺失或检测到其他请求混入时显示空值。无模型时可用 `python3 server.py --demo` 预览界面，预览不显示虚构的测速数据。已通过本地 mock 接口与浏览器检查，真实展示机仍需验收问答和测速。
+浏览器打开 `http://127.0.0.1:8088`。性能面板的阶段速率对应最后一次模型调用，总耗时包含整个任务；数据缺失或其他请求混入时显示空值。`bash expo_assistant/run.sh --demo` 可预览界面，模拟模式不显示测速。本机真实模型已通过文件读写、图片与文档联合理解、搜索引用与天气工具验收；使用范围与启动说明见工作台文档。
 
 ## 实验复现原则
 
@@ -168,8 +173,8 @@ python3 server.py --upstream http://127.0.0.1:8000 --model Qwen3.6-27B-AWQ4
 
 ## 已知限制
 
-- 当前容器同时存在 `_rocm_sdk_devel` 与 `_rocm_sdk_core` 两套 profiler SDK；真实 vLLM attach 会因 `librocprofiler-sdk.so.1` 路径冲突触发 signal 6。
-- 已验证单进程 PID 分片和 `torchrun` TP=2 worker 的 kernel/RCCL trace，但尚未得到可信的真实请求内 W4A16、attention、RCCL 时间百分比。
+- 旧研究容器存在两套 profiler SDK 的路径冲突；新版本机 Torch profiler 仅获得 CPU/API 事件，rocprof attach 也未成功。此次改用请求内 HIP events 测量目标模块范围，不能将其解读为逐 GPU kernel 的完整归因。
+- W7900 已验证单进程 PID 分片和 `torchrun` TP=2 worker 的 kernel/RCCL trace，其结论与本机单卡模块计时分别记录。
 - standalone kernel 与 RCCL microbenchmark 是解释性辅助数据，不能替代端到端 A/B。
 - gfx1100 结果不应直接外推到 gfx1151；每个平台必须重新编译并重新选择 tile/dispatcher 边界。
 

@@ -1,0 +1,137 @@
+{
+  "scope": "Random real-shape per-layer causal GQA6 attention. HIP event timings, independent FP32 softmax reference; not serving performance. Candidate additionally masks padded query rows to give each output one writer.",
+  "rows": [
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        16,
+        32,
+        null,
+        null
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 0.7531552159998682,
+      "reference_relative_l2": 0.00031310206395573914,
+      "native_relative_l2": 9.029025704876403e-07,
+      "n_regs": 256,
+      "n_spills": 441,
+      "shared_bytes": 32768,
+      "before_native_ms": [
+        108.79181671142578,
+        108.26502227783203,
+        108.21329498291016,
+        108.92839813232422,
+        107.73316955566406
+      ],
+      "candidate_ms": [
+        107.62134552001953,
+        109.2654800415039,
+        107.05557250976562,
+        107.0411148071289,
+        107.53520965576172
+      ],
+      "after_native_ms": [
+        106.03665161132812,
+        106.2543716430664,
+        106.45606994628906,
+        107.19398498535156,
+        107.59857940673828
+      ],
+      "speedup": 1.0012150887682065,
+      "numerics_passed": true
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        16,
+        32,
+        4,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 0.4373532999998133,
+      "reference_relative_l2": 0.00031310206395573914,
+      "native_relative_l2": 5.735805643780623e-07,
+      "n_regs": 256,
+      "n_spills": 21,
+      "shared_bytes": 16384,
+      "before_native_ms": [
+        108.33130645751953,
+        109.16272735595703,
+        109.32267761230469,
+        108.33470153808594,
+        108.7602310180664
+      ],
+      "candidate_ms": [
+        44.85771179199219,
+        44.5828971862793,
+        45.063297271728516,
+        45.339603424072266,
+        46.44644546508789
+      ],
+      "after_native_ms": [
+        108.35773468017578,
+        107.91136169433594,
+        107.35181427001953,
+        112.11688232421875,
+        106.598388671875
+      ],
+      "speedup": 2.404311816239517,
+      "numerics_passed": true
+    },
+    {
+      "M": 1536,
+      "context_tokens": 6656,
+      "query_heads": 24,
+      "kv_heads": 4,
+      "head_dim": 256,
+      "physical_block": 832,
+      "tile": [
+        128,
+        64,
+        8,
+        1
+      ],
+      "native_reference_relative_l2": 0.00031310078338719904,
+      "first_compile_s": 1.0479655600029218,
+      "reference_relative_l2": 0.00031261128606274724,
+      "native_relative_l2": 0.00010590063902782276,
+      "n_regs": 256,
+      "n_spills": 216,
+      "shared_bytes": 65536,
+      "before_native_ms": [
+        108.16014099121094,
+        108.2676010131836,
+        108.70690155029297,
+        108.3662109375,
+        107.8664321899414
+      ],
+      "candidate_ms": [
+        14.84846019744873,
+        14.631980895996094,
+        14.76083755493164,
+        14.868982315063477,
+        14.53858757019043
+      ],
+      "after_native_ms": [
+        107.99455261230469,
+        107.91295623779297,
+        107.26145935058594,
+        106.6548080444336,
+        107.5424575805664
+      ],
+      "speedup": 7.313524996349624,
+      "numerics_passed": true
+    }
+  ]
+}

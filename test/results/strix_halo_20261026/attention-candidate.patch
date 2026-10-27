@@ -1,0 +1,42 @@
+--- v032-triton-unified-attention.py
++++ attention-candidate.py
+@@ -31,6 +31,8 @@
+ from vllm.v1.kv_cache_interface import KVQuantMode
+ 
+ logger = init_logger(__name__)
++_AMD_TEST_CONFIG = (16,32,4,1)
++
+ is_batch_invariant = envs.VLLM_BATCH_INVARIANT
+ float8_info = torch.finfo(current_platform.fp8_dtype())
+ 
+@@ -347,6 +349,7 @@
+ 
+     dim_mask = tl.where(offs_d < HEAD_SIZE, 1, 0).to(tl.int1)
+     query_mask_0 = tl.where(query_pos < cur_batch_query_len, 1, 0).to(tl.int1)
++    query_mask_0 = query_mask_0 & (offs_m < BLOCK_Q * num_queries_per_kv)
+     query_mask_1 = tl.where(query_offset_1 < num_query_heads, 1, 0).to(tl.int1)
+ 
+     # Q : (BLOCK_M, HEAD_SIZE_PADDED)
+@@ -945,11 +948,12 @@
+     BLOCK_M = (
+         16 if num_queries_per_kv <= 16 else triton.next_power_of_2(num_queries_per_kv)
+     )
++    BLOCK_M = _AMD_TEST_CONFIG[0]
+     BLOCK_Q = BLOCK_M // num_queries_per_kv
+ 
+     # Tuned launch parameters; ``None`` lets Triton pick its defaults.
+-    launch_num_warps: int | None = None
+-    launch_num_stages: int | None = None
++    launch_num_warps: int | None = _AMD_TEST_CONFIG[2]
++    launch_num_stages: int | None = _AMD_TEST_CONFIG[3]
+ 
+     # head_size 256 with many query rows per sequence (e.g. diffusion-gemma
+     # bidirectional canvas passes) is prefill-shaped, but the decode-oriented
+@@ -991,6 +995,7 @@
+     TILE_SIZE_PREFILL = _get_tile_size(
+         head_size, sliding_window_val, q.element_size(), is_prefill=True
+     )
++    TILE_SIZE_PREFILL = _AMD_TEST_CONFIG[1]
+     TILE_SIZE_DECODE = _get_tile_size(
+         head_size, sliding_window_val, q.element_size(), is_prefill=False
+     )

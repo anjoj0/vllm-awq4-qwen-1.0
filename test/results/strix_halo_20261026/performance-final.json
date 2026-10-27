@@ -1,0 +1,57 @@
+{
+  "checked_at": "2026-10-26T18:14:36.822408+00:00",
+  "units": "token/s",
+  "decode_scope": "Greedy, thinking off, fresh salt, 2 requests per final case. Short prompts use 512 output tokens; 8K code uses 256.",
+  "prefill_scope": "Fixed 4096/8192 token IDs, 8 output tokens, 2 requests; report second, cached_tokens=0.",
+  "metrics": [
+    {
+      "metric": "prefill_4096",
+      "baseline": 190.697591186537,
+      "final": 372.39433008591,
+      "gain_percent": 95.280038813726,
+      "final_ttft_s": 11.032104621001054,
+      "baseline_evidence": "prefill-dflash-tile-v2-off.json",
+      "final_evidence": "prefill-final-v6-4096.json"
+    },
+    {
+      "metric": "prefill_8192",
+      "baseline": 234.31007762025732,
+      "final": 363.06927910878375,
+      "gain_percent": 54.952481257423536,
+      "final_ttft_s": 22.571049160993425,
+      "baseline_evidence": "prefill-dflash-shape-tuned-8k.json",
+      "final_evidence": "prefill-final-v6-8192.json"
+    },
+    {
+      "metric": "short_decode_code",
+      "baseline": 19.152189067486333,
+      "final": 27.537216329438902,
+      "gain_percent": 43.7810384620074,
+      "baseline_evidence": "decode-long-dflash-n4-block64.json",
+      "final_evidence": "decode-long-dflash-attn-v6.json"
+    },
+    {
+      "metric": "short_decode_zh_explanation",
+      "baseline": 12.095849547253419,
+      "final": 17.42021996388535,
+      "gain_percent": 44.01816007905725,
+      "baseline_evidence": "decode-long-dflash-n4-block64.json",
+      "final_evidence": "decode-long-dflash-attn-v6.json"
+    },
+    {
+      "metric": "8k_decode_code",
+      "baseline": 15.784679780943605,
+      "final": 22.601648372966803,
+      "gain_percent": 43.187246663395285,
+      "baseline_evidence": "decode-long-dflash-attn-v4-8k.json",
+      "final_evidence": "decode-long-dflash-final-v6-8k.json"
+    }
+  ],
+  "prefix_state_check_cached_tokens": [
+    0,
+    2496
+  ],
+  "harness_passed": true,
+  "model_code_tests_passed": 8,
+  "public_research": "See README.md for source links and non-equivalent model/quantization conditions."
+}

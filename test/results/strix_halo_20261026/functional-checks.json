@@ -1,0 +1,386 @@
+[
+  {
+    "file": "smoke-20261026-214355-124976.json",
+    "checked_at": "2026-10-26T13:43:42.323060+00:00",
+    "profile": "target-only",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-214802-494537.json",
+    "checked_at": "2026-10-26T13:44:47.560609+00:00",
+    "profile": "dflash",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-215834-976137.json",
+    "checked_at": "2026-10-26T13:54:47.056524+00:00",
+    "profile": "dflash",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-220448-038799.json",
+    "checked_at": "2026-10-26T14:01:41.250375+00:00",
+    "profile": "dspark",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-221055-684008.json",
+    "checked_at": "2026-10-26T14:07:54.900620+00:00",
+    "profile": "dspark-49k",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-224631-019103.json",
+    "checked_at": "2026-10-26T14:42:58.447957+00:00",
+    "profile": "dflash2",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-225355-940742.json",
+    "checked_at": "2026-10-26T14:50:56.516014+00:00",
+    "profile": "dflash",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-230118-559072.json",
+    "checked_at": "2026-10-26T14:58:30.603918+00:00",
+    "profile": "dspark",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-230816-990947.json",
+    "checked_at": "2026-10-26T15:05:43.301722+00:00",
+    "profile": "target-only",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-231504-048711.json",
+    "checked_at": "2026-10-26T15:12:16.927172+00:00",
+    "profile": "dflash",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-232524-992296.json",
+    "checked_at": "2026-10-26T15:22:25.029212+00:00",
+    "profile": "dflash",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  },
+  {
+    "file": "smoke-20261026-233054-699114.json",
+    "checked_at": "2026-10-26T15:28:06.105270+00:00",
+    "profile": "dflash",
+    "passed": true,
+    "steps": [
+      {
+        "name": "health",
+        "passed": true
+      },
+      {
+        "name": "models",
+        "passed": true
+      },
+      {
+        "name": "chat_arithmetic",
+        "passed": true
+      },
+      {
+        "name": "chat_stream",
+        "passed": true
+      },
+      {
+        "name": "responses_stream",
+        "passed": true
+      },
+      {
+        "name": "tool_call",
+        "passed": true
+      }
+    ]
+  }
+]

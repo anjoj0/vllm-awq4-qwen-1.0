@@ -1,81 +1,400 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f6f5f1">
-  <title>本地编程助手 · AMD</title>
-  <link rel="stylesheet" href="/app.css">
-  <script src="/app.js" defer></script>
-</head>
-<body>
-  <a class="skip-link" href="#prompt">跳到提问</a>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="会话与示例">
-      <a class="brand" href="/" aria-label="本地编程助手首页">
-        <span class="brand-symbol" aria-hidden="true"><span></span></span>
-        <span><strong>LOCAL / CODE</strong><small>AMD 本地编程助手</small></span>
-      </a>
-      <button id="new-chat" class="new-chat" type="button"><span aria-hidden="true">＋</span> 新建对话 <span class="key-hint">NEW</span></button>
-      <section class="examples" aria-labelledby="examples-title">
-        <h2 id="examples-title">从一个问题开始</h2>
-        <button class="example" type="button" data-example="explain"><span class="example-number">01</span><span><strong>读懂一段代码</strong><small>解释逻辑、复杂度与边界条件</small></span><span class="example-arrow" aria-hidden="true">↗</span></button>
-        <button class="example" type="button" data-example="debug"><span class="example-number">02</span><span><strong>定位一个错误</strong><small>从报错到可验证的修复</small></span><span class="example-arrow" aria-hidden="true">↗</span></button>
-        <button class="example" type="button" data-example="write"><span class="example-number">03</span><span><strong>把想法写成代码</strong><small>给出实现与小型测试用例</small></span><span class="example-arrow" aria-hidden="true">↗</span></button>
-      </section>
-      <div class="sidebar-bottom">
-        <div class="local-note"><span class="local-mark" aria-hidden="true"></span><span>提问与回答，发生在这里。<small id="upstream-display">连接本地推理服务</small></span></div>
-        <button id="export-chat" class="export-button" type="button" disabled><span aria-hidden="true">↓</span> 导出本会话 <span class="export-format">.md</span></button>
-        <div class="sidebar-footer"><span>POWERED BY AMD</span><span>ROCm / vLLM</span></div>
-      </div>
-    </aside>
-    <main class="workspace">
-      <header class="topbar">
-        <div class="page-heading"><span class="eyebrow">ON-DEVICE INTELLIGENCE</span><h1>本地编程助手<span class="title-dot" aria-hidden="true">.</span></h1></div>
-        <button id="connection" class="connection" type="button" title="重新检查模型服务连接"><span id="connection-dot" class="status-dot" aria-hidden="true"></span><span id="connection-text">正在连接</span><span class="refresh-symbol" aria-hidden="true">↻</span></button>
-      </header>
-      <div id="preview-banner" class="preview-banner" role="status" hidden><strong>界面预览 · 模拟文本</strong><span>当前内容不来自真实模型推理，不展示性能数字。</span></div>
-      <section class="telemetry" aria-label="最近一次请求的实测性能">
-        <div class="telemetry-heading"><span class="telemetry-mark" aria-hidden="true"></span><span id="telemetry-label">本次推理</span><span id="telemetry-state">等待提问</span></div>
-        <div class="metric-grid">
-          <div class="metric"><span class="metric-name">Prefill</span><div><strong id="metric-prefill">—</strong><span class="metric-unit">tok/s</span></div></div>
-          <div class="metric"><span class="metric-name">Decode</span><div><strong id="metric-decode">—</strong><span class="metric-unit">tok/s</span></div></div>
-          <div class="metric"><span class="metric-name">首字延迟</span><div><strong id="metric-ttft">—</strong><span class="metric-unit">s</span></div></div>
-          <div class="metric"><span class="metric-name">总耗时</span><div><strong id="metric-total">—</strong><span class="metric-unit">s</span></div></div>
-          <div class="metric metric-tokens"><span class="metric-name">输入 / 输出</span><div><strong id="metric-input">—</strong><span class="token-divider">/</span><strong id="metric-output">—</strong><span class="metric-unit">tokens</span></div></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f8f9fc" />
+    <title>本地编程助手 · AMD</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#prompt">跳到输入</a>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="工作区与会话">
+        <a class="brand" href="/" aria-label="本地编程助手首页">
+          <span class="brand-symbol" aria-hidden="true"><span></span></span>
+          <span
+            ><strong>LOCAL / CODE</strong><small>AMD 本地编程助手</small></span
+          >
+        </a>
+        <button id="new-chat" class="new-chat" type="button">
+          <span>＋</span> 新对话 <span class="key-hint">⌘ K</span>
+        </button>
+        <div class="side-heading">
+          <span>体验新能力</span><span class="subtle-dot"></span>
         </div>
-        <p id="metric-note" class="metric-note">Prefill 与 Decode 在请求结束后更新；无独立可靠统计时显示 —。</p>
-      </section>
-      <div class="model-line"><span class="model-diamond" aria-hidden="true"></span><span id="model-name">Qwen3.6-27B</span><span class="model-separator" aria-hidden="true"></span><span id="model-subtitle">本地模型 · 流式回答</span></div>
-      <div id="chat-scroll" class="chat-scroll" tabindex="0" aria-label="对话记录">
-        <section id="empty-state" class="empty-state">
-          <div class="empty-monogram" aria-hidden="true"><span></span></div>
-          <p class="empty-eyebrow">YOUR IDEAS, INTO CODE.</p>
-          <h2>好代码，<br>从一个好问题开始。</h2>
-          <p class="empty-description">解释逻辑、排查错误，或实现一个小想法。<br>描述你的目标，也可以直接粘贴代码。</p>
-          <div class="empty-tags" aria-label="可提问的编程主题"><span>Python</span><span>C / C++</span><span>算法与调试</span></div>
-        </section>
-        <div id="messages" class="messages"></div>
-      </div>
-      <div id="notice" class="notice" role="status" hidden></div>
-      <section class="composer-area" aria-label="输入问题">
-        <form id="chat-form" class="composer">
-          <label for="prompt" class="sr-only">编程问题或代码</label>
-          <textarea id="prompt" rows="2" maxlength="60000" placeholder="描述问题，或粘贴一段代码…" autocomplete="off" spellcheck="false"></textarea>
-          <div class="composer-toolbar">
-            <div class="composer-options">
-              <label class="thinking-option"><input id="thinking" type="checkbox"><span class="switch" aria-hidden="true"></span><span>思考模式</span></label>
-              <label class="length-option"><span>输出上限</span><select id="max-tokens" aria-label="最大输出 token 数"><option value="512">512 tokens</option><option value="768" selected>768 tokens</option><option value="1024">1,024 tokens</option><option value="2048">2,048 tokens</option></select></label>
+        <div class="example-list" aria-label="一键载入测试案例">
+          <button class="example-button" data-case="project" type="button">
+            <span class="case-icon blue">⌘</span
+            ><span
+              ><strong>项目文件读写</strong
+              ><small>读取、生成，再修改一份清单</small></span
+            ><span class="case-arrow">↗</span>
+          </button>
+          <button class="example-button" data-case="multimodal" type="button">
+            <span class="case-icon violet">▧</span
+            ><span
+              ><strong>图片与文档理解</strong
+              ><small>看懂图表，核对文档目标</small></span
+            ><span class="case-arrow">↗</span>
+          </button>
+          <button class="example-button" data-case="search" type="button">
+            <span class="case-icon green">◎</span
+            ><span
+              ><strong>联网搜索与引用</strong
+              ><small>查询资料，打开原文找依据</small></span
+            ><span class="case-arrow">↗</span>
+          </button>
+          <button class="example-button" data-case="weather" type="button">
+            <span class="case-icon amber">☀</span
+            ><span
+              ><strong>城市天气查询</strong
+              ><small>当前天气与未来几天预报</small></span
+            ><span class="case-arrow">↗</span>
+          </button>
+        </div>
+        <div class="side-heading">
+          <span>最近对话</span><span class="subtle-dot"></span>
+        </div>
+        <nav id="session-list" class="session-list" aria-label="最近对话">
+          <p class="muted small">你的思路，从这里继续</p>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="device-card">
+            <span class="device-symbol">▣</span>
+            <div>
+              <strong>在你的设备上运行</strong
+              ><small id="model-subtitle">Strix Halo · AMD ROCm</small>
             </div>
-            <div class="composer-actions">
-              <button id="stop" class="stop-button" type="button" hidden><span aria-hidden="true">■</span> 停止</button>
-              <button id="send" class="send-button" type="submit" disabled aria-label="发送问题"><span>发送</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <span class="online-light"></span>
+          </div>
+          <div class="side-footer">
+            <span>本地保存 · 由你掌控</span
+            ><button
+              id="export-chat"
+              class="icon-button"
+              title="导出当前会话"
+              aria-label="导出当前会话"
+              type="button"
+            >
+              ↓
+            </button>
+          </div>
+        </div>
+      </aside>
+      <main class="workspace">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button
+              id="menu-toggle"
+              class="icon-button mobile-menu"
+              aria-label="展开侧栏"
+              type="button"
+            >
+              ☰</button
+            ><span class="header-title">工作空间</span
+            ><span class="header-slash">/</span
+            ><span id="conversation-title">新对话</span>
+          </div>
+          <div class="topbar-actions">
+            <button
+              id="metrics-toggle"
+              class="quiet-button"
+              type="button"
+              aria-expanded="false"
+            >
+              ▥ <span>性能</span></button
+            ><button id="connection" class="connection" type="button">
+              <span class="status-dot"></span
+              ><span id="connection-text">连接中</span>
+            </button>
+          </div>
+        </header>
+        <div id="preview-banner" class="preview-banner" role="status" hidden>
+          界面预览 · 使用模拟文本，不提供真实测速
+        </div>
+        <section
+          class="telemetry"
+          id="telemetry"
+          hidden
+          aria-label="最后一次模型调用的性能"
+        >
+          <div class="telemetry-heading">
+            <span>最后一次模型调用</span
+            ><span id="telemetry-state">等待任务</span>
+          </div>
+          <div class="metric-grid">
+            <div>
+              <span class="metric-name">Prefill</span
+              ><strong id="metric-prefill">—</strong><small>tok/s</small>
+            </div>
+            <div>
+              <span class="metric-name">Decode</span
+              ><strong id="metric-decode">—</strong><small>tok/s</small>
+            </div>
+            <div>
+              <span class="metric-name">首输出</span
+              ><strong id="metric-ttft">—</strong><small>s</small>
+            </div>
+            <div>
+              <span class="metric-name">任务耗时</span
+              ><strong id="metric-total">—</strong><small>s</small>
+            </div>
+            <div>
+              <span class="metric-name">输入 / 输出</span
+              ><strong id="metric-input">—</strong><small>/</small
+              ><strong id="metric-output">—</strong>
             </div>
           </div>
-        </form>
-        <div class="composer-caption"><span>Enter 发送 <span class="caption-dot">·</span> Shift + Enter 换行</span><span>模型输出请结合实际代码验证</span></div>
-      </section>
-    </main>
-  </div>
-</body>
+          <p id="metric-note">单次模型调用结束后显示实测速率，工具耗时另计。</p>
+        </section>
+        <div
+          id="chat-scroll"
+          class="chat-scroll"
+          tabindex="0"
+          aria-label="对话记录"
+        >
+          <section id="empty-state" class="empty-state">
+            <div class="hero-mark" aria-hidden="true">✦</div>
+            <p class="eyebrow">你的模型，你的工作空间</p>
+            <h1>把想法，变成进展。</h1>
+            <p class="hero-description">
+              读懂项目，理解图片，探索新的答案。<br />与本地 Qwen
+              一起，完成下一件事。
+            </p>
+            <div class="suggestions">
+              <button class="suggestion" data-example="project" type="button">
+                <span class="suggestion-icon blue">⌘</span
+                ><strong>一起读懂项目</strong
+                ><span>浏览文件，梳理结构与实现</span
+                ><span class="suggestion-arrow">↗</span>
+              </button>
+              <button class="suggestion" data-example="search" type="button">
+                <span class="suggestion-icon green">◎</span
+                ><strong>找一份可靠资料</strong
+                ><span>搜索网页，用来源支持答案</span
+                ><span class="suggestion-arrow">↗</span>
+              </button>
+              <button class="suggestion" data-example="upload" type="button">
+                <span class="suggestion-icon violet">▧</span
+                ><strong>让文件开口说话</strong
+                ><span>上传图片、PDF 或项目文档</span
+                ><span class="suggestion-arrow">↗</span>
+              </button>
+            </div>
+            <div class="hero-footnote">
+              <span class="online-light"></span
+              ><span id="model-name">Qwen3.6-27B-AWQ4</span><span>·</span
+              ><span>多模态本地推理</span>
+            </div>
+          </section>
+          <div
+            id="messages"
+            class="messages"
+            aria-live="polite"
+            aria-relevant="additions"
+          ></div>
+        </div>
+        <div class="composer-area">
+          <div id="notice" class="notice" role="status" hidden></div>
+          <details id="case-guide" class="case-guide" hidden>
+            <summary>案例校验点与后续任务</summary>
+            <p id="case-check"></p>
+            <button id="case-followup" class="quiet-button" type="button">
+              填入后续任务 →
+            </button>
+          </details>
+          <div
+            id="attachment-tray"
+            class="attachment-tray"
+            aria-label="待发送附件"
+          ></div>
+          <form id="chat-form" class="composer">
+            <label class="sr-only" for="prompt">任务或问题</label>
+            <textarea
+              id="prompt"
+              rows="2"
+              maxlength="16000"
+              placeholder="有什么想一起完成的？也可以拖入文件或图片…"
+              autocomplete="off"
+              spellcheck="false"
+            ></textarea>
+            <div class="composer-toolbar">
+              <div class="composer-left">
+                <button
+                  id="attach"
+                  class="attach-button"
+                  type="button"
+                  aria-label="上传文件或图片"
+                  title="上传文件或图片"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="m9 12 5.5-5.5a3 3 0 0 1 4.25 4.25l-8.5 8.5a5 5 0 0 1-7.07-7.07L12 3.4"
+                      stroke="currentColor"
+                      stroke-width="1.7"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </button>
+                <input
+                  id="file-input"
+                  type="file"
+                  multiple
+                  hidden
+                  accept="image/png,image/jpeg,image/webp,image/gif,.pdf,.docx,.xlsx,.pptx,.txt,.md,.csv,.json,.jsonl,.py,.js,.ts,.tsx,.jsx,.html,.css,.yaml,.yml,.toml,.xml,.log,.c,.cpp,.h,.rs,.go,.sh"
+                />
+                <div class="mode-switch" role="group" aria-label="工作模式">
+                  <button type="button" data-mode="chat" aria-pressed="false">
+                    对话</button
+                  ><button
+                    type="button"
+                    data-mode="agent"
+                    class="active"
+                    aria-pressed="true"
+                  >
+                    ✦ Agent</button
+                  ><button
+                    type="button"
+                    data-mode="search"
+                    aria-pressed="false"
+                  >
+                    ◎ 搜索
+                  </button>
+                </div>
+              </div>
+              <div class="composer-right">
+                <label class="thinking-option" title="启用模型思考"
+                  ><input id="thinking" type="checkbox" /><span
+                    >深度思考</span
+                  ></label
+                >
+                <label
+                  class="length-option"
+                  title="每次模型调用的最大输出 token"
+                  ><span class="sr-only">每步输出上限</span
+                  ><select id="max-tokens" aria-label="每步输出上限">
+                    <option value="512">512</option>
+                    <option value="1024" selected>1,024</option>
+                    <option value="2048">2,048</option>
+                    <option value="4096">4,096</option>
+                  </select></label
+                >
+                <button
+                  id="stop"
+                  class="stop-button"
+                  type="button"
+                  hidden
+                  aria-label="停止任务"
+                >
+                  ■
+                </button>
+                <button
+                  id="send"
+                  class="send-button"
+                  type="submit"
+                  disabled
+                  aria-label="发送任务"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    aria-hidden="true"
+                  >
+                    <path
+                      d="M12 19V5m-6 6 6-6 6 6"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+          <div class="composer-caption">
+            <span id="mode-hint"
+              >Agent 可读取和修改当前项目，操作过程实时可见</span
+            ><span>Enter 发送 · Shift + Enter 换行</span>
+          </div>
+        </div>
+      </main>
+    </div>
+    <dialog
+      id="delete-session-dialog"
+      class="confirm-dialog"
+      aria-labelledby="delete-session-title"
+      aria-describedby="delete-session-description"
+    >
+      <h2 id="delete-session-title">删除这段对话？</h2>
+      <p id="delete-session-name" class="delete-session-name"></p>
+      <p id="delete-session-description">
+        会话记录及仅属于它的上传附件将被删除，无法恢复。项目文件会保留。
+      </p>
+      <p
+        id="delete-session-error"
+        class="delete-session-error"
+        role="alert"
+      ></p>
+      <div class="confirm-actions">
+        <button
+          id="delete-session-cancel"
+          class="quiet-button"
+          type="button"
+          autofocus
+        >
+          取消
+        </button>
+        <button id="delete-session-confirm" class="danger-button" type="button">
+          删除会话
+        </button>
+      </div>
+    </dialog>
+    <dialog id="preview-dialog" class="preview-dialog">
+      <div class="preview-header">
+        <div>
+          <span class="eyebrow" id="preview-kind">项目文件</span>
+          <h2 id="preview-title"></h2>
+        </div>
+        <button
+          id="preview-close"
+          type="button"
+          class="icon-button"
+          aria-label="关闭预览"
+        >
+          ✕
+        </button>
+      </div>
+      <div id="preview-content" class="preview-content"></div>
+      <div id="preview-notice" class="muted preview-notice" role="status"></div>
+      <div class="preview-footer">
+        <button id="preview-ask" class="quiet-button" type="button">
+          让 Qwen 阅读</button
+        ><a id="preview-download" class="quiet-button" href="#" download
+          >下载文件</a
+        ><button id="preview-edit" type="button" class="quiet-button">
+          编辑</button
+        ><button id="preview-save" type="button" class="primary-button" hidden>
+          保存修改
+        </button>
+      </div>
+    </dialog>
+    <div id="drop-overlay" class="drop-overlay" hidden>
+      <div>
+        <span>＋</span>
+        <h2>把文件放在这里</h2>
+        <p>图片、PDF、Office 文档或代码 · 单个最多 12 MiB</p>
+      </div>
+    </div>
+  </body>
 </html>

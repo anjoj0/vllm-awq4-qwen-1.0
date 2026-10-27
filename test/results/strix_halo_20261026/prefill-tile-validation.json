@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "rows": [
+    {
+      "M": 1,
+      "K": 5120,
+      "N": 34816,
+      "group_size": 32,
+      "relative_l2_fp32_reference": 6.077078796806745e-05,
+      "relative_l2_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "M": 5,
+      "K": 5120,
+      "N": 34816,
+      "group_size": 32,
+      "relative_l2_fp32_reference": 7.087691483320668e-05,
+      "relative_l2_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "M": 2047,
+      "K": 5120,
+      "N": 34816,
+      "group_size": 32,
+      "relative_l2_fp32_reference": 9.491023229202256e-05,
+      "relative_l2_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "M": 2048,
+      "K": 5120,
+      "N": 34816,
+      "group_size": 32,
+      "relative_l2_fp32_reference": 0.00010014592407969758,
+      "relative_l2_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "M": 4097,
+      "K": 5120,
+      "N": 34816,
+      "group_size": 32,
+      "relative_l2_fp32_reference": 9.655282337917015e-05,
+      "relative_l2_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "M": 8192,
+      "K": 5120,
+      "N": 34816,
+      "group_size": 32,
+      "relative_l2_fp32_reference": 0.00010063067020382732,
+      "relative_l2_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    }
+  ]
+}

@@ -10,6 +10,7 @@
 **/.rocprofv3
 .triton-cache*
 .vllm-cache*
+.runtime
 models
 *.safetensors
 *.gguf

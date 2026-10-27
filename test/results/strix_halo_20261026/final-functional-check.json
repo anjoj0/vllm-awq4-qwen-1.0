@@ -1,0 +1,226 @@
+{
+  "checked_at": "2026-10-26T18:07:38.037642+00:00",
+  "host": "http://127.0.0.1:8000",
+  "model": "Qwen3.6-27B-AWQ4",
+  "requested_profile": "dflash",
+  "steps": [
+    {
+      "name": "health",
+      "passed": true,
+      "result": {
+        "health": "ready"
+      },
+      "wall_seconds": 100.0116
+    },
+    {
+      "name": "models",
+      "passed": true,
+      "result": {
+        "object": "list",
+        "data": [
+          {
+            "id": "Qwen3.6-27B-AWQ4",
+            "object": "model",
+            "created": 1793038158,
+            "owned_by": "vllm",
+            "root": "/models/hub/models--cyankiwi--Qwen3.6-27B-AWQ-INT4/snapshots/46d3c4aca0cfa475e99283abe9fb1254df1eef03",
+            "parent": null,
+            "max_model_len": 32768,
+            "permission": [
+              {
+                "id": "modelperm-82ed8351b0755030",
+                "object": "model_permission",
+                "created": 1793038158,
+                "allow_create_engine": false,
+                "allow_sampling": true,
+                "allow_logprobs": true,
+                "allow_search_indices": false,
+                "allow_view": true,
+                "allow_fine_tuning": false,
+                "organization": "*",
+                "group": null,
+                "is_blocking": false
+              }
+            ]
+          }
+        ]
+      },
+      "wall_seconds": 0.0009
+    },
+    {
+      "name": "chat_arithmetic",
+      "passed": true,
+      "result": {
+        "id": "chatcmpl-939cd72848d9fff4",
+        "object": "chat.completion",
+        "created": 1793038158,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "42",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 26,
+          "total_tokens": 29,
+          "completion_tokens": 3,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 557.2359769939794,
+          "generation_time_ms": 139.3694120051805,
+          "queue_time_ms": 0.029501999961212277,
+          "mean_itl_ms": 69.68470600259025,
+          "tokens_per_second": 4.306598897132014,
+          "speculative_decoding": null
+        }
+      },
+      "wall_seconds": 0.707
+    },
+    {
+      "name": "chat_stream",
+      "passed": true,
+      "result": {
+        "text": "Strix Halo 是由美国吉他手 Jim O'Rourke 和鼓手 Chris Corsano 组成的实验音乐二人组，以其融合即兴演奏、极简主义与噪音元素的独特前卫风格而闻名。",
+        "usage": {
+          "prompt_tokens": 20,
+          "total_tokens": 62,
+          "completion_tokens": 42,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "terminal_event_received": true
+      },
+      "wall_seconds": 4.3419
+    },
+    {
+      "name": "responses_stream",
+      "passed": true,
+      "result": {
+        "text": "Strix Halo 是由美国吉他手 Jim O'Rourke 和鼓手 Chris Corsano 组成的实验音乐二人组，以其融合即兴演奏、极简主义与噪音元素的独特前卫风格而闻名。",
+        "usage": {
+          "input_tokens": 20,
+          "input_tokens_details": {
+            "cached_tokens": 0,
+            "cache_write_tokens": 0,
+            "input_tokens_per_turn": [],
+            "cached_tokens_per_turn": []
+          },
+          "output_tokens": 42,
+          "output_tokens_details": {
+            "reasoning_tokens": 0,
+            "tool_output_tokens": 0,
+            "output_tokens_per_turn": [],
+            "tool_output_tokens_per_turn": []
+          },
+          "total_tokens": 62
+        },
+        "terminal_event_received": true
+      },
+      "wall_seconds": 4.362
+    },
+    {
+      "name": "tool_call",
+      "passed": true,
+      "result": {
+        "id": "chatcmpl-a9f0db2aa72199d2",
+        "object": "chat.completion",
+        "created": 1793038167,
+        "model": "Qwen3.6-27B-AWQ4",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "",
+              "refusal": null,
+              "annotations": null,
+              "audio": null,
+              "function_call": null,
+              "tool_calls": [
+                {
+                  "id": "chatcmpl-tool-86936a4d6875fd9d",
+                  "type": "function",
+                  "function": {
+                    "name": "demo_lookup",
+                    "arguments": "{\"topic\": \"Strix Halo\"}"
+                  }
+                }
+              ],
+              "reasoning": null
+            },
+            "logprobs": null,
+            "finish_reason": "stop",
+            "stop_reason": null,
+            "token_ids": null,
+            "routed_experts": null
+          }
+        ],
+        "service_tier": null,
+        "system_fingerprint": "vllm-0.32.0-4f38e4d8",
+        "usage": {
+          "prompt_tokens": 295,
+          "total_tokens": 324,
+          "completion_tokens": 29,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "created_cache_tokens": 0,
+            "multimodal_tokens": null
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0
+          }
+        },
+        "prompt_logprobs": null,
+        "prompt_token_ids": null,
+        "prompt_text": null,
+        "kv_transfer_params": null,
+        "ec_transfer_params": null,
+        "metrics": {
+          "time_to_first_token_ms": 1245.2314050024142,
+          "generation_time_ms": 1253.7763540021842,
+          "queue_time_ms": 33.62627799651818,
+          "mean_itl_ms": 44.777726928649436,
+          "tokens_per_second": 11.604605826254513,
+          "speculative_decoding": null
+        }
+      },
+      "wall_seconds": 3.1017
+    }
+  ],
+  "scope": "Short text, streaming and forced tool-call smoke only; not a quality/performance benchmark.",
+  "passed": true
+}

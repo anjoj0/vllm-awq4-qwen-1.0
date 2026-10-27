@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "scope": "Per-layer numerics, not whole-model quality",
+  "rows": [
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 1,
+      "relative_error_reference": 0.0004092227027285844,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 2,
+      "relative_error_reference": 0.00040879606967791915,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 3,
+      "relative_error_reference": 0.00018536766583565623,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 5,
+      "relative_error_reference": 0.00018183082283940166,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 9,
+      "relative_error_reference": 0.00018233442096970975,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 10,
+      "relative_error_reference": 0.00018568625091575086,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    },
+    {
+      "K": 17408,
+      "N": 5120,
+      "M": 129,
+      "relative_error_reference": 0.00018472183728590608,
+      "relative_error_native": 0.0,
+      "native_bitwise_equal": true,
+      "passed": true
+    }
+  ]
+}

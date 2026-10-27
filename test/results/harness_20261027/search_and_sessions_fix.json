@@ -1,0 +1,230 @@
+{
+  "checked_at": "2026-10-27T14:47:26.241095+08:00",
+  "unit_tests": {
+    "command": ".runtime/harness-venv/bin/python -m unittest discover -s expo_assistant -p 'test_*.py' -q",
+    "passed": 48
+  },
+  "browser": {
+    "cancel_preserves_record_and_upload": true,
+    "delete_other_preserves_current": true,
+    "delete_current_last_creates_blank": true,
+    "deleted_upload_removed": true,
+    "reload_persists": true,
+    "mobile_dialog": true,
+    "console_errors": [],
+    "isolated_data_dir": "/home/amd/demo01/vllm-awq4-qwen-1.0/.runtime/harness-search-validation",
+    "delete_current_loads_remaining": true,
+    "server_refusal_preserves_record_and_allows_retry": true,
+    "keyboard_focus_after_delete": true
+  },
+  "production": {
+    "production_url": "http://127.0.0.1:8088",
+    "status": {
+      "ok": true,
+      "model": "Qwen3.6-27B-AWQ4",
+      "models": [
+        "Qwen3.6-27B-AWQ4"
+      ],
+      "metrics_available": true,
+      "message": "服务已连接"
+    },
+    "delete_api_deployed": true,
+    "visible_delete_buttons": 20,
+    "existing_sessions_unchanged": 20,
+    "page_errors": []
+  },
+  "real_model_search": [
+    {
+      "query": "帮我搜索一下AMD最新的AI MAX 495处理器的参数",
+      "max_tokens_per_round": 1024,
+      "thinking": false,
+      "task_status": "complete",
+      "model_rounds": 4,
+      "tool_calls": 2,
+      "wall_s": 88.03,
+      "final_response_nonempty": true,
+      "tools": [
+        {
+          "name": "web_search",
+          "status": "complete",
+          "arguments": {
+            "query": "AMD AI MAX 495 processor specifications"
+          }
+        },
+        {
+          "name": "fetch_page",
+          "status": "complete",
+          "arguments": {
+            "url": "https://www.amd.com/zh-cn/products/processors/laptop/ryzen-pro/ai-max-pro-400-series/amd-ryzen-ai-max-plus-pro-495.html",
+            "query": "规格 参数 核心 频率 内存"
+          }
+        }
+      ],
+      "errors": []
+    },
+    {
+      "query": "帮我搜索一下AMD最新的AI MAX 495处理器的参数",
+      "max_tokens_per_round": 1024,
+      "thinking": false,
+      "task_status": "complete",
+      "model_rounds": 4,
+      "tool_calls": 2,
+      "wall_s": 89.75,
+      "final_response_nonempty": true,
+      "tools": [
+        {
+          "name": "web_search",
+          "status": "complete",
+          "arguments": {
+            "query": "AMD AI MAX 495 processor specifications"
+          }
+        },
+        {
+          "name": "fetch_page",
+          "status": "complete",
+          "arguments": {
+            "url": "https://www.amd.com/zh-cn/products/processors/laptop/ryzen-pro/ai-max-pro-400-series/amd-ryzen-ai-max-plus-pro-495.html",
+            "query": "AMD Ryzen AI Max+ PRO 495 specifications parameters"
+          }
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "network_checks": [
+    {
+      "query": "Python 3.14 documentation",
+      "elapsed_s": 1.36,
+      "provider": "bing",
+      "relevance": "matched",
+      "top": [
+        {
+          "title": "Python Release Python 3.14.9 | Python.org",
+          "url": "https://www.python.org/downloads/latest/python3.14/",
+          "snippet": "Python 3.14.9 is an expedited security release and the ninth maintenance release of 3.14, containing around 168 bugfixes, build …"
+        },
+        {
+          "title": "Python 3.14_百度百科",
+          "url": "https://baike.baidu.com/item/Python%203.14/67551899",
+          "snippet": "Python 3.14是Python编程语言的一个主要稳定版本，其最终正式版（3.14.0）于2025年10月7日发布。 该版本在3.13的基础上引入了多 …"
+        }
+      ],
+      "attempts": [
+        {
+          "provider": "bing",
+          "query": "Python 3.14 documentation",
+          "status": "weak_results"
+        },
+        {
+          "provider": "sogou",
+          "query": "Python 3.14 documentation",
+          "status": "unavailable",
+          "error": "HTTP Error 399: "
+        },
+        {
+          "provider": "bing",
+          "query": "\"3.14\" \"python\"",
+          "status": "matched"
+        }
+      ]
+    },
+    {
+      "query": "vLLM prefix caching official documentation",
+      "elapsed_s": 1.17,
+      "provider": "bing",
+      "relevance": "partial",
+      "top": [
+        {
+          "title": "GitHub - vllm-project/vllm: A high-throughput and memory …",
+          "url": "https://github.com/vllm-project/vllm",
+          "snippet": "Originally developed in the Sky Computing Lab at UC Berkeley, vLLM has grown into one of the most active open-source AI projects …"
+        },
+        {
+          "title": "vLLM",
+          "url": "https://vllm.ai/",
+          "snippet": "vLLM is a high-throughput and memory-efficient inference and serving engine for Large Language Models (LLMs). Deploy AI models …"
+        }
+      ],
+      "attempts": [
+        {
+          "provider": "bing",
+          "query": "vLLM prefix caching official documentation",
+          "status": "weak_results"
+        },
+        {
+          "provider": "sogou",
+          "query": "vLLM prefix caching official documentation",
+          "status": "unavailable",
+          "error": "HTTP Error 399: "
+        }
+      ]
+    },
+    {
+      "query": "苏轼 赤壁赋 原文",
+      "elapsed_s": 0.51,
+      "provider": "bing",
+      "relevance": "partial",
+      "top": [
+        {
+          "title": "苏（汉语文字）_百度百科",
+          "url": "https://baike.baidu.com/item/%E8%8B%8F/653951",
+          "snippet": "苏（读作：sū或者sù）为现代汉语通用规范一级字（常用字）该字最早见于西周金文。 本义原指用树枝或稻草穿鳃提鱼，使鱼可以落 …"
+        },
+        {
+          "title": "苏 sū、sù - 汉典",
+          "url": "http://zdic.net/hans/%E8%8B%8F",
+          "snippet": "蘇，息也，死而更生也——《广韵》 更生为苏——《颜氏家训·杂艺》 震苏苏——《易·震卦》 傒予后，后来其苏——《书·仲虺之诰》 …"
+        }
+      ],
+      "attempts": [
+        {
+          "provider": "bing",
+          "query": "苏轼 赤壁赋 原文",
+          "status": "weak_results"
+        },
+        {
+          "provider": "sogou",
+          "query": "苏轼 赤壁赋 原文",
+          "status": "unavailable",
+          "error": "HTTP Error 399: "
+        }
+      ]
+    },
+    {
+      "url": "https://www.amd.com/en/products/specifications/processors.html",
+      "bytes_read": 11319268,
+      "structured_matches": 1,
+      "has_16_cores": true,
+      "links": [
+        {
+          "title": "AMD Ryzen™ AI Max+ PRO 495",
+          "url": "https://www.amd.com/en/products/processors/laptop/ryzen-pro/ai-max-pro-400-series/amd-ryzen-ai-max-plus-pro-495.html"
+        }
+      ]
+    }
+  ],
+  "chinese_query_after_refinement": {
+    "query": "苏轼 赤壁赋 原文",
+    "effective_query": "\"苏轼\" \"赤壁赋\"",
+    "relevance": "matched",
+    "provider": "bing",
+    "top": [
+      {
+        "title": "赤壁赋（北宋苏轼赋作）_百度百科",
+        "url": "https://baike.baidu.com/item/%E8%B5%A4%E5%A3%81%E8%B5%8B/130",
+        "snippet": "《赤壁赋》又名《前赤壁赋》，是北宋文学家苏轼创作的文赋作品，收录于《苏东坡全集》。 《赤壁赋》历来受较高评价，被视为宋 …"
+      },
+      {
+        "title": "赤壁赋原文、翻译及赏析、拼音版及朗读_苏轼文言文_古文岛 ...",
+        "url": "https://www.gushiwen.cn/shiwenv_4cac23b07849.aspx",
+        "snippet": "——宋代·苏轼《赤壁赋》https://www.guwendao.net/shiwenv_4cac23b07849.aspx. 壬戌之秋，七月既望，苏子与客泛舟游于赤壁之下 …"
+      }
+    ]
+  },
+  "notes": [
+    "Search provider fallback, numeric model matching, structured page extraction, and final response completion were checked without changing the inference service.",
+    "Bing still returned partial results for the vLLM prefix caching query; partial matches are explicitly labeled. Public search coverage and availability are not guaranteed.",
+    "These are functional checks, not a complete factuality evaluation. Model answers still mixed some third-party search snippets with the official citation despite the provenance prompt.",
+    "Deletion tests used only the isolated validation data directory. All 20 existing production conversation files had identical hashes before and after deployment."
+  ]
+}

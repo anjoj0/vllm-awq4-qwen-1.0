@@ -8,6 +8,8 @@ Strix Halo 和 W7900 同属 RDNA 3/3.5，但内存与部署目标不同。Strix 
 
 ## 2. Strix Halo
 
+以下表格是旧运行时历史结果。2026-10-26 的 v0.32.0 整机迁移、DSpark/DFlash2 对照和 DFlash N=4 选择见 [本地部署与实验记录](STRIX_HALO_LOCAL_DEPLOYMENT.md)，不要跨版本直接比较峰值与固定任务均值。
+
 | 技术 | 实验结果 |
 |---|---:|
 | BF16 基线 | 4.3 token/s decode |

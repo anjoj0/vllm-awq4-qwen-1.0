@@ -1,0 +1,4 @@
+# Runtime only. The inference service keeps its existing environment.
+Pillow==13.0.0
+pypdf==6.21.2
+lxml==6.1.3

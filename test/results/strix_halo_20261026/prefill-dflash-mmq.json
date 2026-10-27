@@ -1,0 +1,84 @@
+{
+  "label": "dflash-mmq",
+  "note": "Two uncached 4096-token requests; first may include shape JIT, second is the comparison. No cache comparison.",
+  "rows": [
+    {
+      "usage": {
+        "prompt_tokens": 4096,
+        "total_tokens": 4104,
+        "completion_tokens": 8,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "per_request_metrics": {
+        "time_to_first_token_ms": 32832.99871200143,
+        "generation_time_ms": 1107.2968159969605,
+        "queue_time_ms": 0.021961001039016992,
+        "mean_itl_ms": 158.18525942813721,
+        "tokens_per_second": 0.23570802420976436
+      },
+      "stats": {
+        "input_tokens": 4096,
+        "output_tokens": 8,
+        "cached_tokens": 0,
+        "prefill_tps": 124.75254045262675,
+        "decode_tps": 6.321701551807961,
+        "ttft_s": 32.838863535998826,
+        "total_s": 33.944811430999835,
+        "delivery_tps": 7.23361384036334,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      },
+      "prompt_tokens": 4096,
+      "cached_tokens": 0,
+      "computed_tokens": 4096,
+      "client_ttft_s": 32.838863535998826,
+      "wall_s": 33.944811430999835,
+      "output_sha256": "b59415886f90aec1499a15b1a0ec19dcbb2981315a76de2969ff1f2925996de5",
+      "output_preview": " language\n\n<think>\nHere's a thinking",
+      "phase": "first_shape_call"
+    },
+    {
+      "usage": {
+        "prompt_tokens": 4096,
+        "total_tokens": 4104,
+        "completion_tokens": 8,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "per_request_metrics": {
+        "time_to_first_token_ms": 32946.69435600008,
+        "generation_time_ms": 839.4262550027634,
+        "queue_time_ms": 0.014779998309677467,
+        "mean_itl_ms": 119.91803642896619,
+        "tokens_per_second": 0.2367836216566014
+      },
+      "stats": {
+        "input_tokens": 4096,
+        "output_tokens": 8,
+        "cached_tokens": 0,
+        "prefill_tps": 124.32203230288741,
+        "decode_tps": 8.339029138392814,
+        "ttft_s": 32.99335243099995,
+        "total_s": 33.83159274400168,
+        "delivery_tps": 9.543802506171584,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      },
+      "prompt_tokens": 4096,
+      "cached_tokens": 0,
+      "computed_tokens": 4096,
+      "client_ttft_s": 32.99335243099995,
+      "wall_s": 33.83159274400168,
+      "output_sha256": "9b37de3dd4523c3328594855341cdf8dcf2c3e6fd27fe9315b7c453f9b2bb103",
+      "output_preview": " system prompt. A local inference service runs",
+      "phase": "steady"
+    }
+  ]
+}

@@ -31,6 +31,11 @@ def build_command(env):
         "--reasoning-parser", "qwen3",
         "--tool-call-parser", "qwen3_coder",
         "--enable-auto-tool-choice",
+        # Qwen's hybrid attention needs chunked prefill for aligned state caching.
+        "--enable-chunked-prefill",
+        # Report cache hits and timings per request for prefill comparisons.
+        "--enable-prompt-tokens-details",
+        "--enable-per-request-metrics",
         "--gpu-memory-utilization", env.get("VLLM_GPU_MEMORY_UTIL", "0.55"),
         "--max-num-seqs", env.get("VLLM_MAX_NUM_SEQS", "1"),
         "--max-num-batched-tokens", env.get("VLLM_MAX_NUM_BATCHED_TOKENS", "8192"),
@@ -38,17 +43,59 @@ def build_command(env):
         "--kv-cache-dtype", env.get("VLLM_KV_CACHE_DTYPE", "auto"),
         "--skip-mm-profiling",
     ]
+    block_size = env.get("VLLM_BLOCK_SIZE", "").strip()
+    if block_size:
+        if int(block_size) <= 0:
+            raise ValueError("VLLM_BLOCK_SIZE must be positive")
+        # Hybrid attention may raise this minimum to fit recurrent-state pages.
+        command += ["--block-size", str(int(block_size))]
+    dtype = env.get("VLLM_DTYPE", "").strip()
+    if dtype:
+        if dtype not in {"auto", "half", "float16", "bfloat16"}:
+            raise ValueError("VLLM_DTYPE must be auto, half, float16, or bfloat16")
+        command += ["--dtype", dtype]
+    profiler_dir = env.get("VLLM_PROFILER_DIR", "").strip()
+    if profiler_dir:
+        if not os.path.isabs(profiler_dir):
+            raise ValueError("VLLM_PROFILER_DIR must be an absolute container path")
+        command += ["--profiler-config", json.dumps({
+            "profiler": "torch", "torch_profiler_dir": profiler_dir,
+            "torch_profiler_with_stack": False, "torch_profiler_record_shapes": True,
+            "ignore_frontend": True,
+        })]
+    command.append("--enable-prefix-caching"
+                   if enabled(env.get("VLLM_ENABLE_PREFIX_CACHING", "1"))
+                   else "--no-enable-prefix-caching")
     if enabled(env.get("VLLM_ENFORCE_EAGER", "1")):
         command.append("--enforce-eager")
+    decode_graphs = enabled(env.get("VLLM_DECODE_GRAPHS", "0"))
+    if decode_graphs and ("--enforce-eager" in command
+                          or int(env.get("VLLM_MAX_NUM_SEQS", "1")) != 1):
+        raise ValueError("VLLM_DECODE_GRAPHS requires eager=0 and max_num_seqs=1")
+    width = 0
     if method != "none":
         draft = env.get("VLLM_DRAFT_MODEL_ID", "").strip() or DEFAULT_DRAFTS[method]
         width = int(env.get("VLLM_SPEC_TOKENS", "").strip()
                     or env.get("VLLM_DFLASH_N", "8"))
         if width < 1:
             raise ValueError("VLLM_SPEC_TOKENS must be positive")
-        command += ["--speculative-config", json.dumps({
+        spec = {
             "method": method, "model": draft, "num_speculative_tokens": width,
             "draft_tensor_parallel_size": 1,
+        }
+        topk = env.get("VLLM_DSPARK_DRAFT_TOPK", "").strip()
+        if topk:
+            if method != "dspark" or int(topk) < 1:
+                raise ValueError("VLLM_DSPARK_DRAFT_TOPK requires DSpark and a positive integer")
+            spec["dspark_draft_topk"] = int(topk)
+        command += ["--speculative-config", json.dumps(spec)]
+    if decode_graphs:
+        # Bound capture to one request's verification rows. Prefill stays eager;
+        # torch.compile is separate and intentionally disabled in this profile.
+        command += ["--compilation-config", json.dumps({
+            "mode": 0, "cudagraph_mode": "FULL_DECODE_ONLY",
+            "cudagraph_capture_sizes": list(range(1, width + 2)),
+            "max_cudagraph_capture_size": width + 1,
         })]
     return command
 

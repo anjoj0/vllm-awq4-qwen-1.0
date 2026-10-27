@@ -1,0 +1,80 @@
+{
+  "label": "df2-fp16-finite-diagnostic",
+  "scope": "Instrumented diagnosis, not headline performance",
+  "request": {
+    "model": "Qwen3.6-27B-AWQ4",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Implement a complete Python LRU cache using only the standard library. Include capacity validation, get, put, delete, clear, __len__, and thread safety with RLock. Provide type hints, concise docstrings, an explanation of O(1) operations, and unittest cases for eviction, updating existing keys, missing keys, zero capacity, and clearing. Give the full implementation followed by the full tests."
+      }
+    ],
+    "temperature": 0,
+    "max_tokens": 128,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "cache_salt": "7a2b8d81f3b245ac9d3304255faef38e"
+  },
+  "response": {
+    "id": "chatcmpl-9281d918287c80da",
+    "object": "chat.completion",
+    "created": 1793034632,
+    "model": "Qwen3.6-27B-AWQ4",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "```python\n\"\"\"\nLRU Cache Implementation\n\nThis module provides a thread-safe Least Recently Used (LRU) cache with O(1)\ntime complexity for get, put, delete, and clear operations.\n\nO(1) Operations Explanation:\n- We use a doubly linked list to maintain the order of usage. The most recently\n  used item is at the head, and the least recently used is at the tail.\n- A dictionary maps keys to nodes in the linked list for O(1) lookup.\n- get(key): Look up the key in the dictionary (O(1)), then move the corresponding",
+          "refusal": null,
+          "annotations": null,
+          "audio": null,
+          "function_call": null,
+          "reasoning": null
+        },
+        "logprobs": null,
+        "finish_reason": "length",
+        "stop_reason": null,
+        "token_ids": null,
+        "routed_experts": null
+      }
+    ],
+    "service_tier": null,
+    "system_fingerprint": "vllm-0.32.0-0083cf8d",
+    "usage": {
+      "prompt_tokens": 93,
+      "total_tokens": 221,
+      "completion_tokens": 128,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "created_cache_tokens": 0,
+        "multimodal_tokens": null
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0
+      }
+    },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
+    "prompt_text": null,
+    "kv_transfer_params": null,
+    "ec_transfer_params": null,
+    "metrics": {
+      "time_to_first_token_ms": 1583.602252001583,
+      "generation_time_ms": 45646.74907399967,
+      "queue_time_ms": 0.03475099947536364,
+      "mean_itl_ms": 359.42322105511556,
+      "tokens_per_second": 2.7101216994236803,
+      "speculative_decoding": null
+    }
+  },
+  "wall_s": 47.2399580550009,
+  "counters": {
+    "vllm:spec_decode_num_drafts_total": 127.0,
+    "vllm:spec_decode_num_draft_tokens_total": 889.0,
+    "vllm:spec_decode_num_accepted_tokens_total": 0.0
+  },
+  "mean_acceptance_length": 1.0,
+  "draft_acceptance_rate": 0.0
+}

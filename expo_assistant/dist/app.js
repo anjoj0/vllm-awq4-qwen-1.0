@@ -1,384 +1,991 @@
-/* Offline, buildless interface. Model output is always rendered as text nodes. */
+/* Local, buildless UI. Untrusted model/tool content is rendered as text, never HTML. */
 (() => {
   "use strict";
-
   const $ = (id) => document.getElementById(id);
-  const ui = {
-    form: $("chat-form"), prompt: $("prompt"), send: $("send"), stop: $("stop"),
-    newChat: $("new-chat"), exportChat: $("export-chat"), thinking: $("thinking"),
-    maxTokens: $("max-tokens"), messages: $("messages"), empty: $("empty-state"),
-    scroll: $("chat-scroll"), notice: $("notice"), connection: $("connection"),
-    connectionText: $("connection-text"), model: $("model-name"),
-    subtitle: $("model-subtitle"), upstream: $("upstream-display"),
-    preview: $("preview-banner"), telemetryState: $("telemetry-state"),
-    telemetryLabel: $("telemetry-label"), metricNote: $("metric-note"),
-    prefill: $("metric-prefill"), decode: $("metric-decode"), ttft: $("metric-ttft"),
-    total: $("metric-total"), input: $("metric-input"), output: $("metric-output")
-  };
   const state = {
-    config: { model: "Qwen3.6-27B", max_output_tokens: 768, demo: false },
-    history: [], messages: [], active: null, preview: false,
-    resetting: false, checkingStatus: false, renderFrame: null
+    session: null,
+    sessions: [],
+    attachments: [],
+    mode: "agent",
+    active: null,
+    uploading: false,
+    loadingCase: false,
+    navigating: false,
+    deleteTarget: null,
+    deleting: false,
+    config: {},
+    preview: null,
+    rendered: [],
+    initialized: false,
+    example: null,
   };
-  const FENCE = String.fromCharCode(96).repeat(3);
-  const examples = {
-    explain: "请解释下面这段 Python 代码的执行逻辑、时间复杂度和适用场景，并举一个输入输出示例：\n\n" + FENCE + "python\nfrom collections import deque\n\ndef window_max(nums, k):\n    q, result = deque(), []\n    for i, value in enumerate(nums):\n        while q and q[0] <= i - k:\n            q.popleft()\n        while q and nums[q[-1]] <= value:\n            q.pop()\n        q.append(i)\n        if i >= k - 1:\n            result.append(nums[q[0]])\n    return result\n" + FENCE,
-    debug: "下面的 Python 函数本想返回有序数组中 target 的下标，但某些输入会一直循环。请定位原因、给出修复代码，并用空数组、单元素和找不到目标的情况验证：\n\n" + FENCE + "python\ndef binary_search(nums, target):\n    left, right = 0, len(nums) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if nums[mid] == target:\n            return mid\n        if nums[mid] < target:\n            left = mid\n        else:\n            right = mid\n    return -1\n" + FENCE,
-    write: "请用 Python 标准库实现一个容量可配置的 LRU 缓存，提供 get(key) 和 put(key, value)。要求：解释核心思路，两个操作的平均时间复杂度为 O(1)，未命中返回 -1，并给出一个简短的测试示例。"
+  const modes = {
+    chat: "对话可分段读取和搜索已上传文档，图片由模型直接理解",
+    agent: "Agent 可读取和修改当前项目，操作过程实时可见",
+    search: "搜索可联网查询与读取项目；此模式不会修改文件",
   };
-
-  function element(tag, className, text) {
-    const node = document.createElement(tag);
-    if (className) node.className = className;
-    if (text !== undefined) node.textContent = text;
-    return node;
-  }
-
-  function notice(message) {
-    ui.notice.textContent = message || "";
-    ui.notice.hidden = !message;
-  }
-
-  function number(value, digits) {
-    return typeof value === "number" && Number.isFinite(value) && value >= 0
-      ? value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })
+  const names = {
+    list_files: "浏览项目",
+    read_file: "读取文件",
+    search_files: "搜索项目",
+    write_file: "写入文件",
+    edit_file: "修改文件",
+    read_attachment: "读取附件",
+    search_attachment: "搜索附件",
+    web_search: "搜索网页",
+    fetch_page: "打开网页",
+    get_weather: "查询天气",
+  };
+  const el = (tag, cls, text) => {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  };
+  const post = (obj) => ({
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(obj),
+  });
+  const fmt = (v, digits = 1) =>
+    typeof v === "number" && Number.isFinite(v)
+      ? v.toLocaleString("en-US", {
+          maximumFractionDigits: digits,
+          minimumFractionDigits: digits,
+        })
       : "—";
+  const notice = (text) => {
+    $("notice").textContent = text || "";
+    $("notice").hidden = !text;
+  };
+  async function api(url, opts = {}, timeout = 15000) {
+    const ctrl = new AbortController(),
+      timer = setTimeout(() => ctrl.abort(), timeout);
+    try {
+      const r = await fetch(url, {
+        ...opts,
+        signal: ctrl.signal,
+        cache: "no-store",
+      });
+      const data = await r.json();
+      if (!r.ok) throw Error(data.message || `HTTP ${r.status}`);
+      return data;
+    } finally {
+      clearTimeout(timer);
+    }
   }
-
+  function local(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
+    } catch (_) {}
+    return null;
+  }
+  function controls() {
+    const busy =
+      Boolean(state.active) ||
+      state.uploading ||
+      state.loadingCase ||
+      state.navigating ||
+      state.deleting;
+    $("send").disabled =
+      !state.initialized ||
+      busy ||
+      (!$("prompt").value.trim() && !state.attachments.length);
+    $("stop").hidden = !state.active;
+    $("send").hidden = Boolean(state.active);
+    $("stop").disabled = Boolean(state.active?.cancelled);
+    [
+      "prompt",
+      "thinking",
+      "max-tokens",
+      "new-chat",
+      "attach",
+      "file-input",
+    ].forEach((id) => {
+      $(id).disabled = busy;
+    });
+    document
+      .querySelectorAll(
+        "[data-mode],.suggestion,.session-button,.session-delete,.example-button,#case-followup",
+      )
+      .forEach((n) => (n.disabled = busy));
+    $("export-chat").disabled =
+      !state.session?.turns?.length && !state.rendered.length;
+  }
+  function mode(value) {
+    state.mode = value;
+    document.querySelectorAll("[data-mode]").forEach((b) => {
+      const on = b.dataset.mode === value;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    $("mode-hint").textContent = modes[value];
+  }
+  function resize() {
+    $("prompt").style.height = "auto";
+    $("prompt").style.height = Math.min($("prompt").scrollHeight, 150) + "px";
+  }
+  function bottom() {
+    const n = $("chat-scroll");
+    return n.scrollHeight - n.scrollTop - n.clientHeight < 110;
+  }
+  function scroll() {
+    const n = $("chat-scroll");
+    n.scrollTop = n.scrollHeight;
+  }
+  function safeURL(value) {
+    try {
+      const u = new URL(value);
+      return ["http:", "https:"].includes(u.protocol) ? u.href : null;
+    } catch (_) {
+      return null;
+    }
+  }
+  function inline(parent, text) {
+    const pattern =
+      /(\x60[^\x60]+\x60|\*\*[^*]+\*\*|\[[^\]\n]+\]\(https?:\/\/[^\s)]+\))/g;
+    let start = 0,
+      m;
+    while ((m = pattern.exec(text))) {
+      parent.append(document.createTextNode(text.slice(start, m.index)));
+      const token = m[0];
+      if (token[0] === "`")
+        parent.append(el("code", "inline-code", token.slice(1, -1)));
+      else if (token.startsWith("**"))
+        parent.append(el("strong", "", token.slice(2, -2)));
+      else {
+        const cut = token.indexOf("]("),
+          href = safeURL(token.slice(cut + 2, -1));
+        if (href) {
+          const a = el("a", "", token.slice(1, cut));
+          a.href = href;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          parent.append(a);
+        } else parent.append(document.createTextNode(token));
+      }
+      start = m.index + token.length;
+    }
+    parent.append(document.createTextNode(text.slice(start)));
+  }
+  async function copy(text, button) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const old = button.textContent;
+      button.textContent = "已复制";
+      setTimeout(() => (button.textContent = old), 1500);
+    } catch (_) {
+      notice("浏览器未允许复制，请手动选取文本。");
+    }
+  }
+  function markdown(text) {
+    const out = document.createDocumentFragment(),
+      lines = text.replace(/\r\n?/g, "\n").split("\n");
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      if (!line.trim()) {
+        i++;
+        continue;
+      }
+      if (/^\s*```/.test(line)) {
+        const lang = line.trim().slice(3),
+          code = [];
+        i++;
+        while (i < lines.length && !/^\s*```/.test(lines[i]))
+          code.push(lines[i++]);
+        if (i < lines.length) i++;
+        const box = el("div", "code-block"),
+          head = el("div", "code-header"),
+          button = el("button", "copy-code", "复制代码");
+        button.type = "button";
+        button.onclick = () => copy(code.join("\n"), button);
+        head.append(el("span", "", lang || "code"), button);
+        const pre = el("pre");
+        pre.append(el("code", "", code.join("\n")));
+        box.append(head, pre);
+        out.append(box);
+        continue;
+      }
+      const h = line.match(/^(#{1,4})\s+(.+)/);
+      if (h) {
+        const n = el("h" + h[1].length);
+        inline(n, h[2]);
+        out.append(n);
+        i++;
+        continue;
+      }
+      if (
+        line.includes("|") &&
+        i + 1 < lines.length &&
+        /^\s*\|?\s*:?-{3,}:?\s*\|[\s|:\-]+$/.test(lines[i + 1])
+      ) {
+        const cells = (s) =>
+          s
+            .trim()
+            .replace(/^\|/, "")
+            .replace(/\|$/, "")
+            .split("|")
+            .map((x) => x.trim());
+        const wrap = el("div", "table-wrap"),
+          table = el("table"),
+          head = el("thead"),
+          body = el("tbody"),
+          row = el("tr");
+        cells(line).forEach((x) => {
+          const c = el("th");
+          inline(c, x);
+          row.append(c);
+        });
+        head.append(row);
+        i += 2;
+        while (i < lines.length && lines[i].trim() && lines[i].includes("|")) {
+          const r = el("tr");
+          cells(lines[i++]).forEach((x) => {
+            const c = el("td");
+            inline(c, x);
+            r.append(c);
+          });
+          body.append(r);
+        }
+        table.append(head, body);
+        wrap.append(table);
+        out.append(wrap);
+        continue;
+      }
+      if (/^\s*(?:[-*+] |\d+\. )/.test(line)) {
+        const ordered = /^\s*\d+\. /.test(line),
+          list = el(ordered ? "ol" : "ul");
+        while (i < lines.length && /^\s*(?:[-*+] |\d+\. )/.test(lines[i])) {
+          const li = el("li");
+          inline(li, lines[i++].replace(/^\s*(?:[-*+] |\d+\. )/, ""));
+          list.append(li);
+        }
+        out.append(list);
+        continue;
+      }
+      const p = el("p"),
+        paragraph = [line];
+      i++;
+      while (
+        i < lines.length &&
+        lines[i].trim() &&
+        !/^\s*(?:```|#{1,4} |[-*+] |\d+\. )/.test(lines[i])
+      )
+        paragraph.push(lines[i++]);
+      inline(p, paragraph.join("\n"));
+      out.append(p);
+    }
+    return out;
+  }
+  function attachURL(id) {
+    return (
+      "/api/attachment?session=" +
+      encodeURIComponent(state.session.id) +
+      "&id=" +
+      encodeURIComponent(id)
+    );
+  }
+  function attachment(id) {
+    return (
+      state.session?.attachments?.find((x) => x.id === id) ||
+      state.attachments.find((x) => x.id === id)
+    );
+  }
+  function chip(item, removable = false) {
+    const div = el("div", "attachment-chip");
+    if (item.kind === "image") {
+      const img = el("img");
+      img.src = attachURL(item.id);
+      img.alt = item.name;
+      div.append(img);
+    } else div.append(el("span", "", "▤"));
+    const label = el("span", "attachment-name", item.name);
+    label.title = item.note || item.name;
+    label.tabIndex = 0;
+    label.onclick = () => previewAttachment(item);
+    label.onkeydown = (e) => {
+      if (e.key === "Enter") previewAttachment(item);
+    };
+    div.append(label);
+    if (removable) {
+      const b = el("button", "", "×");
+      b.type = "button";
+      b.setAttribute("aria-label", "移除 " + item.name);
+      b.onclick = () => {
+        state.attachments = state.attachments.filter((x) => x.id !== item.id);
+        tray();
+        controls();
+      };
+      div.append(b);
+    }
+    return div;
+  }
+  function tray() {
+    $("attachment-tray").replaceChildren(
+      ...state.attachments.map((x) => chip(x, true)),
+    );
+  }
   function clearMetrics() {
-    [ui.prefill, ui.decode, ui.ttft, ui.total, ui.input, ui.output].forEach((node) => { node.textContent = "—"; });
-    ui.metricNote.textContent = state.preview
-      ? "界面预览使用模拟文本，不展示推理性能数字。"
-      : "Prefill 与 Decode 在请求结束后更新；无独立可靠统计时显示 —。";
-    ui.metricNote.title = ui.metricNote.textContent;
+    $("telemetry-state").textContent = "等待任务";
+    ["prefill", "decode", "ttft", "total", "input", "output"].forEach(
+      (k) => ($("metric-" + k).textContent = "—"),
+    );
+    $("metric-note").textContent =
+      "工具执行过程可见；实测速率在每次模型调用完成后更新。";
   }
-
-  function setPreview(preview) {
-    state.preview = Boolean(preview);
-    ui.preview.hidden = !state.preview;
-    ui.telemetryLabel.textContent = state.preview ? "界面预览" : "本次推理";
-    if (state.preview) clearMetrics();
+  function stats(data) {
+    if (data.source === "demo") return;
+    ["prefill", "decode"].forEach(
+      (k) =>
+        ($("metric-" + k).textContent =
+          data.metric_source === "server" ? fmt(data[k + "_tps"]) : "—"),
+    );
+    $("metric-ttft").textContent = fmt(data.ttft_s, 2);
+    $("metric-total").textContent = fmt(data.total_s, 2);
+    ["input", "output"].forEach(
+      (k) => ($("metric-" + k).textContent = fmt(data[k + "_tokens"], 0)),
+    );
+    $("metric-note").textContent = data.note || "";
   }
-
-  function applyStats(stats) {
-    if (stats.source === "demo" || state.config.demo) setPreview(true);
-    if (state.preview) {
+  function makeTurn(turn) {
+    const article = el("article", "turn"),
+      user = el("div", "user-message");
+    user.append(el("div", "user-text", turn.text));
+    if (turn.attachments?.length) {
+      const list = el("div", "user-attachments");
+      turn.attachments.forEach((id) => {
+        const a = attachment(id);
+        if (a) list.append(chip(a));
+      });
+      user.append(list);
+    }
+    const head = el("div", "assistant-head");
+    head.append(
+      el("span", "assistant-symbol", "✦"),
+      el("span", "", "Qwen"),
+      el(
+        "span",
+        "turn-mode",
+        { agent: "AGENT", search: "SEARCH", chat: "CHAT" }[turn.mode] || "CHAT",
+      ),
+    );
+    const content = el("div"),
+      status = el("div", "turn-status");
+    status.append(el("span", "busy-dot"), el("span", "", "正在理解任务…"));
+    article.append(user, head, content, status);
+    $("messages").append(article);
+    $("empty-state").hidden = true;
+    const view = {
+      turn,
+      article,
+      content,
+      status,
+      rounds: new Map(),
+      tools: new Map(),
+      answer: "",
+      error: false,
+    };
+    state.rendered.push(view);
+    return view;
+  }
+  function round(view, id) {
+    if (!view.rounds.has(id)) {
+      const thought = el("details", "reasoning");
+      thought.hidden = true;
+      thought.append(el("summary", "", "思考过程"));
+      const reasoning = el("div", "reasoning-body"),
+        content = el("div", "answer-content");
+      thought.append(reasoning);
+      view.content.append(thought, content);
+      view.rounds.set(id, {
+        thought,
+        reasoning,
+        content,
+        text: "",
+        thinking: "",
+        frame: null,
+      });
+    }
+    return view.rounds.get(id);
+  }
+  function event(view, name, data, replay = false) {
+    const follow = bottom();
+    if (name === "delta") {
+      const r = round(view, data.continuation_of || data.round || 1);
+      if (data.channel === "reasoning") {
+        r.thinking += data.text;
+        r.reasoning.textContent = r.thinking;
+        r.thought.hidden = false;
+      } else {
+        r.text += data.text;
+        view.answer += data.text;
+        if (replay) r.content.replaceChildren(markdown(r.text));
+        else if (!r.frame)
+          r.frame = requestAnimationFrame(() => {
+            r.content.replaceChildren(markdown(r.text));
+            r.frame = null;
+            if (follow) scroll();
+          });
+      }
+    } else if (name === "tool") {
+      let item = view.tools.get(data.id);
+      if (!item) {
+        const box = el("details", "tool-card"),
+          summary = el("summary"),
+          icon = el("span", "tool-status"),
+          label = el("span", "", names[data.name] || data.name),
+          target = el("span", "tool-target"),
+          elapsed = el("span", "tool-duration"),
+          detail = el("div", "tool-detail");
+        summary.append(icon, label, target, elapsed);
+        box.append(summary, detail);
+        view.content.append(box);
+        item = { box, icon, target, elapsed, detail };
+        view.tools.set(data.id, item);
+      }
+      item.box.className = "tool-card " + data.status;
+      item.icon.textContent =
+        data.status === "running" ? "◌" : data.status === "error" ? "!" : "✓";
+      const args = data.arguments || {};
+      item.target.textContent =
+        args.path ||
+        args.query ||
+        args.url ||
+        args.location ||
+        args.attachment_id ||
+        "";
+      item.elapsed.textContent =
+        data.elapsed_s === undefined ? "进行中" : fmt(data.elapsed_s, 1) + " s";
+      item.detail.replaceChildren(
+        el(
+          "pre",
+          "",
+          JSON.stringify(data.result || { arguments: args }, null, 2),
+        ),
+      );
+      const result = data.result?.result;
+      if (
+        result?.name &&
+        ["read_attachment", "search_attachment"].includes(data.name)
+      ) {
+        const pages = result.pages || [];
+        const range = pages.length
+          ? ` · 第 ${pages[0]}${pages.length > 1 ? "–" + pages[pages.length - 1] : ""} 页`
+          : result.offset !== undefined
+            ? ` · 字符 ${result.offset}–${result.next_offset}`
+            : "";
+        item.target.textContent = result.name + range;
+        const source = attachment(args.attachment_id);
+        if (source) {
+          const button = el("button", "quiet-button", "查看附件原文");
+          button.type = "button";
+          button.onclick = () => previewAttachment(source, result.offset || 0);
+          item.detail.append(button);
+        }
+      }
+      if (
+        result?.path &&
+        ["write_file", "edit_file", "read_file"].includes(data.name)
+      ) {
+        const b = el("button", "quiet-button", "查看 " + result.path);
+        b.type = "button";
+        b.onclick = () => previewFile(result.path);
+        item.detail.append(b);
+      }
+      if (data.status === "error") item.box.open = true;
+      if (result?.results) {
+        const sources = el("div", "sources");
+        result.results.forEach((x) => {
+          const url = safeURL(x.url);
+          if (url) {
+            const a = el("a", "source-link", x.title || url);
+            a.href = url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.title = url;
+            sources.append(a);
+          }
+        });
+        item.detail.append(sources);
+      }
+      if (data.name === "get_weather" && result?.current && !item.weather) {
+        item.weather = weatherCard(result);
+        view.content.append(item.weather);
+      }
+      view.status.replaceChildren(
+        el("span", "busy-dot"),
+        el(
+          "span",
+          "",
+          data.status === "running"
+            ? (names[data.name] || data.name) + "…"
+            : "正在继续处理…",
+        ),
+      );
+    } else if (name === "step") {
+      view.status.replaceChildren(
+        el("span", "busy-dot"),
+        el("span", "", `第 ${data.round} 步 · ${data.message}`),
+      );
+    } else if (name === "stats") {
+      view.stats = data;
+      stats(data);
+    } else if (name === "round_stats") {
+      if (!replay) stats(data);
+    } else if (name === "context") {
+      if (!replay) notice(data.message);
+    } else if (name === "error") {
+      view.error = true;
+      view.errorMessage = data.message;
+      view.status.classList.add("error");
+      view.status.textContent = data.message;
+    }
+    if (follow) scroll();
+  }
+  function weatherCard(data) {
+    const box = el("section", "weather-card"),
+      head = el("div", "weather-head"),
+      left = el("div");
+    left.append(
+      el("div", "weather-city", data.location),
+      el(
+        "div",
+        "weather-time",
+        (data.current.time || "").replace("T", " ") + " · " + data.timezone,
+      ),
+    );
+    const temp = el(
+      "div",
+      "weather-temp",
+      fmt(data.current.temperature_2m, 1) + "°",
+    );
+    head.append(left, temp);
+    box.append(head);
+    box.append(
+      el(
+        "div",
+        "weather-description",
+        data.current.description +
+          " · 体感 " +
+          fmt(data.current.apparent_temperature, 1) +
+          "°C · 风速 " +
+          fmt(data.current.wind_speed_10m, 1) +
+          " km/h",
+      ),
+    );
+    const days = el("div", "weather-days");
+    data.forecast.forEach((day) => {
+      const card = el("div", "weather-day");
+      card.append(
+        el("span", "", day.date.slice(5)),
+        el("strong", "", day.description),
+        el("span", "", fmt(day.min_c, 0) + "° / " + fmt(day.max_c, 0) + "°"),
+        el("small", "", "降水 " + fmt(day.rain_probability_percent, 0) + "%"),
+      );
+      days.append(card);
+    });
+    box.append(days);
+    const source = el("a", "weather-source", "Open-Meteo · 数值天气预报");
+    source.href = "https://open-meteo.com/";
+    source.target = "_blank";
+    source.rel = "noopener noreferrer";
+    box.append(source);
+    return box;
+  }
+  function finish(view, status) {
+    for (const r of view.rounds.values()) {
+      if (r.frame) cancelAnimationFrame(r.frame);
+      r.content.replaceChildren(markdown(r.text));
+    }
+    view.status.replaceChildren();
+    const labels = {
+      complete: "已完成",
+      cancelled: "已停止 · 此前成功的文件操作保留",
+      error: "任务中断 · 已执行的操作可在上方查看",
+      limited: "达到步骤上限",
+      incomplete: "达到输出上限 · 回答尚未结束",
+    };
+    view.status.append(
+      el(
+        "span",
+        "",
+        view.errorMessage || labels[status] || "任务已中断，可以继续提问",
+      ),
+    );
+    view.status.classList.toggle("error", status === "error");
+    const actions = el("span", "turn-actions");
+    if (view.answer) {
+      const b = el("button", "", "复制回答");
+      b.onclick = () => copy(view.answer, b);
+      actions.append(b);
+    }
+    if (["error", "cancelled", "incomplete"].includes(status)) {
+      const b = el(
+        "button",
+        "",
+        status === "incomplete" ? "继续回答" : "继续此任务",
+      );
+      b.onclick = () => {
+        if (!state.active) {
+          $("prompt").value =
+            status === "incomplete"
+              ? "请从中断处继续完成上一轮回答，避免重复已经写出的内容。"
+              : "请根据已上传附件、当前文件和已完成的操作继续：" +
+                view.turn.text;
+          resize();
+          controls();
+          $("prompt").focus();
+        }
+      };
+      actions.append(b);
+    }
+    view.status.append(actions);
+  }
+  async function sessions() {
+    const data = await api("/api/sessions");
+    state.sessions = data.sessions;
+    $("session-list").replaceChildren();
+    if (!data.sessions.length)
+      $("session-list").append(el("p", "muted small", "你的思路，从这里继续"));
+    data.sessions.forEach((s) => {
+      const row = el("div", "session-row");
+      row.dataset.sessionId = s.id;
+      const b = el(
+        "button",
+        "session-button" + (s.id === state.session?.id ? " active" : ""),
+        s.title,
+      );
+      b.type = "button";
+      b.title = s.title;
+      b.onclick = () => loadSession(s.id).catch((e) => notice(e.message));
+      const remove = el("button", "icon-button session-delete");
+      remove.type = "button";
+      remove.title = "删除会话";
+      remove.setAttribute("aria-label", "删除会话：" + s.title);
+      const icon = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg",
+      );
+      icon.setAttribute("viewBox", "0 0 24 24");
+      icon.setAttribute("width", "16");
+      icon.setAttribute("height", "16");
+      icon.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "path",
+      );
+      path.setAttribute(
+        "d",
+        "M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7m4-7v7",
+      );
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", "currentColor");
+      path.setAttribute("stroke-width", "1.6");
+      path.setAttribute("stroke-linecap", "round");
+      path.setAttribute("stroke-linejoin", "round");
+      icon.append(path);
+      remove.append(icon);
+      remove.onclick = () => {
+        if (
+          state.active ||
+          state.uploading ||
+          state.navigating ||
+          state.deleting
+        )
+          return;
+        state.deleteTarget = s;
+        $("delete-session-name").textContent = s.title;
+        $("delete-session-error").textContent = "";
+        $("delete-session-dialog").showModal();
+      };
+      row.append(b, remove);
+      $("session-list").append(row);
+    });
+    controls();
+  }
+  async function loadSession(id) {
+    if (state.active || state.uploading || state.navigating) return;
+    state.navigating = true;
+    controls();
+    try {
+      state.session = await api("/api/session?id=" + id);
       clearMetrics();
+      local("qwen-session", id);
+      state.attachments = [];
+      state.example = null;
+      $("case-guide").hidden = true;
+      tray();
+      state.rendered = [];
+      $("messages").replaceChildren();
+      $("empty-state").hidden = Boolean(state.session.turns.length);
+      $("conversation-title").textContent = state.session.title;
+      for (const turn of state.session.turns) {
+        const view = makeTurn(turn);
+        (turn.events || []).forEach((e) => event(view, e.name, e.data, true));
+        finish(view, turn.status === "running" ? "error" : turn.status);
+      }
+      await sessions();
+      scroll();
+      $("sidebar").classList.remove("open");
+    } finally {
+      state.navigating = false;
+      controls();
+    }
+  }
+  async function newSession() {
+    if (state.active || state.uploading || state.navigating) return;
+    state.navigating = true;
+    controls();
+    let obj;
+    try {
+      obj = await api("/api/sessions", post({}));
+    } finally {
+      state.navigating = false;
+      controls();
+    }
+    await loadSession(obj.id);
+    clearMetrics();
+    notice("");
+    $("prompt").value = "";
+    resize();
+    $("prompt").focus();
+  }
+  async function deleteSession() {
+    const selected = state.deleteTarget;
+    if (
+      !selected ||
+      state.deleting ||
+      state.active ||
+      state.uploading ||
+      state.navigating
+    )
+      return;
+    state.deleting = true;
+    $("delete-session-confirm").disabled = true;
+    $("delete-session-cancel").disabled = true;
+    $("delete-session-confirm").textContent = "删除中…";
+    controls();
+    let deleted = false;
+    try {
+      const result = await api(
+        "/api/session/delete",
+        post({ session_id: selected.id }),
+      );
+      deleted = true;
+      $("delete-session-dialog").close();
+      if (local("qwen-session") === selected.id) local("qwen-session", null);
+      if (state.session?.id === selected.id) {
+        state.session = null;
+        state.attachments = [];
+        state.rendered = [];
+        state.example = null;
+        $("messages").replaceChildren();
+        $("empty-state").hidden = false;
+        $("case-guide").hidden = true;
+        $("conversation-title").textContent = "新对话";
+        $("prompt").value = "";
+        tray();
+        clearMetrics();
+        resize();
+        await sessions();
+        if (state.sessions.length) await loadSession(state.sessions[0].id);
+        else await newSession();
+      } else await sessions();
+      notice(result.warning || "会话已删除。");
+    } catch (e) {
+      if (deleted) notice("会话已删除，列表刷新失败，请刷新页面：" + e.message);
+      else $("delete-session-error").textContent = e.message;
+    } finally {
+      state.deleting = false;
+      $("delete-session-confirm").disabled = false;
+      $("delete-session-cancel").disabled = false;
+      $("delete-session-confirm").textContent = "删除会话";
+      controls();
+      if (deleted)
+        (
+          document.querySelector(".session-button.active") || $("new-chat")
+        ).focus();
+    }
+  }
+  $("delete-session-confirm").onclick = deleteSession;
+  $("delete-session-cancel").onclick = () => $("delete-session-dialog").close();
+  $("delete-session-dialog").addEventListener("cancel", (e) => {
+    if (state.deleting) e.preventDefault();
+  });
+  $("delete-session-dialog").addEventListener("close", () => {
+    state.deleteTarget = null;
+    const target =
+      document.querySelector(".session-button.active") || $("new-chat");
+    target.focus();
+  });
+  async function loadExample(id) {
+    if (
+      state.active ||
+      state.uploading ||
+      state.loadingCase ||
+      state.navigating
+    )
+      return;
+    state.loadingCase = true;
+    controls();
+    try {
+      await newSession();
+      const data = await api(
+        "/api/example",
+        post({ session_id: state.session.id, case_id: id }),
+        30000,
+      );
+      state.example = data;
+      state.attachments = data.attachments;
+      state.session.attachments.push(...data.attachments);
+      state.session.title = data.title;
+      $("conversation-title").textContent = data.title;
+      mode(data.mode);
+      $("prompt").value = data.prompt;
+      $("case-check").textContent = data.check;
+      $("case-guide").hidden = false;
+      tray();
+      resize();
+      await sessions();
+      notice("案例已载入，点击发送即可开始。");
+      $("sidebar").classList.remove("open");
+    } catch (e) {
+      notice(e.message);
+    } finally {
+      state.loadingCase = false;
+      controls();
+      $("prompt").focus();
+    }
+  }
+  function openPreview(title, kind) {
+    $("preview-title").textContent = title;
+    $("preview-kind").textContent = kind;
+    $("preview-content").replaceChildren();
+    $("preview-notice").textContent = "";
+    ["preview-save", "preview-edit", "preview-download"].forEach(
+      (k) => ($(k).hidden = true),
+    );
+    if (!$("preview-dialog").open) $("preview-dialog").showModal();
+  }
+  async function previewFile(path) {
+    try {
+      const data = await api("/api/file?path=" + encodeURIComponent(path));
+      state.preview = { ...data, kind: "file" };
+      openPreview(path, "项目文件");
+      $("preview-content").append(el("pre", "", data.content));
+      $("preview-download").href =
+        "/api/download?path=" + encodeURIComponent(path);
+      $("preview-download").hidden = false;
+      $("preview-edit").hidden = data.truncated || Boolean(state.active);
+      $("preview-notice").textContent = data.truncated
+        ? "预览仅显示前 10 万字符；下载可获取完整内容。"
+        : "修改会保存差异和原文件备份。";
+    } catch (e) {
+      notice(e.message);
+    }
+  }
+  async function previewAttachment(item, offset = 0) {
+    try {
+      state.preview = { ...item, kind: "attachment" };
+      openPreview(
+        item.name,
+        item.kind === "image" ? "图片 · 视觉理解" : "文档 · 提取文字",
+      );
+      if (item.kind === "image") {
+        const img = el("img");
+        img.src = attachURL(item.id);
+        img.alt = item.name;
+        $("preview-content").append(img);
+        $("preview-notice").textContent = item.note || "";
+      } else {
+        const data = await api(attachURL(item.id) + "&offset=" + offset);
+        $("preview-content").append(el("pre", "", data.text));
+        $("preview-notice").textContent =
+          `字符 ${data.offset}–${data.next_offset} / ${data.total_chars} · ${data.note || ""}`;
+        if (data.truncated) {
+          const b = el("button", "quiet-button", "下一段");
+          b.onclick = () => previewAttachment(item, data.next_offset);
+          $("preview-content").append(b);
+        }
+      }
+    } catch (e) {
+      notice(e.message);
+    }
+  }
+  async function upload(list) {
+    if (
+      state.active ||
+      state.uploading ||
+      state.deleting ||
+      $("delete-session-dialog").open
+    )
+      return;
+    if (state.navigating || state.loadingCase) {
+      notice("正在切换会话，请稍后上传。");
       return;
     }
-    const independent = stats.metric_source === "server" || stats.metric_source === "client";
-    ui.prefill.textContent = independent ? number(stats.prefill_tps, 1) : "—";
-    ui.decode.textContent = independent ? number(stats.decode_tps, 1) : "—";
-    ui.ttft.textContent = number(stats.ttft_s, 2);
-    ui.total.textContent = number(stats.total_s, 2);
-    ui.input.textContent = number(stats.input_tokens, 0);
-    ui.output.textContent = number(stats.output_tokens, 0);
-    let explanation = typeof stats.note === "string" ? stats.note.trim() : "";
-    if (stats.metric_source === "shared") {
-      explanation = explanation || "服务端指标含其他请求，无法分离本次 Prefill / Decode，速度显示 —。";
-    } else if (stats.metric_source === "unavailable") {
-      explanation = explanation || "未获得本次请求的独立 Prefill / Decode 指标，速度显示 —。";
-    } else if (stats.metric_source === "client") {
-      explanation = explanation || "使用客户端可观测统计；缺少服务端细分项时显示 —。";
-    } else {
-      explanation = explanation || "来自本次请求的服务端实测；未返回的统计项显示 —。";
+    if (!state.session) await newSession();
+    const chosen = Array.from(list);
+    if (chosen.length + state.attachments.length > 4) {
+      notice("每次最多发送 4 个附件，其中最多 2 张图片。");
+      return;
     }
-    if (typeof stats.cached_tokens === "number" && stats.cached_tokens > 0) {
-      explanation += " 命中缓存 " + number(stats.cached_tokens, 0) + " tokens。";
-    }
-    ui.metricNote.textContent = explanation;
-    ui.metricNote.title = explanation;
-  }
-
-  function updateControls() {
-    const busy = Boolean(state.active) || state.resetting;
-    ui.send.disabled = busy || !ui.prompt.value.trim();
-    ui.stop.hidden = !state.active;
-    ui.stop.disabled = !state.active || Boolean(state.active.cancelRequested);
-    ui.prompt.disabled = busy;
-    ui.thinking.disabled = busy;
-    ui.maxTokens.disabled = busy;
-    ui.newChat.disabled = state.resetting;
-    ui.exportChat.disabled = !state.messages.length;
-    document.querySelectorAll(".example").forEach((button) => { button.disabled = busy; });
-    document.querySelectorAll(".retry-button").forEach((button) => { button.disabled = busy; });
-  }
-
-  function resizePrompt() {
-    ui.prompt.style.height = "auto";
-    ui.prompt.style.height = Math.min(ui.prompt.scrollHeight, 180) + "px";
-  }
-
-  function followingBottom() {
-    return ui.scroll.scrollHeight - ui.scroll.scrollTop - ui.scroll.clientHeight < 90;
-  }
-
-  function scrollToBottom() {
-    ui.scroll.scrollTop = ui.scroll.scrollHeight;
-  }
-
-  function appendInline(parent, text) {
-    // No HTML parsing, URL rendering, arbitrary attributes or model-generated DOM.
-    const pattern = /(\x60[^\x60]+\x60|\*\*[^*]+\*\*)/g;
-    let cursor = 0;
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-      parent.append(document.createTextNode(text.slice(cursor, match.index)));
-      if (match[0].charCodeAt(0) === 96) {
-        parent.append(element("code", "inline-code", match[0].slice(1, -1)));
-      } else {
-        parent.append(element("strong", "", match[0].slice(2, -2)));
-      }
-      cursor = match.index + match[0].length;
-    }
-    parent.append(document.createTextNode(text.slice(cursor)));
-  }
-
-  async function copyText(text, button) {
+    state.uploading = true;
+    controls();
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const input = element("textarea", "sr-only");
-        input.value = text;
-        document.body.append(input);
-        input.select();
-        const copied = document.execCommand("copy");
-        input.remove();
-        if (!copied) throw new Error("copy unavailable");
+      for (const f of chosen) {
+        if (f.size > 12 * 1024 * 1024)
+          throw Error("单个附件最多 12 MiB：" + f.name);
+        if (
+          state.attachments.filter((a) => a.kind === "image").length >= 2 &&
+          f.type.startsWith("image/")
+        )
+          throw Error("每次最多 2 张图片");
+        notice("正在解析 " + f.name + "…");
+        const encoded = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(f);
+        });
+        const item = await api(
+          "/api/upload",
+          post({ session_id: state.session.id, name: f.name, data: encoded }),
+          60000,
+        );
+        state.attachments.push(item);
+        state.session.attachments.push(item);
+        tray();
       }
-      button.textContent = "已复制";
-    } catch (_) {
-      button.textContent = "请手动选取复制";
-    }
-    window.setTimeout(() => { if (button.isConnected) button.textContent = "复制代码"; }, 1800);
-  }
-
-  function codeBlock(language, source) {
-    const wrapper = element("div", "code-block");
-    const header = element("div", "code-header");
-    header.append(element("span", "", language.slice(0, 36) || "code"));
-    const copy = element("button", "copy-code", "复制代码");
-    copy.type = "button";
-    copy.addEventListener("click", () => copyText(source, copy));
-    header.append(copy);
-    const pre = element("pre");
-    pre.append(element("code", "", source));
-    wrapper.append(header, pre);
-    return wrapper;
-  }
-
-  function markdown(text) {
-    const fragment = document.createDocumentFragment();
-    const lines = text.replace(/\r\n?/g, "\n").split("\n");
-    let index = 0;
-    while (index < lines.length) {
-      const line = lines[index];
-      if (!line.trim()) { index += 1; continue; }
-      if (line.trimStart().startsWith(FENCE)) {
-        const language = line.trimStart().slice(3).trim();
-        const code = [];
-        index += 1;
-        while (index < lines.length && !lines[index].trimStart().startsWith(FENCE)) {
-          code.push(lines[index++]);
-        }
-        if (index < lines.length) index += 1;
-        fragment.append(codeBlock(language, code.join("\n")));
-        continue;
-      }
-      const heading = /^(#{1,3})\s+(.+)$/.exec(line);
-      if (heading) {
-        const node = element("h" + (heading[1].length + 1));
-        appendInline(node, heading[2]);
-        fragment.append(node);
-        index += 1;
-        continue;
-      }
-      const unordered = /^\s*[-*+]\s+(.+)$/.test(line);
-      const ordered = /^\s*\d+[.)]\s+(.+)$/.test(line);
-      if (unordered || ordered) {
-        const list = element(ordered ? "ol" : "ul");
-        const pattern = ordered ? /^\s*\d+[.)]\s+(.+)$/ : /^\s*[-*+]\s+(.+)$/;
-        while (index < lines.length) {
-          const item = pattern.exec(lines[index]);
-          if (!item) break;
-          const li = element("li");
-          appendInline(li, item[1]);
-          list.append(li);
-          index += 1;
-        }
-        fragment.append(list);
-        continue;
-      }
-      const paragraph = [line];
-      index += 1;
-      while (index < lines.length && lines[index].trim()
-        && !lines[index].trimStart().startsWith(FENCE)
-        && !/^(#{1,3})\s+/.test(lines[index])
-        && !/^\s*(?:[-*+]|\d+[.)])\s+/.test(lines[index])) {
-        paragraph.push(lines[index++]);
-      }
-      const p = element("p");
-      appendInline(p, paragraph.join("\n"));
-      fragment.append(p);
-    }
-    return fragment;
-  }
-
-  function createMessage(role, content) {
-    const record = {
-      role, content: content || "", reasoning: "", createdAt: new Date(),
-      complete: role === "user", cancelled: false, error: "", stats: null, source: "live"
-    };
-    const article = element("article", "message message-" + role);
-    const header = element("div", "message-header");
-    header.append(element("span", "message-avatar", role === "user" ? "YOU" : "AI"));
-    header.append(element("span", "message-author", role === "user" ? "你" : "本地编程助手"));
-    const time = element("time", "message-time", record.createdAt.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" }));
-    time.dateTime = record.createdAt.toISOString();
-    header.append(time);
-    const reasoning = element("details", "reasoning");
-    reasoning.hidden = true;
-    const summary = element("summary", "", "思考过程");
-    const reasoningBody = element("div", "reasoning-body");
-    reasoning.append(summary, reasoningBody);
-    const body = element("div", "message-content");
-    const status = element("div", "message-status");
-    status.setAttribute("role", "status");
-    article.append(header);
-    if (role === "assistant") article.append(reasoning);
-    article.append(body);
-    if (role === "assistant") article.append(status);
-    record.dom = { article, body, status, reasoning, reasoningBody };
-    state.messages.push(record);
-    ui.messages.append(article);
-    ui.empty.hidden = true;
-    if (role === "user") body.textContent = record.content;
-    else {
-      const label = element("span", "typing-label");
-      label.append(element("span", "typing-dot"), document.createTextNode("正在准备回答…"));
-      body.append(label);
-    }
-    return record;
-  }
-
-  function renderAnswer(record) {
-    const follow = followingBottom();
-    record.dom.reasoning.hidden = !record.reasoning;
-    record.dom.reasoningBody.textContent = record.reasoning;
-    if (record.content) {
-      record.dom.body.replaceChildren(markdown(record.content));
-    } else if (record.reasoning && state.active) {
-      const label = element("span", "typing-label");
-      label.append(element("span", "typing-dot"), document.createTextNode("正在思考，等待正文…"));
-      record.dom.body.replaceChildren(label);
-    }
-    if (follow) scrollToBottom();
-  }
-
-  function scheduleRender(record) {
-    if (state.renderFrame !== null) return;
-    state.renderFrame = window.requestAnimationFrame(() => {
-      state.renderFrame = null;
-      renderAnswer(record);
-    });
-  }
-
-  function finalizeMessage(record, prompt) {
-    if (state.renderFrame !== null) {
-      window.cancelAnimationFrame(state.renderFrame);
-      state.renderFrame = null;
-    }
-    renderAnswer(record);
-    const status = record.dom.status;
-    status.replaceChildren();
-    status.classList.toggle("error", Boolean(record.error));
-    if (record.error || record.cancelled) {
-      if (!record.content) record.dom.body.replaceChildren();
-      const message = record.error
-        ? record.error + " 本轮未加入后续上下文。"
-        : "已停止 · 本轮未加入后续上下文。";
-      status.append(element("span", "", message));
-      const retry = element("button", "retry-button", "重试这一轮");
-      retry.type = "button";
-      retry.addEventListener("click", () => { if (!state.active) sendPrompt(prompt); });
-      status.append(retry);
-    } else {
-      const detail = record.source === "demo" ? "模拟文本 · 界面预览" : "回答完成";
-      status.append(element("span", "", detail + (record.stats && record.stats.finish_reason === "length" ? " · 已达到输出上限，可继续追问" : "")));
-    }
-    updateControls();
-  }
-
-  function requestId() {
-    if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
-    const bytes = new Uint8Array(16);
-    window.crypto.getRandomValues(bytes);
-    bytes[6] = (bytes[6] & 15) | 64;
-    bytes[8] = (bytes[8] & 63) | 128;
-    const hex = Array.from(bytes, (v) => v.toString(16).padStart(2, "0")).join("");
-    return [hex.slice(0, 8), hex.slice(8, 12), hex.slice(12, 16), hex.slice(16, 20), hex.slice(20)].join("-");
-  }
-
-  async function fetchJSON(url, options, timeoutMs) {
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), timeoutMs || 7000);
-    try {
-      const response = await fetch(url, Object.assign({}, options, { signal: controller.signal, cache: "no-store" }));
-      if (!response.ok) throw new Error("HTTP " + response.status);
-      return await response.json();
+      notice("附件已就绪。可以提问，也可以直接发送让模型总结。");
+    } catch (e) {
+      notice(e.message || "附件读取失败");
     } finally {
-      window.clearTimeout(timer);
+      state.uploading = false;
+      $("file-input").value = "";
+      controls();
     }
   }
-
-  async function refreshStatus() {
-    if (state.checkingStatus) return;
-    state.checkingStatus = true;
-    try {
-      const result = await fetchJSON("/api/status");
-      ui.connection.dataset.state = result.ok ? "connected" : "error";
-      ui.connectionText.textContent = state.config.demo ? "界面预览" : result.ok ? "模型已连接" : "服务未就绪";
-      ui.connection.title = typeof result.message === "string" && result.message
-        ? result.message + " · 点击重新检查"
-        : "点击重新检查模型服务连接";
-      if (result.model) ui.model.textContent = String(result.model);
-    } catch (_) {
-      ui.connection.dataset.state = "error";
-      ui.connectionText.textContent = "连接不可用";
-      ui.connection.title = "无法连接页面服务，请检查服务是否运行；点击重试。";
-    } finally {
-      state.checkingStatus = false;
-    }
-  }
-
-  async function readEvents(response, handler) {
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-    let eventName = "message";
-    let data = [];
-    const dispatch = () => {
-      if (data.length) {
-        let payload;
-        try { payload = JSON.parse(data.join("\n")); }
-        catch (_) { throw new Error("服务返回了无法解析的流式消息。"); }
-        handler(eventName, payload);
-      }
-      eventName = "message";
+  async function readSSE(response, handler) {
+    const reader = response.body.getReader(),
+      decoder = new TextDecoder();
+    let buffer = "",
+      name = "",
       data = [];
-    };
-    const line = (value) => {
-      if (value.endsWith("\r")) value = value.slice(0, -1);
-      if (!value) { dispatch(); return; }
-      if (value.startsWith(":")) return;
-      const colon = value.indexOf(":");
-      const key = colon < 0 ? value : value.slice(0, colon);
-      let content = colon < 0 ? "" : value.slice(colon + 1);
-      if (content.startsWith(" ")) content = content.slice(1);
-      if (key === "event") eventName = content;
-      else if (key === "data") data.push(content);
-    };
+    function dispatch() {
+      if (data.length) handler(name, JSON.parse(data.join("\n")));
+      name = "";
+      data = [];
+    }
+    function line(s) {
+      if (s.endsWith("\r")) s = s.slice(0, -1);
+      if (!s) dispatch();
+      else if (s.startsWith("event:")) name = s.slice(6).trim();
+      else if (s.startsWith("data:")) data.push(s.slice(5).trimStart());
+    }
     try {
       while (true) {
         const result = await reader.read();
@@ -396,225 +1003,364 @@
       reader.releaseLock();
     }
   }
-
-  async function sendPrompt(prompt) {
-    const text = String(prompt || "").trim();
-    if (!text || state.active || state.resetting) return;
+  async function send() {
+    if (
+      state.active ||
+      state.uploading ||
+      state.navigating ||
+      state.loadingCase ||
+      !state.initialized
+    )
+      return;
+    let text = $("prompt").value.trim();
+    if (!text && !state.attachments.length) return;
+    if (!state.session) await newSession();
+    text = text || "请理解并总结这些附件。";
     notice("");
-    ui.prompt.value = "";
-    resizePrompt();
-    setPreview(state.config.demo);
     clearMetrics();
-    ui.telemetryState.textContent = "生成中 · 结束后更新速度";
-    const user = createMessage("user", text);
-    const answer = createMessage("assistant", "");
-    const controller = new AbortController();
-    let resolveFinished;
+    const turn = {
+      id: crypto.randomUUID(),
+      text,
+      attachments: state.attachments.map((x) => x.id),
+      mode: state.mode,
+      events: [],
+      status: "running",
+    };
+    const view = makeTurn(turn);
     const active = {
-      id: requestId(), controller, started: performance.now(), cancelRequested: false,
-      done: false, stats: null, stopPromise: null,
-      finished: new Promise((resolve) => { resolveFinished = resolve; })
+      id: turn.id,
+      ctrl: new AbortController(),
+      cancelled: false,
+      done: false,
     };
     state.active = active;
-    updateControls();
-    scrollToBottom();
-    const elapsedTimer = window.setInterval(() => {
-      if (!state.preview && !active.stats) ui.total.textContent = number((performance.now() - active.started) / 1000, 1);
-    }, 150);
+    state.attachments = [];
+    tray();
+    $("prompt").value = "";
+    resize();
+    controls();
+    scroll();
+    $("telemetry-state").textContent = "任务进行中";
+    const start = performance.now();
+    const timer = setInterval(() => {
+      $("metric-total").textContent = fmt(
+        (performance.now() - start) / 1000,
+        1,
+      );
+    }, 250);
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          request_id: active.id,
-          messages: state.history.concat([{ role: "user", content: text }]),
-          max_tokens: Number(ui.maxTokens.value),
-          temperature: 0.2, thinking: ui.thinking.checked
-        })
+      const r = await fetch("/api/agent", {
+        ...post({
+          request_id: turn.id,
+          session_id: state.session.id,
+          text,
+          attachments: turn.attachments,
+          mode: turn.mode,
+          max_tokens: Number($("max-tokens").value),
+          thinking: $("thinking").checked,
+        }),
+        signal: active.ctrl.signal,
       });
-      if (!response.ok) {
-        let message = "请求失败（HTTP " + response.status + "）。";
-        try {
-          const payload = await response.json();
-          if (typeof payload.message === "string") message = payload.message;
-          else if (typeof payload.error === "string") message = payload.error;
-          else if (payload.error && typeof payload.error.message === "string") message = payload.error.message;
-        } catch (_) { /* Preserve the concise HTTP error. */ }
-        throw new Error(message);
+      if (!r.ok) {
+        const data = await r.json();
+        throw Error(data.message || `HTTP ${r.status}`);
       }
-      if (!response.body || !(response.headers.get("content-type") || "").includes("text/event-stream")) {
-        throw new Error("服务未返回预期的流式回答。");
-      }
-      await readEvents(response, (name, data) => {
-        if (!data || typeof data !== "object") return;
-        if (name === "meta") {
-          if (data.model) ui.model.textContent = String(data.model);
-          answer.source = data.source === "demo" ? "demo" : "live";
-          setPreview(answer.source === "demo" || state.config.demo);
-        } else if (name === "delta" && typeof data.text === "string") {
-          if (data.channel === "reasoning") answer.reasoning += data.text;
-          else if (data.channel === "content") answer.content += data.text;
-          scheduleRender(answer);
-        } else if (name === "stats") {
-          active.stats = data;
-          answer.stats = data;
-          if (data.source === "demo") { answer.source = "demo"; setPreview(true); }
-        } else if (name === "error") {
-          answer.error = typeof data.message === "string" ? data.message : "模型服务返回错误。";
-        } else if (name === "done") {
+      if (!r.headers.get("content-type")?.includes("text/event-stream"))
+        throw Error("服务未返回流式响应");
+      await readSSE(r, (name, data) => {
+        turn.events.push({ name, data });
+        if (name === "done") {
           active.done = true;
-          answer.cancelled = Boolean(data.cancelled);
+          active.cancelled = active.cancelled || data.cancelled;
+        } else event(view, name, data);
+      });
+      if (!active.done && !active.cancelled) throw Error("流式连接中断");
+      turn.status = active.cancelled
+        ? "cancelled"
+        : view.error
+          ? "error"
+          : view.stats?.task_status || "complete";
+    } catch (e) {
+      turn.status = active.cancelled ? "cancelled" : "error";
+      if (!active.cancelled) view.errorMessage = e.message;
+    } finally {
+      clearInterval(timer);
+      if (view.stats) stats(view.stats);
+      else
+        $("metric-total").textContent = fmt(
+          (performance.now() - start) / 1000,
+          2,
+        );
+      finish(view, turn.status);
+      state.active = null;
+      state.session.turns.push(turn);
+      $("telemetry-state").textContent =
+        turn.status === "complete"
+          ? "任务完成"
+          : turn.status === "cancelled"
+            ? "已停止"
+            : turn.status === "incomplete"
+              ? "回答尚未结束"
+              : "任务中断";
+      controls();
+      sessions().catch(() => {});
+      $("prompt").focus();
+    }
+  }
+  async function stop() {
+    const a = state.active;
+    if (!a) return;
+    a.cancelled = true;
+    controls();
+    try {
+      await api("/api/cancel", post({ request_id: a.id }), 4000);
+    } catch (_) {
+    } finally {
+      a.ctrl.abort();
+    }
+  }
+  async function status() {
+    try {
+      const data = await api("/api/status");
+      $("connection").dataset.state = data.ok ? "connected" : "error";
+      $("connection-text").textContent = state.config.demo
+        ? "界面预览"
+        : data.ok
+          ? "模型已连接"
+          : "服务未就绪";
+      $("connection").title = data.message || "";
+    } catch (_) {
+      $("connection").dataset.state = "error";
+      $("connection-text").textContent = "连接不可用";
+    }
+  }
+  $("chat-form").onsubmit = (e) => {
+    e.preventDefault();
+    send();
+  };
+  $("prompt").oninput = () => {
+    resize();
+    controls();
+  };
+  $("prompt").onkeydown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      send();
+    }
+  };
+  document
+    .querySelectorAll("[data-mode]")
+    .forEach((b) => (b.onclick = () => mode(b.dataset.mode)));
+  $("stop").onclick = stop;
+  $("new-chat").onclick = () => newSession().catch((e) => notice(e.message));
+  $("connection").onclick = status;
+  $("metrics-toggle").onclick = () => {
+    const on = $("telemetry").hidden;
+    $("telemetry").hidden = !on;
+    $("metrics-toggle").setAttribute("aria-expanded", String(on));
+  };
+  $("menu-toggle").onclick = () => $("sidebar").classList.toggle("open");
+  $("attach").onclick = () => $("file-input").click();
+  $("file-input").onchange = () => upload($("file-input").files);
+  document
+    .querySelectorAll("[data-example]")
+    .forEach(
+      (b) =>
+        (b.onclick = () =>
+          loadExample(
+            b.dataset.example === "upload" ? "multimodal" : b.dataset.example,
+          )),
+    );
+  document
+    .querySelectorAll("[data-case]")
+    .forEach((b) => (b.onclick = () => loadExample(b.dataset.case)));
+  $("case-followup").onclick = () => {
+    if (state.example && !state.active) {
+      $("prompt").value = state.example.followup;
+      resize();
+      controls();
+      $("prompt").focus();
+    }
+  };
+  $("preview-close").onclick = () => $("preview-dialog").close();
+  $("preview-dialog").onclick = (e) => {
+    if (e.target === $("preview-dialog")) {
+      const r = e.target.getBoundingClientRect();
+      if (
+        e.clientX < r.left ||
+        e.clientX > r.right ||
+        e.clientY < r.top ||
+        e.clientY > r.bottom
+      )
+        e.target.close();
+    }
+  };
+  $("preview-ask").onclick = () => {
+    const p = state.preview;
+    if (!p || state.active) return;
+    if (p.kind === "file") {
+      mode("agent");
+      $("prompt").value =
+        "请读取项目文件 " + p.path + "，解释它的作用和关键实现。";
+    } else {
+      if (!state.attachments.some((x) => x.id === p.id)) {
+        if (state.attachments.length >= 4) {
+          $("preview-notice").textContent = "本轮附件已满，请先移除一个。";
+          return;
+        }
+        state.attachments.push(attachment(p.id));
+        tray();
+      }
+      $("prompt").value = "请帮我理解 " + p.name + " 中的内容。";
+    }
+    $("preview-dialog").close();
+    resize();
+    controls();
+    $("prompt").focus();
+  };
+  $("preview-edit").onclick = () => {
+    if (state.active) return;
+    const area = el("textarea");
+    area.id = "file-editor";
+    area.value = state.preview.content;
+    area.setAttribute("aria-label", "编辑文件内容");
+    $("preview-content").replaceChildren(area);
+    $("preview-edit").hidden = true;
+    $("preview-save").hidden = false;
+    area.focus();
+  };
+  $("preview-save").onclick = async () => {
+    if (state.active) return;
+    const p = state.preview,
+      b = $("preview-save");
+    b.disabled = true;
+    try {
+      await api(
+        "/api/file",
+        post({
+          path: p.path,
+          content: $("file-editor").value,
+          expected_sha256: p.sha256,
+        }),
+      );
+      await previewFile(p.path);
+      $("preview-notice").textContent =
+        "已保存。修改前内容与差异已保存在本地备份目录。";
+    } catch (e) {
+      $("preview-notice").textContent = e.message;
+    } finally {
+      b.disabled = false;
+    }
+  };
+  $("export-chat").onclick = () => {
+    const turns = state.session?.turns || [];
+    const blocks = ["# Qwen 本地工作台\n"];
+    turns.forEach((t) => {
+      blocks.push("## 你\n\n" + t.text + "\n");
+      let text = "";
+      const flush = () => {
+        if (text) blocks.push(text);
+        text = "";
+      };
+      t.events?.forEach((e) => {
+        if (e.name === "delta" && e.data.channel === "content")
+          text += e.data.text;
+        if (e.name === "tool" && e.data.status !== "running") {
+          flush();
+          blocks.push(
+            "\n工具 " +
+              e.data.name +
+              "：" +
+              JSON.stringify(e.data.result, null, 2) +
+              "\n",
+          );
         }
       });
-      if (!active.done && !active.cancelRequested && !answer.error) throw new Error("连接在回答完成前中断，请重试。");
-      answer.cancelled = answer.cancelled || active.cancelRequested;
-      if (!answer.error && !answer.cancelled && !answer.content.trim()) {
-        answer.error = answer.reasoning ? "本轮没有返回正文，可关闭思考或提高输出上限后重试。" : "模型未返回正文，请重试。";
-      }
-      answer.complete = active.done && !answer.cancelled && !answer.error;
-      if (answer.complete) {
-        state.history.push({ role: "user", content: user.content }, { role: "assistant", content: answer.content });
-      }
-    } catch (error) {
-      if (active.cancelRequested) answer.cancelled = true;
-      else answer.error = error instanceof Error ? error.message : "请求失败，请重试。";
-    } finally {
-      window.clearInterval(elapsedTimer);
-      if (active.stats) applyStats(active.stats);
-      else if (!state.preview) {
-        ui.total.textContent = number((performance.now() - active.started) / 1000, 2);
-        ui.metricNote.textContent = "本轮未返回完整统计；仅总耗时为页面实测，Prefill / Decode 显示 —。";
-        ui.metricNote.title = ui.metricNote.textContent;
-      }
-      ui.telemetryState.textContent = answer.cancelled ? "已停止" : answer.error ? "本轮未完成" : state.preview ? "模拟文本已完成" : "本轮已完成";
-      state.active = null;
-      finalizeMessage(answer, text);
-      updateControls();
-      if (!state.resetting) ui.prompt.focus();
-      resolveFinished();
-    }
-  }
-
-  async function stopActive() {
-    const active = state.active;
-    if (!active) return;
-    if (active.stopPromise) return active.stopPromise;
-    active.cancelRequested = true;
-    updateControls();
-    ui.telemetryState.textContent = "正在停止…";
-    active.stopPromise = (async () => {
-      try {
-        await fetchJSON("/api/cancel", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ request_id: active.id })
-        }, 2500);
-      } catch (_) { /* Always release the local reader, including a disconnected server. */ }
-      finally { active.controller.abort(); }
-      await active.finished;
-    })();
-    return active.stopPromise;
-  }
-
-  async function newConversation() {
-    if (state.resetting) return;
-    state.resetting = true;
-    updateControls();
-    await stopActive();
-    state.history = [];
-    state.messages = [];
-    ui.messages.replaceChildren();
-    ui.empty.hidden = false;
-    ui.prompt.value = "";
-    notice("");
-    setPreview(state.config.demo);
-    clearMetrics();
-    ui.telemetryState.textContent = "等待提问";
-    state.resetting = false;
-    updateControls();
-    resizePrompt();
-    ui.prompt.focus();
-  }
-
-  function exportConversation() {
-    if (!state.messages.length) return;
-    const lines = [
-      "# 本地编程助手会话", "", "时间：" + new Date().toLocaleString("zh-CN"),
-      "模型：" + String(ui.model.textContent), state.preview ? "模式：界面预览 / 模拟文本" : "模式：模型服务", ""
-    ];
-    for (const record of state.messages) {
-      lines.push("## " + (record.role === "user" ? "用户" : "助手"), "", record.content || "（无正文）", "");
-      if (record.role === "assistant" && !record.complete) {
-        lines.push("状态：" + (record.cancelled ? "已停止" : record.error || "生成中") + "；本轮不进入后续上下文。", "");
-      }
-      if (record.source === "demo") lines.push("注：此段为模拟文本。", "");
-    }
-    const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" }));
-    const anchor = element("a");
-    anchor.href = url;
-    anchor.download = "本地编程会话-" + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-") + ".md";
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  ui.form.addEventListener("submit", (event) => { event.preventDefault(); sendPrompt(ui.prompt.value); });
-  ui.prompt.addEventListener("input", () => { resizePrompt(); updateControls(); });
-  ui.prompt.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
-      event.preventDefault();
-      if (!ui.send.disabled) sendPrompt(ui.prompt.value);
-    }
-  });
-  ui.stop.addEventListener("click", stopActive);
-  ui.newChat.addEventListener("click", newConversation);
-  document.querySelector(".brand").addEventListener("click", (event) => {
-    event.preventDefault();
-    newConversation();
-  });
-  ui.exportChat.addEventListener("click", exportConversation);
-  ui.connection.addEventListener("click", refreshStatus);
-  document.querySelectorAll(".example").forEach((button) => {
-    button.addEventListener("click", () => {
-      if (state.active || state.resetting) return;
-      ui.prompt.value = examples[button.dataset.example] || "";
-      resizePrompt();
-      updateControls();
-      ui.prompt.focus();
+      flush();
+      blocks.push("\n");
     });
-  });
-
-  async function initialize() {
-    try {
-      const config = await fetchJSON("/api/config");
-      state.config = Object.assign({}, state.config, config);
-      ui.model.textContent = String(state.config.model);
-      if (config.subtitle) ui.subtitle.textContent = String(config.subtitle);
-      if (config.upstream_display) ui.upstream.textContent = String(config.upstream_display);
-      const limit = Number(config.max_output_tokens);
-      if (Number.isInteger(limit) && limit > 0) {
-        if (!Array.from(ui.maxTokens.options).some((option) => Number(option.value) === limit)) {
-          const option = element("option", "", limit.toLocaleString("en-US") + " tokens");
-          option.value = String(limit);
-          ui.maxTokens.append(option);
-        }
-        ui.maxTokens.value = String(limit);
-      }
-      setPreview(config.demo);
-    } catch (_) {
-      notice("暂时无法读取服务配置。可点击右上角检查连接，服务就绪后再提问。");
+    const url = URL.createObjectURL(
+        new Blob([blocks.join("\n")], { type: "text/markdown;charset=utf-8" }),
+      ),
+      a = el("a");
+    a.href = url;
+    a.download = "qwen-conversation.md";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  let dragging = 0;
+  window.addEventListener("dragenter", (e) => {
+    if (e.dataTransfer?.types.includes("Files")) {
+      e.preventDefault();
+      dragging++;
+      $("drop-overlay").hidden = false;
     }
-    updateControls();
-  }
-
-  initialize();
-  refreshStatus();
+  });
+  window.addEventListener("dragleave", () => {
+    if (--dragging <= 0) {
+      dragging = 0;
+      $("drop-overlay").hidden = true;
+    }
+  });
+  window.addEventListener("dragover", (e) => {
+    if (e.dataTransfer?.types.includes("Files")) e.preventDefault();
+  });
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dragging = 0;
+    $("drop-overlay").hidden = true;
+    if (e.dataTransfer?.files.length) upload(e.dataTransfer.files);
+  });
+  $("prompt").addEventListener("paste", (e) => {
+    const imgs = Array.from(e.clipboardData?.files || []).filter((f) =>
+      f.type.startsWith("image/"),
+    );
+    if (imgs.length) {
+      e.preventDefault();
+      upload(imgs);
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      e.preventDefault();
+      if (!$("delete-session-dialog").open && !state.deleting)
+        newSession().catch((x) => notice(x.message));
+    }
+    if (e.key === "Escape") $("sidebar").classList.remove("open");
+  });
   window.addEventListener("pagehide", () => {
-    if (!state.active) return;
-    const payload = JSON.stringify({ request_id: state.active.id });
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon("/api/cancel", new Blob([payload], { type: "application/json" }));
-    }
+    if (state.active)
+      navigator.sendBeacon(
+        "/api/cancel",
+        new Blob([JSON.stringify({ request_id: state.active.id })], {
+          type: "application/json",
+        }),
+      );
   });
-  window.setInterval(() => { if (!state.active) refreshStatus(); }, 30000);
-  resizePrompt();
+  async function init() {
+    try {
+      state.config = await api("/api/config");
+      $("model-name").textContent = state.config.model;
+      $("model-subtitle").textContent = state.config.subtitle;
+      $("preview-banner").hidden = !state.config.demo;
+      $("max-tokens").value = String(state.config.max_output_tokens);
+      await sessions();
+      const saved = local("qwen-session");
+      if (saved && state.sessions.some((s) => s.id === saved))
+        await loadSession(saved);
+      else if (state.sessions.length) await loadSession(state.sessions[0].id);
+      else await newSession();
+      state.initialized = true;
+      await status();
+    } catch (e) {
+      notice("工作台初始化失败：" + e.message);
+    } finally {
+      controls();
+      resize();
+    }
+  }
+  init();
+  setInterval(() => {
+    if (!state.active) status();
+  }, 30000);
 })();

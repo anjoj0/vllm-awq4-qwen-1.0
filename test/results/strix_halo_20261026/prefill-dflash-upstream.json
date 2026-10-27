@@ -1,0 +1,84 @@
+{
+  "label": "dflash-upstream",
+  "note": "Two uncached 4096-token requests; first may include shape JIT, second is the comparison. No cache comparison.",
+  "rows": [
+    {
+      "usage": {
+        "prompt_tokens": 4096,
+        "total_tokens": 4104,
+        "completion_tokens": 8,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "per_request_metrics": {
+        "time_to_first_token_ms": 22488.794895001774,
+        "generation_time_ms": 1308.022344001074,
+        "queue_time_ms": 0.025620996893849224,
+        "mean_itl_ms": 186.8603348572963,
+        "tokens_per_second": 0.33617941087046066
+      },
+      "stats": {
+        "input_tokens": 4096,
+        "output_tokens": 8,
+        "cached_tokens": 0,
+        "prefill_tps": 182.1351485983961,
+        "decode_tps": 5.351590538268551,
+        "ttft_s": 22.494546293000894,
+        "total_s": 23.801494240000466,
+        "delivery_tps": 6.121131310826891,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      },
+      "prompt_tokens": 4096,
+      "cached_tokens": 0,
+      "computed_tokens": 4096,
+      "client_ttft_s": 22.494546293000894,
+      "wall_s": 23.801494240000466,
+      "output_sha256": "c42fc69d7f6265ea5e98d9221f5ee0151a5064109eb2e88461a314253e5c1d2a",
+      "output_preview": "\n\n<think>\nHere's a thinking process",
+      "phase": "first_shape_call"
+    },
+    {
+      "usage": {
+        "prompt_tokens": 4096,
+        "total_tokens": 4104,
+        "completion_tokens": 8,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "per_request_metrics": {
+        "time_to_first_token_ms": 22471.033605997945,
+        "generation_time_ms": 1314.4151920023432,
+        "queue_time_ms": 0.01311999949393794,
+        "mean_itl_ms": 187.7735988574776,
+        "tokens_per_second": 0.3363400904452382
+      },
+      "stats": {
+        "input_tokens": 4096,
+        "output_tokens": 8,
+        "cached_tokens": 0,
+        "prefill_tps": 182.27910971156663,
+        "decode_tps": 5.325562305268548,
+        "ttft_s": 22.669907232000696,
+        "total_s": 23.982665790001192,
+        "delivery_tps": 6.0940375907242625,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      },
+      "prompt_tokens": 4096,
+      "cached_tokens": 0,
+      "computed_tokens": 4096,
+      "client_ttft_s": 22.669907232000696,
+      "wall_s": 23.982665790001192,
+      "output_sha256": "c42fc69d7f6265ea5e98d9221f5ee0151a5064109eb2e88461a314253e5c1d2a",
+      "output_preview": "\n\n<think>\nHere's a thinking process",
+      "phase": "steady"
+    }
+  ]
+}

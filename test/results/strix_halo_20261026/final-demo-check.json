@@ -1,0 +1,468 @@
+{
+  "backend": "optimized-v0320",
+  "status": {
+    "ok": true,
+    "model": "Qwen3.6-27B-AWQ4",
+    "models": [
+      "Qwen3.6-27B-AWQ4"
+    ],
+    "metrics_available": true,
+    "message": "服务已连接"
+  },
+  "repair": {
+    "request": {
+      "request_id": "482c5f15a71946ab91e6638dea477a72",
+      "messages": [
+        {
+          "role": "user",
+          "content": "下面的二分查找会死循环，请给出修复后的 Python 函数及三条 assert 测试，不要长篇解释。\ndef search(nums,target):\n    left,right=0,len(nums)-1\n    while left<=right:\n        mid=(left+right)//2\n        if nums[mid]==target:return mid\n        if nums[mid]<target:left=mid\n        else:right=mid\n    return -1"
+        }
+      ],
+      "max_tokens": 512,
+      "temperature": 0,
+      "thinking": false
+    },
+    "events": [
+      {
+        "event": "meta",
+        "data": {
+          "request_id": "482c5f15a71946ab91e6638dea477a72",
+          "model": "Qwen3.6-27B-AWQ4",
+          "source": "live"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "```",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "python\ndef search(nums",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": ", target):\n   ",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " left, right = ",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "0, len(nums)",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " - 1\n   ",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " while left <= right:",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "\n        mid = (",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "left + right) //",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " 2\n        if",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " nums[mid] == target",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": ":\n            return mid",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "\n        if",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " nums[mid] < target",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": ":\n            left =",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " mid + 1\n",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "        else:\n           ",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " right = mid - ",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "1\n    return -",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "1\n\nassert search",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "([1, 2",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": ", 3],",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " 2) == ",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "1\nassert search([",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "1, 2,",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " 3], 0",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": ") == -1\n",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "assert search([1,",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": " 2, 3",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "], 3",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": ") == 2",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "\n```",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "stats",
+        "data": {
+          "input_tokens": 167,
+          "output_tokens": 147,
+          "cached_tokens": 0,
+          "prefill_tps": 184.27605625898548,
+          "decode_tps": 33.45453130946254,
+          "ttft_s": 0.9140628789973562,
+          "total_s": 5.2786089979999815,
+          "delivery_tps": 33.68047810515336,
+          "metric_source": "server",
+          "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。",
+          "finish_reason": "stop",
+          "source": "live"
+        }
+      },
+      {
+        "event": "done",
+        "data": {
+          "cancelled": false
+        }
+      }
+    ],
+    "text": "```python\ndef search(nums, target):\n    left, right = 0, len(nums) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if nums[mid] == target:\n            return mid\n        if nums[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\nassert search([1, 2, 3], 2) == 1\nassert search([1, 2, 3], 0) == -1\nassert search([1, 2, 3], 3) == 2\n```",
+    "cancel_response": null
+  },
+  "cancel": {
+    "request": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "请写一个完整的 Python HTTP 缓存实现，并逐步解释每个函数和测试用例。"
+        }
+      ],
+      "max_tokens": 512,
+      "temperature": 0,
+      "thinking": false,
+      "request_id": "d8a664ba557448a09ec39510cdfb2ae7"
+    },
+    "events": [
+      {
+        "event": "meta",
+        "data": {
+          "request_id": "d8a664ba557448a09ec39510cdfb2ae7",
+          "model": "Qwen3.6-27B-AWQ4",
+          "source": "live"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "#",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "done",
+        "data": {
+          "cancelled": true
+        }
+      }
+    ],
+    "text": "#",
+    "cancel_response": {
+      "cancelled": true
+    }
+  },
+  "recovery": {
+    "request": {
+      "messages": [
+        {
+          "role": "user",
+          "content": "计算 19 + 23，只输出结果数字。"
+        }
+      ],
+      "max_tokens": 64,
+      "temperature": 0,
+      "thinking": false,
+      "request_id": "14bb6deea0d442faaeb63dbae9bb8ea1"
+    },
+    "events": [
+      {
+        "event": "meta",
+        "data": {
+          "request_id": "14bb6deea0d442faaeb63dbae9bb8ea1",
+          "model": "Qwen3.6-27B-AWQ4",
+          "source": "live"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "4",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "2",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "stats",
+        "data": {
+          "input_tokens": 95,
+          "output_tokens": 3,
+          "cached_tokens": 0,
+          "prefill_tps": 120.73799209077033,
+          "decode_tps": 14.003655752779993,
+          "ttft_s": 0.7940989889975754,
+          "total_s": 0.9378289289961685,
+          "delivery_tps": 20.872477926515266,
+          "metric_source": "server",
+          "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。",
+          "finish_reason": "stop",
+          "source": "live"
+        }
+      },
+      {
+        "event": "done",
+        "data": {
+          "cancelled": false
+        }
+      }
+    ],
+    "text": "42",
+    "cancel_response": null
+  },
+  "prefix_state_check": [
+    {
+      "usage": {
+        "prompt_tokens": 4096,
+        "total_tokens": 4104,
+        "completion_tokens": 8,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        }
+      },
+      "per_request_metrics": {
+        "time_to_first_token_ms": 10979.522411995276,
+        "generation_time_ms": 475.912503003201,
+        "queue_time_ms": 0.023640997824259102,
+        "mean_itl_ms": 67.98750042902871,
+        "tokens_per_second": 0.6983584699630815
+      },
+      "stats": {
+        "input_tokens": 4096,
+        "output_tokens": 8,
+        "cached_tokens": 0,
+        "prefill_tps": 373.05812095479354,
+        "decode_tps": 14.70858604434042,
+        "ttft_s": 10.98522743099602,
+        "total_s": 11.459862435993273,
+        "delivery_tps": 16.85505686637313,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      },
+      "prompt_tokens": 4096,
+      "cached_tokens": 0,
+      "computed_tokens": 4096,
+      "client_ttft_s": 10.98522743099602,
+      "wall_s": 11.459862435993273,
+      "output_sha256": "c42fc69d7f6265ea5e98d9221f5ee0151a5064109eb2e88461a314253e5c1d2a",
+      "output_preview": "\n\n<think>\nHere's a thinking process"
+    },
+    {
+      "usage": {
+        "prompt_tokens": 4096,
+        "total_tokens": 4104,
+        "completion_tokens": 8,
+        "prompt_tokens_details": {
+          "cached_tokens": 2496
+        }
+      },
+      "per_request_metrics": {
+        "time_to_first_token_ms": 4444.285101002606,
+        "generation_time_ms": 476.49625899794046,
+        "queue_time_ms": 0.020560997654683888,
+        "mean_itl_ms": 68.07089414256292,
+        "tokens_per_second": 1.6257580686330497
+      },
+      "stats": {
+        "input_tokens": 4096,
+        "output_tokens": 8,
+        "cached_tokens": 2496,
+        "prefill_tps": 360.0129072815443,
+        "decode_tps": 14.69056654237081,
+        "ttft_s": 4.449928976995579,
+        "total_s": 4.925130866999098,
+        "delivery_tps": 16.83494987770518,
+        "metric_source": "server",
+        "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。 本轮达到输出长度上限，可提高上限或继续追问。",
+        "finish_reason": "length",
+        "source": "live"
+      },
+      "prompt_tokens": 4096,
+      "cached_tokens": 2496,
+      "computed_tokens": 1600,
+      "client_ttft_s": 4.449928976995579,
+      "wall_s": 4.925130866999098,
+      "output_sha256": "c42fc69d7f6265ea5e98d9221f5ee0151a5064109eb2e88461a314253e5c1d2a",
+      "output_preview": "\n\n<think>\nHere's a thinking process"
+    }
+  ],
+  "passed": true
+}

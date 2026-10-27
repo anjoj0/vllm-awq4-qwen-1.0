@@ -1,0 +1,36 @@
+{
+  "source": "EngineArgs.create_engine_config() in vLLM 0.32.0+rocm723; checked 2026-10-26",
+  "method": "dflash",
+  "num_speculative_tokens": 7,
+  "draft_dtype": "torch.float16",
+  "target_dtype": "torch.float16",
+  "dflash_config": {
+    "block_size": 8,
+    "conv_group_size": 16,
+    "conv_kernel_size": 2,
+    "mask_token_id": 248070,
+    "selector_rank": 256,
+    "selector_top_k": 16,
+    "target_layer_ids": [
+      5,
+      19,
+      33,
+      47,
+      61
+    ]
+  },
+  "rope_parameters": {
+    "rope_theta": 10000000,
+    "rope_type": "default"
+  },
+  "layer_types": [
+    "sliding_attention",
+    "sliding_attention",
+    "sliding_attention",
+    "sliding_attention",
+    "sliding_attention"
+  ],
+  "hidden_size": 5120,
+  "max_model_len": 32768,
+  "limitation": "No BF16-target comparison or model-state instrumentation; cause of near-zero acceptance unresolved."
+}

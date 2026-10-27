@@ -1,0 +1,1968 @@
+{
+  "dtype": "bfloat16",
+  "rows": [
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 0.072265625
+        },
+        null
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 24.25
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 14.375
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 6048.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 26112.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 0.072265625
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 5.65625
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 26112.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 8.25
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 9.125
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 62208.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 1,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 233472.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 26112.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 233472.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 26112.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 24.375
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 10.875
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 4096.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 51968.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 238592.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 8.0625
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 280576.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 4.3125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 17.625
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 3696.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 1,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 54528.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 280576.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 54528.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 280576.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 8.75
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 11.25
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1560.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 23936.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 305152.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 8.25
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 321536.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 3.6875
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 11.9375
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1488.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 1,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 10176.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 321536.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 10176.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 321536.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 30.375
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 10.5
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1872.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 12480.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 325632.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 10.6875
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 337920.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 5.53125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 12.625
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1160.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 1,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 11904.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 337920.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 11904.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 337920.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 43.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 10.125
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 396.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 2928.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 344064.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 10.375
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 342016.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 13.5625
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 7.6875
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 13184.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 1,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 94208.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 342016.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 0.06298828125
+        },
+        null
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 16.125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 13.6875
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 6752.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 27520.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 0.06298828125
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 6.125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 27520.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 7.65625
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 7.5625
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 77824.0
+        }
+      ]
+    },
+    {
+      "layer": 0,
+      "call": 2,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 219136.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 27520.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 219136.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 27520.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 20.5
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 13.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 3824.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 52224.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 219136.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 8.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 266240.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 4.78125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 17.25
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 4640.0
+        }
+      ]
+    },
+    {
+      "layer": 1,
+      "call": 2,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 62976.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 266240.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 62976.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 266240.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 9.375
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 13.1875
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1952.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 36352.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 311296.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 8.25
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 337920.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 3.703125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 14.0625
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 988.0
+        }
+      ]
+    },
+    {
+      "layer": 2,
+      "call": 2,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 16064.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 337920.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 16064.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 337920.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 30.375
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 14.125
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1600.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 27520.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 344064.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 11.4375
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 370688.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 5.40625
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 13.9375
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 1024.0
+        }
+      ]
+    },
+    {
+      "layer": 3,
+      "call": 2,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 14912.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 370688.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "input",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 14912.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 370688.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "attention_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 46.25
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 12.4375
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "attention",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 360.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "attention_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 4608.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 385024.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "post_norm",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 10.875
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 385024.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "mlp_prepare",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 13.125
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            2,
+            320
+          ],
+          "finite_count": 5120,
+          "elements": 5120,
+          "finite_absmax": 8.125
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "mlp",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 17024.0
+        }
+      ]
+    },
+    {
+      "layer": 4,
+      "call": 2,
+      "stage": "mlp_finish",
+      "tensors": [
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 109056.0
+        },
+        {
+          "dtype": "torch.bfloat16",
+          "shape": [
+            8,
+            5120
+          ],
+          "finite_count": 40960,
+          "elements": 40960,
+          "finite_absmax": 385024.0
+        }
+      ]
+    }
+  ],
+  "scope": "Both target and draft changed to BF16; first two actual draft forwards, synchronized diagnostics excluded from performance"
+}

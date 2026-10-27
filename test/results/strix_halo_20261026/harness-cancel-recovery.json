@@ -1,0 +1,104 @@
+{
+  "backend": "dflash-n4-block64",
+  "cancel": {
+    "request": {
+      "request_id": "6a028e174b154b68b2e1e3c5b35a39a8",
+      "messages": [
+        {
+          "role": "user",
+          "content": "请写一个完整的 Python HTTP 缓存实现，并逐步解释每个函数和测试用例。"
+        }
+      ],
+      "max_tokens": 512,
+      "temperature": 0,
+      "thinking": false
+    },
+    "events": [
+      {
+        "event": "meta",
+        "data": {
+          "request_id": "6a028e174b154b68b2e1e3c5b35a39a8",
+          "model": "Qwen3.6-27B-AWQ4",
+          "source": "live"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "#",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "done",
+        "data": {
+          "cancelled": true
+        }
+      }
+    ],
+    "text": "#"
+  },
+  "recovery": {
+    "request": {
+      "request_id": "1b7e3c1d9be8455ca10d3e75f8ef4ee2",
+      "messages": [
+        {
+          "role": "user",
+          "content": "计算 19 + 23，只输出结果数字。"
+        }
+      ],
+      "max_tokens": 64,
+      "temperature": 0,
+      "thinking": false
+    },
+    "events": [
+      {
+        "event": "meta",
+        "data": {
+          "request_id": "1b7e3c1d9be8455ca10d3e75f8ef4ee2",
+          "model": "Qwen3.6-27B-AWQ4",
+          "source": "live"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "4",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "delta",
+        "data": {
+          "text": "2",
+          "channel": "content"
+        }
+      },
+      {
+        "event": "stats",
+        "data": {
+          "input_tokens": 95,
+          "output_tokens": 3,
+          "cached_tokens": 0,
+          "prefill_tps": 118.4181799739732,
+          "decode_tps": 9.87806243142187,
+          "ttft_s": 0.9703534430009313,
+          "total_s": 1.1735471520005376,
+          "delivery_tps": 14.76423662312209,
+          "metric_source": "server",
+          "note": "服务端阶段统计差分；仅专用单请求时可归因。Decode 排除 prefill 产生的首 token。",
+          "finish_reason": "stop",
+          "source": "live"
+        }
+      },
+      {
+        "event": "done",
+        "data": {
+          "cancelled": false
+        }
+      }
+    ],
+    "text": "42"
+  },
+  "passed": true
+}
